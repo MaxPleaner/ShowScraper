@@ -1,6 +1,22 @@
 require "#{__dir__}/../scraper/scraper.rb"
 
 RSpec.describe Scraper do
+  describe ".new_tab" do
+    it "works with 2 or more tabs" do
+      driver = described_class.send(:init_driver)
+      driver.navigate.to("http://google.com")
+      print("LEVEL 1: ", driver.css("body")[0].text.first(50), "\n\n")
+      driver.new_tab("http://yahoo.com") do
+        print("LEVEL 2: ", driver.css("body")[0].text.first(50), "\n\n")
+        driver.new_tab("http://bind.com") do
+          print("LEVEL 3: ", driver.css("body")[0].text.first(50), "\n\n")
+        end
+        print("LEVEL 2: ", driver.css("body")[0].text.first(50), "\n\n")
+      end
+      print("LEVEL 1: ", driver.css("body")[0].text.first(50), "\n\n")
+    end
+  end
+
   describe ".run" do
     it "returns data" do
       result = described_class.run

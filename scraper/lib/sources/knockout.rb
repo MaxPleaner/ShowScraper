@@ -1,5 +1,5 @@
 class Knockout
-	PAGE_LIMIT = 20
+	PAGE_LIMIT = 2
 
 	def self.run
 		index = 1
