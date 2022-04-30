@@ -1,12 +1,17 @@
 class Knockout
+	PAGE_LIMIT = 20
+
 	def self.run
 		index = 1
 		events = []
 		loop do
-			get_events(index).each { |event| process_event(event) }
-			break if events.empty? || index > 100
+			events.concat(
+				get_events(index).map { |event| parse_event_data(event) }
+			)
+			break if events.empty? || index > PAGE_LIMIT
 			index += 1
 		end
+		events
 	end
 
 	class << self
@@ -14,11 +19,6 @@ class Knockout
 		def get_events(page_idx)
 			$driver.navigate.to("https://theknockoutsf.com/events/list/?tribe_paged=#{page_idx}")
 			$driver.css(".type-tribe_events")
-		end
-
-		def process_event(event)
-			data = parse_event_data(event)
-			pp data
 		end
 
 		def parse_event_data(event)
