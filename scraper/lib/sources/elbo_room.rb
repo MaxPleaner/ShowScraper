@@ -1,4 +1,5 @@
 class ElboRoom
+  # No pagination needed here, all events shown at once.
   MAIN_URL = "https://www.elboroomjacklondon.com/full-events-listing"
 
   def self.run

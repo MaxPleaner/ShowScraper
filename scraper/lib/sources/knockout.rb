@@ -1,5 +1,6 @@
 class Knockout
-	PAGE_LIMIT = 1
+	# "Load more" type site
+	PAGE_LIMIT = 2
 
 	def self.run
 		index = 1

@@ -1,10 +1,13 @@
 class GoldenBull
   MAIN_URL = "https://goldenbullbar.com/shows" # this performs an internal redirect
   MONTHS_LIMIT = 3
+
+  # Full calendar view type site
   CALENDAR_LOAD_TIME = 2 # will sleep this many seconds after opening calendar
 
   def self.run
     events = []
+    $driver.get(MAIN_URL)
     (MONTHS_LIMIT - 1).times do
       events.concat(
         get_events.map { |event| parse_event_data(event) }
@@ -18,12 +21,12 @@ class GoldenBull
     private
 
     def get_events
-      $driver.get(MAIN_URL)
       sleep CALENDAR_LOAD_TIME
       $driver.css(".Main-content .background-image-link")
     end
 
     def get_next_page
+      $driver.css("[aria-label='Go to next month']")[0].click
     end
 
     def parse_event_data(event)
@@ -35,7 +38,6 @@ class GoldenBull
           data[:date] = parse_date($driver.css("time.event-date")[0].text)
           data[:title] = $driver.css(".eventitem-title")[0].text
           data[:details] = $driver.css(".sqs-block-content")[0].text
-          binding.pry
         end
       end
     end
