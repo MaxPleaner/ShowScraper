@@ -5,15 +5,15 @@ RSpec.describe Scraper do
     it "works with 2 or more tabs" do
       driver = described_class.send(:init_driver)
       driver.navigate.to("http://google.com")
-      print("LEVEL 1: ", driver.css("body")[0].text.first(50), "\n\n")
+      expect(driver.title).to include("Google")
       driver.new_tab("http://yahoo.com") do
-        print("LEVEL 2: ", driver.css("body")[0].text.first(50), "\n\n")
-        driver.new_tab("http://bind.com") do
-          print("LEVEL 3: ", driver.css("body")[0].text.first(50), "\n\n")
+        expect(driver.title).to include("Yahoo")
+        driver.new_tab("http://bing.com") do
+          expect(driver.title).to include("Bing")
         end
-        print("LEVEL 2: ", driver.css("body")[0].text.first(50), "\n\n")
+        expect(driver.title).to include("Yahoo")
       end
-      print("LEVEL 1: ", driver.css("body")[0].text.first(50), "\n\n")
+      expect(driver.title).to include("Google")
     end
   end
 
