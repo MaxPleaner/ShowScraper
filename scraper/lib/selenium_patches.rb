@@ -11,12 +11,20 @@ class SeleniumPatches
 		end
 
 		def driver.new_tab(url, &blk)
+			# set up new tab
 			execute_script("window.open()")
 			switch_to.window(window_handles.last)
 			get(url)
-			blk.call
+
+			# execute block
+			blk_result = blk.call
+
+			# close new tab
 			close
 			switch_to.window(window_handles.last)
+
+			# return block result
+			blk_result
 		end
 	end
 end

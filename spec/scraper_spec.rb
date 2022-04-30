@@ -18,7 +18,7 @@ RSpec.describe Scraper do
   end
 
   describe ".run" do
-    it "returns data" do
+    it "returns data", :focus do
       result = described_class.run
       described_class::SOURCES.each do |source|
         key = source.name

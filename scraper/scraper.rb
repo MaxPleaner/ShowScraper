@@ -33,9 +33,9 @@ class Scraper
 
     def run_scraper(source)
       source.run
-    rescue => e
-      puts "ERROR: #{e}"
-      {}
+    # rescue => e
+    #   puts "ERROR: #{e}"
+    #   {}
     end
 
   end
