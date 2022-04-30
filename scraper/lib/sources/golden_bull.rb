@@ -1,0 +1,48 @@
+class GoldenBull
+  MAIN_URL = "https://goldenbullbar.com/shows" # this performs an internal redirect
+  MONTHS_LIMIT = 3
+  CALENDAR_LOAD_TIME = 2 # will sleep this many seconds after opening calendar
+
+  def self.run
+    events = []
+    (MONTHS_LIMIT - 1).times do
+      events.concat(
+        get_events.map { |event| parse_event_data(event) }
+      )
+      get_next_page
+    end
+    events
+  end
+
+  class << self
+    private
+
+    def get_events
+      $driver.get(MAIN_URL)
+      sleep CALENDAR_LOAD_TIME
+      $driver.css(".Main-content .background-image-link")
+    end
+
+    def get_next_page
+    end
+
+    def parse_event_data(event)
+      {
+        url: event.attribute("href"),
+        img: event.css("img")[0].attribute("src"),
+      }.tap do |data|
+        $driver.new_tab(data[:url]) do
+          data[:date] = parse_date($driver.css("time.event-date")[0].text)
+          data[:title] = $driver.css(".eventitem-title")[0].text
+          data[:details] = $driver.css(".sqs-block-content")[0].text
+          binding.pry
+        end
+      end
+    end
+
+    def parse_date(date_string)
+      # TODO: also parse time, the data is available.
+      DateTime.parse(date_string)
+    end
+  end
+end

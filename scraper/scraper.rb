@@ -5,11 +5,46 @@ require 'active_support/all'
 load "#{__dir__}/lib/selenium_patches.rb"
 Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| load path }
 
+# Configure scrapers
+$VERBOSE = nil
+Knockout.const_set(:PAGE_LIMIT, 1)
 
 class Scraper
   SOURCES = [
     Knockout,
-    ElboRoom
+    ElboRoom,
+    GoldenBull,
+
+    # TODO Venues:
+    # - Bottom of the Hill
+    # - Cornerstone
+    # - DNA Lounge
+    # - Benders
+    # - El Rio
+    # - Thee Parkside
+    # - Freight and Salvage
+    # - The Chapel
+    # - Greek Theater
+    # - Independent
+    # - Make Out Room
+    # - Starline Social Club
+    # - Rickshaw Stop
+    # - Warfield
+    # - Great American Music Hall
+    # - Fillmore
+    # - Yoshi's
+    # - Zeitgeist
+    # - Winter's Tavern
+    # - Ivy Room
+
+    # OTHER VENUES (Lower Priority):
+    # - Masonic
+    # - Paramount
+    # - Gilman
+    # - Santa Cruz Venues
+    # - Fox Theater
+    # - Stanford Ampitheater
+    # - Great Northern
   ]
 
   class << self

@@ -40,12 +40,8 @@ RSpec.describe Scraper do
       end
     end
 
-    it "gets data for knockout" do
-      generic_run_test([Knockout])
-    end
-
-    it "gets data for elbo room", :focus do
-      generic_run_test([ElboRoom])
-    end
+    it ("gets data for Knockout") { generic_run_test([Knockout]) }
+    it ("gets data for Elbo Room") { generic_run_test([ElboRoom]) }
+    it ("gets data for Golden Bull") { generic_run_test([GoldenBull]) }
   end
 end
