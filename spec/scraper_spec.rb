@@ -18,9 +18,9 @@ RSpec.describe Scraper do
   end
 
   describe ".run" do
-    it "returns data", :focus do
-      result = described_class.run
-      described_class::SOURCES.each do |source|
+    def generic_run_test(sources)
+      result = described_class.run(sources)
+      sources.each do |source|
         key = source.name
         expect(result.key?(key)).to be true
         expect(result[key]).to be_a(Array)
@@ -31,12 +31,21 @@ RSpec.describe Scraper do
             img: String,
             date: DateTime,
             url: String,
-            title: String
+            title: String,
+            details: String,
           }.each do |event_key, type|
             expect(event[event_key]).to be_a(type)
           end
         end
       end
+    end
+
+    it "gets data for knockout" do
+      generic_run_test([Knockout])
+    end
+
+    it "gets data for elbo room", :focus do
+      generic_run_test([ElboRoom])
     end
   end
 end

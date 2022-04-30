@@ -5,7 +5,6 @@ class Knockout
 		index = 1
 		events = []
 		loop do
-			# binding.pry
 			events.concat(
 				get_events(index).map { |event| parse_event_data(event) }
 			)
@@ -27,6 +26,7 @@ class Knockout
 				date: parse_date(event.css(".tribe-event-date-start")[0].text),
 				url: event.css(".tribe-event-url")[0].attribute("href"),
 				title: event.css(".tribe-event-url")[0].text,
+				details: "",
 			}.tap do |data|
 				data[:img] = fetch_full_res_image(data)
 			end

@@ -8,7 +8,8 @@ Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| load path }
 
 class Scraper
   SOURCES = [
-    Knockout
+    Knockout,
+    ElboRoom
   ]
 
   class << self

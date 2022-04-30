@@ -5,7 +5,6 @@ gem 'pry'
 gem 'activesupport'
 gem 'rspec'
 
-
 # scraper stuff
 gem 'selenium-webdriver'
 gem 'ffi'
@@ -14,6 +13,5 @@ gem 'ffi'
 gem "sinatra-activerecord"
 gem "rake"
 gem "pg"
-
 
 # server
