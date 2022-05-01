@@ -16,6 +16,13 @@ unless ENV["NO_GCS"] == "true"
   require "#{__dir__}/lib/gcs.rb"
 end
 
+class Utils
+  def self.print_event_preview(source, data)
+    return unless ENV["PRINT_EVENTS"] == "true"
+    puts("#{source.name} #{data[:date].strftime("%m/%d")}: #{data[:title].gsub("\n", "")}")
+  end
+end
+
 class Scraper
   SOURCES = [
     DnaLounge,
