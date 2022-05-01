@@ -36,11 +36,11 @@ class DnaLounge
           url: $driver.current_url,
           img: parse_img(event),
           date: parse_date(event),
-          title: $driver.css(".event_title")[0].text,
+          title: parse_title(event),
           details: parse_details(event)
         }
       end.
-        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| puts("#{name}: #{data[:title]}") if ENV["PRINT_EVENTS"] == "true" }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 
@@ -50,6 +50,11 @@ class DnaLounge
       return "" unless thumb
       path = thumb.attribute("srcset").split(" ")[2]
       host + path
+    end
+
+    def parse_title(event)
+      title = $driver.css(".event_title")[0].text
+      title.blank? ? $driver.title : title
     end
 
     def parse_date(event)

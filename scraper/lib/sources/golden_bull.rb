@@ -43,7 +43,7 @@ class GoldenBull
           data[:details] = $driver.css(".sqs-block-content")[0].text
         end
       end.
-        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| puts("#{name}: #{data[:title]}") if ENV["PRINT_EVENTS"] == "true" }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 

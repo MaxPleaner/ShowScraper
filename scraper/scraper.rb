@@ -95,7 +95,7 @@ class Scraper
     end
 
     def persist_static(results)
-      binding.pry
+      GCS.upload_text_as_file(text: results.to_json, dest: "events.json")
     end
 
     def init_driver

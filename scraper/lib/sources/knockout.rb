@@ -37,7 +37,7 @@ class Knockout
 			}.tap do |data|
 				data[:img] = fetch_full_res_image(data)
 			end.
-				tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+				tap { |data| puts("#{name}: #{data[:title]}") if ENV["PRINT_EVENTS"] == "true" }.
 				tap { |data| foreach_event_blk&.call(data) }
 		end
 

@@ -32,7 +32,7 @@ class GreyArea
           details: $driver.css("[data-hook='event-description']")[0].text,
         }
       end.
-        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| puts("#{name}: #{data[:title]}") if ENV["PRINT_EVENTS"] == "true" }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 

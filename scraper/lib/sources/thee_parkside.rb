@@ -30,7 +30,7 @@ class TheeParkside
         details: event.css(".hmt-event-subtitle")[0]&.text || "",
         img: get_high_res_image(event),
       }.
-        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| puts("#{name}: #{data[:title]}") if ENV["PRINT_EVENTS"] == "true" }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 
