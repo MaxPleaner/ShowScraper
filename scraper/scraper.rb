@@ -33,9 +33,9 @@ class Scraper
     GreyArea,
     Knockout,
     TheeParkside,
+    # BottomOfTheHill
 
     # TODO Venues:
-    # - Bottom of the Hill
     # - Cornerstone
     # - Benders
     # - El Rio

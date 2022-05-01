@@ -46,7 +46,6 @@ class GreyArea
     end
 
     def parse_date(date_string)
-      # TODO: figure out how to handle year since this date string doesnt include it
       DateTime.parse(date_string)
     end
   end
