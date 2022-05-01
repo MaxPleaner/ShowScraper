@@ -1,18 +1,21 @@
 class GoldenBull
   MAIN_URL = "https://goldenbullbar.com/shows" # this performs an internal redirect
-  MONTHS_LIMIT = 3
 
-  # Full calendar view type site
-  CALENDAR_LOAD_TIME = 2 # will sleep this many seconds after opening calendar
+  cattr_accessor :months_limit, :events_limit, :load_time
+  self.months_limit = 3
+  self.events_limit = 200
+  self.load_time = 2
 
-  def self.run
+  def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    MONTHS_LIMIT.times do |i|
-      events.concat(
-        get_events.map { |event| parse_event_data(event) }
-      )
-      get_next_page unless i == MONTHS_LIMIT - 1
+    months_limit.times do |i|
+      get_events.map do |event|
+        next if events.count >= events_limit
+        events.push(parse_event_data(event, &foreach_event_blk))
+      end
+      break if events.count >= events_limit
+      get_next_page unless i == months_limit - 1
     end
     events
   end
@@ -21,7 +24,7 @@ class GoldenBull
     private
 
     def get_events
-      sleep CALENDAR_LOAD_TIME
+      sleep load_time
       $driver.css(".Main-content .background-image-link")
     end
 
@@ -29,7 +32,7 @@ class GoldenBull
       $driver.css("[aria-label='Go to next month']")[0].click
     end
 
-    def parse_event_data(event)
+    def parse_event_data(event, &foreach_event_blk)
       {
         url: event.attribute("href"),
         img: event.css("img")[0].attribute("src"),
@@ -39,7 +42,9 @@ class GoldenBull
           data[:title] = $driver.css(".eventitem-title")[0].text
           data[:details] = $driver.css(".sqs-block-content")[0].text
         end
-      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
+      end.
+        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| foreach_event_blk&.call(data) }
     end
 
     def parse_date(date_string)

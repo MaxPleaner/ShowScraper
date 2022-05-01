@@ -18,34 +18,49 @@ RSpec.describe Scraper do
   end
 
   describe ".run" do
-    def generic_run_test(sources)
-      result = described_class.run(sources)
-      sources.each do |source|
-        key = source.name
-        expect(result.key?(key)).to be true
-        expect(result[key]).to be_a(Array)
-        expect(result[key]).not_to be_empty
-        result[key].each do |event|
-          expect(event).to be_a(Hash)
-          {
-            img: String,
-            date: DateTime,
-            url: String,
-            title: String,
-            details: String,
-          }.each do |event_key, type|
-            expect(event[event_key]).to be_a(type)
+    context("persist_mode: nil") do
+      def generic_run_test(sources)
+        result = described_class.run(sources, events_limit: 5)
+        sources.each do |source|
+          key = source.name
+          expect(result.key?(key)).to be true
+          expect(result[key]).to be_a(Array)
+          expect(result[key]).not_to be_empty
+          result[key].each do |event|
+            expect(event).to be_a(Hash)
+            {
+              img: String,
+              date: DateTime,
+              url: String,
+              title: String,
+              details: String,
+            }.each do |event_key, type|
+              expect(event[event_key]).to be_a(type)
+            end
           end
+        end
+      end
+
+      it ("gets data for Knockout") { generic_run_test([Knockout]) }
+      it ("gets data for ElboRoom") { generic_run_test([ElboRoom]) }
+      it ("gets data for GoldenBull") { generic_run_test([GoldenBull]) }
+      it ("gets data for ElisMileHighClub") { generic_run_test([ElisMileHighClub]) }
+      it ("gets data for TheeParkside") { generic_run_test([TheeParkside]) }
+      it ("gets data for DnaLounge") { generic_run_test([DnaLounge]) }
+      # it ("gets data for GreyArea") { generic_run_test([GreyArea]) }
+    end
+
+    context "persist_mode: :sql" do
+      it "saves data to sql" do
+        described_class.run(events_limit: 1, persist_mode: :sql)
+        described_class::SOURCES.each do |source|
+          venue = Venue.find_by!(name: source.name)
+          expect(venue.events.count).to eq(1)
         end
       end
     end
 
-    it ("gets data for Knockout") { generic_run_test([Knockout]) }
-    it ("gets data for ElboRoom") { generic_run_test([ElboRoom]) }
-    it ("gets data for GoldenBull") { generic_run_test([GoldenBull]) }
-    it ("gets data for ElisMileHighClub") { generic_run_test([ElisMileHighClub]) }
-    it ("gets data for TheeParkside") { generic_run_test([TheeParkside]) }
-    it ("gets data for DnaLounge") { generic_run_test([DnaLounge]) }
-    it ("gets data for GreyArea") { generic_run_test([GreyArea]) }
+    context "persist_mode: :static" do
+    end
   end
 end

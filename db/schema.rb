@@ -26,6 +26,7 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_26_171517) do
 
   create_table "venues", force: :cascade do |t|
     t.string "name"
+    t.string "location"
   end
 
 end

@@ -4,16 +4,23 @@ class ElisMileHighClub
   # so we can rather just access the Google calendar directly
   MAIN_URL = "https://calendar.google.com/calendar/embed?src=5b4fnnnhfa7v3svqg76kj3914g%40group.calendar.google.com&ctz=America/Los_Angeles"
 
-  MONTHS_LIMIT = 3
+  cattr_accessor :months_limit, :events_limit, :load_time
+  self.months_limit = 3
+  self.events_limit = 200
+  self.load_time = 2
 
-  def self.run
+  def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    MONTHS_LIMIT.times do |i|
-      events.concat(
-        get_events.map { |event| parse_event_data(event) }
-      )
-      get_next_page unless i == MONTHS_LIMIT - 1
+    sleep load_time
+    months_limit.times do |i|
+      new_events = get_events
+      new_events.each do |event|
+        next if events.count >= events_limit
+        events.push(parse_event_data(event, &foreach_event_blk))
+      end
+      break if events.count >= events_limit
+      get_next_page unless i == months_limit - 1
     end
     events
   end
@@ -29,7 +36,7 @@ class ElisMileHighClub
       $driver.css("#navForward1")[0].click
     end
 
-    def parse_event_data(event)
+    def parse_event_data(event, &foreach_event_blk)
       event.click # shows a popup with event details
 
       {
@@ -40,7 +47,9 @@ class ElisMileHighClub
         details: $driver.css(".event-description")[0].text
       }.tap do
         $driver.css(".bubble-closebutton")[1].click
-      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
+      end.
+        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| foreach_event_blk&.call(data) }
     end
 
     def parse_date(date_string)

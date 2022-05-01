@@ -1,15 +1,21 @@
 class Knockout
 	# "Load more" type site
-	PAGE_LIMIT = 2
 
-	def self.run
+  cattr_accessor :pages_limit, :events_limit
+  self.pages_limit = 5
+  self.events_limit = 200
+
+	def self.run(events_limit: self.events_limit, &foreach_event_blk)
 		index = 1
 		events = []
 		loop do
-			events.concat(
-				get_events(index).map { |event| parse_event_data(event) }
-			)
-			break if events.empty? || index > PAGE_LIMIT
+			new_events = get_events(index)
+			new_events.each do |event|
+        next if events.count >= events_limit
+				events.push(parse_event_data(event, &foreach_event_blk))
+			end
+			break if events.count >= events_limit
+			break if new_events.empty? || index > pages_limit
 			index += 1
 		end
 		events
@@ -22,7 +28,7 @@ class Knockout
 			$driver.css(".type-tribe_events")
 		end
 
-		def parse_event_data(event)
+		def parse_event_data(event, &foreach_event_blk)
 			{
 				date: parse_date(event.css(".tribe-event-date-start")[0].text),
 				url: event.css(".tribe-event-url")[0].attribute("href"),
@@ -30,7 +36,9 @@ class Knockout
 				details: "",
 			}.tap do |data|
 				data[:img] = fetch_full_res_image(data)
-			end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
+			end.
+				tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+				tap { |data| foreach_event_blk&.call(data) }
 		end
 
 		def fetch_full_res_image(event)

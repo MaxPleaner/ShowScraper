@@ -1,15 +1,20 @@
 class DnaLounge
   MAIN_URL = "https://www.dnalounge.com/calendar/latest.html" # this performs an internal redirect
-  MONTHS_LIMIT = 2
 
-  def self.run(&foreach_event_blk)
+  cattr_accessor :months_limit, :events_limit
+  self.months_limit = 3
+  self.events_limit = 200
+
+  def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    MONTHS_LIMIT.times do |i|
-      events.concat(
-        get_events.map { |event| parse_event_data(event, &foreach_event_blk) }
-      )
-      get_next_page unless i == MONTHS_LIMIT - 1
+    months_limit.times do |i|
+      get_events.each do |event|
+        next if events.count >= events_limit
+        events.push(parse_event_data(event, &foreach_event_blk))
+      end
+      break if events.count >= events_limit
+      get_next_page unless i == months_limit - 1
     end
     events
   end
@@ -36,7 +41,7 @@ class DnaLounge
         }
       end.
         tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
-        tap { |data| foreach_event_blk.call(data) }
+        tap { |data| foreach_event_blk&.call(data) }
     end
 
     def parse_img(event)

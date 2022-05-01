@@ -14,6 +14,12 @@ GEM
     childprocess (4.1.0)
     coderay (1.1.3)
     concurrent-ruby (1.1.10)
+    database_cleaner (2.0.1)
+      database_cleaner-active_record (~> 2.0.0)
+    database_cleaner-active_record (2.0.1)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     diff-lcs (1.5.0)
     ffi (1.15.5)
     ffi (1.15.5-x64-mingw32)
@@ -70,6 +76,7 @@ PLATFORMS
 
 DEPENDENCIES
   activesupport
+  database_cleaner
   ffi
   pg
   pry

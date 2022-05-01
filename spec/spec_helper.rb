@@ -1,3 +1,5 @@
+require 'database_cleaner'
+
 ENV["TEST"] = "true"
 
 RSpec.configure do |config|
@@ -12,4 +14,9 @@ RSpec.configure do |config|
   config.shared_context_metadata_behavior = :apply_to_host_groups
 
   config.filter_run_when_matching :focus
+
+  config.before(:suite) do
+    DatabaseCleaner.clean_with(:truncation)
+    require "#{__dir__}/../db/seeds.rb"
+  end
 end

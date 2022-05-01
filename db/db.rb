@@ -2,7 +2,8 @@ require "sinatra/activerecord"
 
 class DatabaseApp < Sinatra::Base
   register Sinatra::ActiveRecordExtension
-  set :database, {adapter: "postgresql", database: "ShowScraper"}
+  database = ENV["TEST"] == "true" ? "ShowScraperTest" : "ShowScraper"
+  set :database, {adapter: "postgresql", database: database}
   # or set :database_file, "path/to/database.yml"
 end
 

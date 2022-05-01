@@ -2,8 +2,14 @@ class ElboRoom
   # No pagination needed here, all events shown at once.
   MAIN_URL = "https://www.elboroomjacklondon.com/full-events-listing"
 
-  def self.run
-    get_events.each_index.map { |index| parse_event_data(index) }
+  cattr_accessor :events_limit
+  self.events_limit = 200
+
+  def self.run(events_limit: self.events_limit, &foreach_event_blk)
+    get_events.each_index.map do |index|
+      next if index >= events_limit
+      parse_event_data(index, &foreach_event_blk)
+    end.compact
   end
 
   class << self
@@ -14,7 +20,7 @@ class ElboRoom
       $driver.css("[data-hook='title'] a")
     end
 
-    def parse_event_data(index)
+    def parse_event_data(index, &foreach_event_blk)
       $driver.new_tab(MAIN_URL) do
         $driver.css("[data-hook='title'] a")[index].click
         {
@@ -24,7 +30,9 @@ class ElboRoom
           img: $driver.css("[data-hook='event-image'] img")[0].attribute("src"),
           details: $driver.css("[data-hook='event-description']")[0].text,
         }
-      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
+      end.
+        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| foreach_event_blk&.call(data) }
     end
 
     def parse_date(date_string)
