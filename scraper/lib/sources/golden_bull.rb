@@ -39,7 +39,7 @@ class GoldenBull
           data[:title] = $driver.css(".eventitem-title")[0].text
           data[:details] = $driver.css(".sqs-block-content")[0].text
         end
-      end
+      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
     end
 
     def parse_date(date_string)

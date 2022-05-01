@@ -45,5 +45,6 @@ RSpec.describe Scraper do
     it ("gets data for GoldenBull") { generic_run_test([GoldenBull]) }
     it ("gets data for ElisMileHighClub") { generic_run_test([ElisMileHighClub]) }
     it ("gets data for TheeParkside") { generic_run_test([TheeParkside]) }
+    it ("gets data for DnaLounge") { generic_run_test([DnaLounge]) }
   end
 end

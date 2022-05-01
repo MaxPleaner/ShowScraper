@@ -40,7 +40,7 @@ class ElisMileHighClub
         details: $driver.css(".event-description")[0].text
       }.tap do
         $driver.css(".bubble-closebutton")[1].click
-      end
+      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
     end
 
     def parse_date(date_string)

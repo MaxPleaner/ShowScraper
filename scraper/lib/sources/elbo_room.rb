@@ -24,7 +24,7 @@ class ElboRoom
           img: $driver.css("[data-hook='event-image'] img")[0].attribute("src"),
           details: $driver.css("[data-hook='event-description']")[0].text,
         }
-      end
+      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
     end
 
     def parse_date(date_string)

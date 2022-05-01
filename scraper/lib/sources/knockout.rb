@@ -30,7 +30,7 @@ class Knockout
 				details: "",
 			}.tap do |data|
 				data[:img] = fetch_full_res_image(data)
-			end
+			end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
 		end
 
 		def fetch_full_res_image(event)

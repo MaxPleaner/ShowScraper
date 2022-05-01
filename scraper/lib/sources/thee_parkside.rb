@@ -23,7 +23,7 @@ class TheeParkside
         title: event.css(".hmt-event-title")[0].text,
         details: event.css(".hmt-event-subtitle")[0]&.text || "",
         img: get_high_res_image(event),
-      }
+      }.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
     end
 
     def get_high_res_image(event)

@@ -15,13 +15,13 @@ class Scraper
     ElboRoom,
     GoldenBull,
     ElisMileHighClub,
-    TheeParkside
+    TheeParkside,
+    DnaLounge
 
     # TODO Venues:
-    # - Thee Parkside
+    # - Grey Matter
     # - Bottom of the Hill
     # - Cornerstone
-    # - DNA Lounge
     # - Benders
     # - El Rio
     # - Freight and Salvage
