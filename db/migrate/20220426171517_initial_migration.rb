@@ -5,12 +5,12 @@ class InitialMigration < ActiveRecord::Migration[7.0]
       t.string :location
     end
     create_table :events do |t|
-      t.string :name
-      t.text :description
-      t.datetime :time
+      t.string :title
+      t.text :details
+      t.datetime :date
       t.references :venue
-      t.text :image_url
-      t.text :details_url
+      t.text :img
+      t.text :url
     end
   end
 end

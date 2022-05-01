@@ -2,8 +2,9 @@ require "selenium-webdriver"
 require 'pry'
 require 'active_support/all'
 
-load "#{__dir__}/lib/selenium_patches.rb"
-Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| load path }
+require "#{__dir__}/lib/selenium_patches.rb"
+Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| require path }
+require "#{__dir__}/../db/db.rb"
 
 # Configure scrapers
 $VERBOSE = nil
@@ -16,10 +17,10 @@ class Scraper
     GoldenBull,
     ElisMileHighClub,
     TheeParkside,
-    DnaLounge
+    DnaLounge,
+    GreyArea,
 
     # TODO Venues:
-    # - Grey Matter
     # - Bottom of the Hill
     # - Cornerstone
     # - Benders
@@ -56,10 +57,27 @@ class Scraper
 
       sources.
         index_by { |source| source.name }.
-        transform_values { |source| run_scraper(source) }
+        transform_values do |source|
+          run_scraper(source) do |event_data|
+            persist_event(source, event_data) if persist
+          end
+        end
     end
 
     private
+
+    def persist_event(source, event_data)
+      venue = Venue.find_by!(name: source.name)
+      existing_event = venue.events.find_by(
+        date: event_data[:date],
+        title: event_data[:title]
+      )
+      if existing_event
+        existing_event.update(event_data)
+      else
+        venue.events.create!(event_data)
+      end
+    end
 
     def init_driver
       options = Selenium::WebDriver::Chrome::Options.new
@@ -71,8 +89,8 @@ class Scraper
       driver
     end
 
-    def run_scraper(source)
-      source.run
+    def run_scraper(source, &foreach_event_blk)
+      source.run(&foreach_event_blk)
     rescue => e
       if ENV["TEST"] == "true"
         raise e
@@ -84,3 +102,5 @@ class Scraper
 
   end
 end
+
+# Scraper.run([DnaLounge], persist: true)

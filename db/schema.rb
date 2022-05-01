@@ -15,18 +15,17 @@ ActiveRecord::Schema[7.0].define(version: 2022_04_26_171517) do
   enable_extension "plpgsql"
 
   create_table "events", force: :cascade do |t|
-    t.string "name"
-    t.text "description"
-    t.datetime "time"
+    t.string "title"
+    t.text "details"
+    t.datetime "date"
     t.bigint "venue_id"
-    t.text "image_url"
-    t.text "details_url"
+    t.text "img"
+    t.text "url"
     t.index ["venue_id"], name: "index_events_on_venue_id"
   end
 
   create_table "venues", force: :cascade do |t|
     t.string "name"
-    t.string "location"
   end
 
 end

@@ -2,12 +2,12 @@ class DnaLounge
   MAIN_URL = "https://www.dnalounge.com/calendar/latest.html" # this performs an internal redirect
   MONTHS_LIMIT = 2
 
-  def self.run
+  def self.run(&foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
     MONTHS_LIMIT.times do |i|
       events.concat(
-        get_events.map { |event| parse_event_data(event) }
+        get_events.map { |event| parse_event_data(event, &foreach_event_blk) }
       )
       get_next_page unless i == MONTHS_LIMIT - 1
     end
@@ -25,7 +25,7 @@ class DnaLounge
       $driver.css(".navR")[0].click
     end
 
-    def parse_event_data(event)
+    def parse_event_data(event, &foreach_event_blk)
       $driver.new_tab(event.attribute("href")) do
         {
           url: $driver.current_url,
@@ -34,7 +34,9 @@ class DnaLounge
           title: $driver.css(".event_title")[0].text,
           details: parse_details(event)
         }
-      end.tap { |x| pp(x) if ENV["PRINT_EVENTS"] == "true" }
+      end.
+        tap { |data| pp(data) if ENV["PRINT_EVENTS"] == "true" }.
+        tap { |data| foreach_event_blk.call(data) }
     end
 
     def parse_img(event)
