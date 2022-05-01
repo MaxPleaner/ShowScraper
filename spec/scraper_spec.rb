@@ -61,6 +61,8 @@ RSpec.describe Scraper do
     end
 
     context "persist_mode: :static" do
+      it "saves data to s3" do
+      end
     end
   end
 end

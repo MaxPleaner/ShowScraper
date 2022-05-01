@@ -1,7 +1,9 @@
 require "selenium-webdriver"
 require 'pry'
 require 'active_support/all'
+require 'dotenv'
 
+Dotenv.load
 require "#{__dir__}/lib/selenium_patches.rb"
 Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| require path }
 require "#{__dir__}/../db/db.rb"
