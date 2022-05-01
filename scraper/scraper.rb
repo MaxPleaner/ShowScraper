@@ -15,14 +15,15 @@ class Scraper
     ElboRoom,
     GoldenBull,
     ElisMileHighClub,
+    TheeParkside
 
     # TODO Venues:
+    # - Thee Parkside
     # - Bottom of the Hill
     # - Cornerstone
     # - DNA Lounge
     # - Benders
     # - El Rio
-    # - Thee Parkside
     # - Freight and Salvage
     # - The Chapel
     # - Greek Theater
