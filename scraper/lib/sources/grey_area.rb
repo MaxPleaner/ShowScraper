@@ -6,34 +6,43 @@ class GreyArea
   self.events_limit = 200
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
-    get_events.each_index.map do |index|
+    get_events.each.map.with_index do |event, index|
       next if index >= events_limit
-      parse_event_data(index, &foreach_event_blk)
-    end.compact
+      parse_event_data(event, &foreach_event_blk)
+    end.reject(&:blank?)
   end
 
   class << self
     private
 
     def get_events
-      []
-      # $driver.navigate.to(MAIN_URL)
-      # $driver.css("[data-hook='title'] a")
+      $driver.navigate.to(MAIN_URL)
+      $driver.css(".featured-items")[0].css(".item-link")
     end
 
-    def parse_event_data(index, &foreach_event_blk)
-      $driver.new_tab(MAIN_URL) do
-        $driver.css("[data-hook='title'] a")[index].click
-        {
-          date: parse_date($driver.css("[data-hook='event-full-date']")[0].text),
-          url: $driver.current_url,
-          title: $driver.css("[data-hook='event-title']")[0].text,
-          img: $driver.css("[data-hook='event-image'] img")[0].attribute("src"),
-          details: $driver.css("[data-hook='event-description']")[0].text,
-        }
-      end.
-        tap { |data| Utils.print_event_preview(self, data) }.
-        tap { |data| foreach_event_blk&.call(data) }
+    def parse_event_data(event, &foreach_event_blk)
+      $driver.new_tab(event.attribute("href")) do
+        # we have to check this here because there's a redirect
+        if $driver.current_url.include?("/event/")
+          {
+            img: parse_img,
+            title: $driver.css("h2.heading")[0]&.text || $driver.title,
+            url: $driver.current_url,
+            date: parse_date($driver.css(".meta-date")[0].text),
+            details: $driver.css(".body-text").map(&:text).join("\n")
+          }.
+            tap { |data| Utils.print_event_preview(self, data) }.
+            tap { |data| foreach_event_blk&.call(data) }
+        else
+          {}
+        end
+      end
+    end
+
+    def parse_img
+      style = $driver.css(".full-width-image .image")[0]&.attribute("style")
+      return "" unless style
+      style.scan(/url\(\"(.+)\"\)/)[0][0]
     end
 
     def parse_date(date_string)

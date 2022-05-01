@@ -19,7 +19,8 @@ end
 class Utils
   def self.print_event_preview(source, data)
     return unless ENV["PRINT_EVENTS"] == "true"
-    puts("#{source.name} #{data[:date].strftime("%m/%d")}: #{data[:title].gsub("\n", "")}")
+    # puts("#{source.name} #{data[:date].strftime("%m/%d")}: #{data[:title].gsub("\n", " ")}")
+    pp data
   end
 end
 
@@ -29,7 +30,7 @@ class Scraper
     ElboRoom,
     ElisMileHighClub,
     GoldenBull,
-    # GreyArea,
+    GreyArea,
     Knockout,
     TheeParkside,
 

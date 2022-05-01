@@ -19,8 +19,8 @@ RSpec.describe Scraper do
 
   describe ".run" do
     context("persist_mode: nil") do
-      def generic_run_test(sources)
-        result = described_class.run(sources, events_limit: 5, persist_mode: nil)
+      def generic_run_test(sources, events_limit)
+        result = described_class.run(sources, events_limit: events_limit, persist_mode: nil)
         sources.each do |source|
           key = source.name
           expect(result.key?(key)).to be true
@@ -41,13 +41,13 @@ RSpec.describe Scraper do
         end
       end
 
-      it ("gets data for Knockout") { generic_run_test([Knockout]) }
-      it ("gets data for ElboRoom") { generic_run_test([ElboRoom]) }
-      it ("gets data for GoldenBull") { generic_run_test([GoldenBull]) }
-      it ("gets data for ElisMileHighClub") { generic_run_test([ElisMileHighClub]) }
-      it ("gets data for TheeParkside") { generic_run_test([TheeParkside]) }
-      it ("gets data for DnaLounge") { generic_run_test([DnaLounge]) }
-      # it ("gets data for GreyArea") { generic_run_test([GreyArea]) }
+      it ("gets data for Knockout") { generic_run_test([Knockout], 5) }
+      it ("gets data for ElboRoom") { generic_run_test([ElboRoom], 5) }
+      it ("gets data for GoldenBull") { generic_run_test([GoldenBull], 5) }
+      it ("gets data for ElisMileHighClub") { generic_run_test([ElisMileHighClub], 5) }
+      it ("gets data for TheeParkside") { generic_run_test([TheeParkside], 5) }
+      it ("gets data for DnaLounge") { generic_run_test([DnaLounge], 5) }
+      it ("gets data for GreyArea") { generic_run_test([GreyArea], 5) }
     end
 
     context "persist_mode: :sql" do
