@@ -8,11 +8,11 @@ class GoldenBull
   def self.run
     events = []
     $driver.get(MAIN_URL)
-    (MONTHS_LIMIT - 1).times do
+    MONTHS_LIMIT.times do |i|
       events.concat(
         get_events.map { |event| parse_event_data(event) }
       )
-      get_next_page
+      get_next_page unless i == MONTHS_LIMIT - 1
     end
     events
   end

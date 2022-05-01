@@ -14,6 +14,7 @@ class Scraper
     Knockout,
     ElboRoom,
     GoldenBull,
+    ElisMileHighClub,
 
     # TODO Venues:
     # - Bottom of the Hill
@@ -61,7 +62,9 @@ class Scraper
 
     def init_driver
       options = Selenium::WebDriver::Chrome::Options.new
-      options.add_argument('--headless')
+      unless ENV["HEADLESS"] == "false"
+        options.add_argument('--headless')
+      end
       driver = Selenium::WebDriver.for :chrome, options: options
       SeleniumPatches.patch_driver(driver)
       driver
@@ -69,9 +72,13 @@ class Scraper
 
     def run_scraper(source)
       source.run
-    # rescue => e
-    #   puts "ERROR: #{e}"
-    #   {}
+    rescue => e
+      if ENV["TEST"] == "true"
+        raise e
+      else
+        puts "ERROR scraping #{source.name}: #{e}"
+        {}
+      end
     end
 
   end
