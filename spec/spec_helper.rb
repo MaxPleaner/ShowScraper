@@ -16,7 +16,9 @@ RSpec.configure do |config|
   config.filter_run_when_matching :focus
 
   config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
-    require "#{__dir__}/../db/seeds.rb"
+    unless ENV["NO_DB"] == "true"
+      DatabaseCleaner.clean_with(:truncation)
+      require "#{__dir__}/../db/seeds.rb"
+    end
   end
 end

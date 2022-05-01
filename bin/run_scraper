@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require "#{__dir__}/../scraper/scraper.rb"
+Scraper.run(events_limit: 1, persist_mode: :static)

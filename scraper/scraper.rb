@@ -3,10 +3,18 @@ require 'pry'
 require 'active_support/all'
 require 'dotenv'
 
-Dotenv.load
+Dotenv.load("#{__dir__}/../.env")
+
 require "#{__dir__}/lib/selenium_patches.rb"
 Dir.glob("#{__dir__}/lib/sources/*.rb").each { |path| require path }
-require "#{__dir__}/../db/db.rb"
+
+unless ENV["NO_DB"] == "true"
+  require "#{__dir__}/../db/db.rb"
+end
+
+unless ENV["NO_GCS"] == "true"
+  require "#{__dir__}/lib/gcs.rb"
+end
 
 class Scraper
   SOURCES = [
@@ -50,7 +58,7 @@ class Scraper
 
   class << self
 
-    def run(sources=SOURCES, events_limit: nil, persist_mode: nil)
+    def run(sources=SOURCES, events_limit: nil, persist_mode: :static)
       $driver ||= init_driver
 
       results = sources.
@@ -58,30 +66,20 @@ class Scraper
         transform_values do |source|
           run_scraper(source, events_limit: events_limit) do |event_data|
             if persist_mode == :sql
-              # for sql persistence we stream each event in as it's loaded
-              persist_event(source, event_data, persist_mode: :sql)
+              persist_sql(source, event_data)
             end
           end
         end
 
       if persist_mode == :static
-        # for static persistente we do it in one big chunk at the end
-        persist_event(source, event_data, persist_mode: :static)
+        # for static persistence we do it in one big chunk at the end
+        persist_static(results)
       end
 
       results
     end
 
     private
-
-    def persist_event(source, event_data, persist_mode:)
-      case persist_mode
-      when :sql
-        persist_sql(source, event_data)
-      when :static
-        persist_json_file(source, event_data)
-      end
-    end
 
     def persist_sql(source, event_data)
       venue = Venue.find_by!(name: source.name)
@@ -94,6 +92,10 @@ class Scraper
       else
         venue.events.create!(event_data)
       end
+    end
+
+    def persist_static(results)
+      binding.pry
     end
 
     def init_driver

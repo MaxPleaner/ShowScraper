@@ -20,7 +20,7 @@ RSpec.describe Scraper do
   describe ".run" do
     context("persist_mode: nil") do
       def generic_run_test(sources)
-        result = described_class.run(sources, events_limit: 5)
+        result = described_class.run(sources, events_limit: 5, persist_mode: nil)
         sources.each do |source|
           key = source.name
           expect(result.key?(key)).to be true
@@ -52,6 +52,8 @@ RSpec.describe Scraper do
 
     context "persist_mode: :sql" do
       it "saves data to sql" do
+        skip("Skipping DB Tests because ENV['NO_DB'] == 'true'") if ENV["NO_DB"] == "true"
+
         described_class.run(events_limit: 1, persist_mode: :sql)
         described_class::SOURCES.each do |source|
           venue = Venue.find_by!(name: source.name)
@@ -62,6 +64,7 @@ RSpec.describe Scraper do
 
     context "persist_mode: :static" do
       it "saves data to s3" do
+        described_class.run(events_limit: 1, persist_mode: :static)
       end
     end
   end
