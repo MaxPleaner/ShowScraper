@@ -34,6 +34,7 @@ class ElisMileHighClub
 
     def get_next_page
       $driver.css("#navForward1")[0].click
+      sleep load_time
     end
 
     def parse_event_data(event, &foreach_event_blk)

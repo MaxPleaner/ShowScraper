@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
 
 require "#{__dir__}/../scraper/scraper.rb"
-Scraper.run(events_limit: nil, persist_mode: :static)
+Scraper.run(events_limit: 5, persist_mode: :static)
+# Scraper.run(events_limit: nil, persist_mode: :static)
+# Scraper.run([ElRio, ElisMileHighClub], events_limit: 5, persist_mode: :static)
+puts "done"

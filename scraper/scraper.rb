@@ -17,7 +17,7 @@ unless ENV["NO_GCS"] == "true"
 end
 
 class Utils
-  def self.print_event_preview(source, data, condense_data: false)
+  def self.print_event_preview(source, data, condense_data: true)
     return unless ENV["PRINT_EVENTS"] == "true"
     if condense_data
       puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
@@ -100,7 +100,7 @@ class Scraper
     # - Gilman
     # - Santa Cruz Venues
     # - Stanford Ampitheater
-  ]
+  ].reverse
 
   class << self
 
@@ -142,13 +142,23 @@ class Scraper
     end
 
     def persist_static(results)
-      GCS.upload_text_as_file(text: results.to_json, dest: "events.json")
+      results_json = results.to_json
+
+      # upload to GCS
+      GCS.upload_text_as_file(text: results_json, dest: "events.json")
+
+      # Also write the file locally
+      File.open("output/events.json", "w") { |f| f.write results_json }
     end
 
     def init_driver
       options = Selenium::WebDriver::Chrome::Options.new
       unless ENV["HEADLESS"] == "false"
         options.add_argument('--headless')
+        options.add_argument('--window-size=1920,1080')
+        options.add_argument(
+          "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
+        )
       end
       driver = Selenium::WebDriver.for :chrome, options: options
       SeleniumPatches.patch_driver(driver)

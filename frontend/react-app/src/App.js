@@ -1,14 +1,27 @@
 import './App.css';
 import React from 'react';
+import $ from 'jquery';
+import _ from 'underscore';
+import moment from 'moment';
 
-class ListItem extends React.Component {
+
+
+class EventListItem extends React.Component {
   constructor(props) {
     super(props)
   }
   render() {
     return (
-      <div>
-        {this.props.children}
+      <div class='Event-box'>
+        <h4>
+          <i>({this.props.event.source}) </i>
+          <br />
+          <span>{this.props.event.title}</span>
+          <br />
+          <a href={this.props.event.url}>
+            <img class='Event-img' src={this.props.event.img} />
+          </a>
+         </h4>
       </div>
     )
   }
@@ -18,23 +31,47 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {listItems: []};
+    this.state = {events: []};
   }
 
   async componentDidMount() {
-    debugger
-    this.setState({ listItems: [4,5,6] });
+    var data = await $.getJSON("http://storage.googleapis.com/show-scraper-data/events.json");
+    var newData = []
+    Object.entries(data).forEach(([source, events]) => {
+      events.forEach((event) => {
+        let newEvent = {
+          ...event,
+          source: source
+        }
+        newData.push(newEvent)
+      })
+    })
+    var groupedData = _.groupBy(newData, (event) => {
+      let date = moment(event.date)
+      return moment(event.date).startOf('day').format();
+    })
+
+    this.setState({ events: groupedData });
   }
 
   render() {
-    const listItems = this.state.listItems.map((item, idx) =>
-      <ListItem />
-    );
+    const events = Object.entries(this.state.events).map(([date, date_events], idx) => {
+      return (
+        <div className='Day-group'>
+          <h2>{date}</h2>
+          <div class='Day-events'>
+            {date_events.map((date_event, idx2) => {
+              return <EventListItem key={(idx + 1) + idx2 } event={date_event} />
+            })}
+          </div>
+        </div>
+      )
+    })
 
     return (
       <div className="App">
         <div className="App-body">
-          {listItems}
+          {events}
         </div>
       </div>
     );

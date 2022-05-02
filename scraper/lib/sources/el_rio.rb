@@ -4,7 +4,7 @@ class ElRio
   cattr_accessor :months_limit, :events_limit, :load_time
   self.months_limit = 3
   self.events_limit = 200
-  self.load_time = 2
+  self.load_time = 3
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
@@ -29,7 +29,7 @@ class ElRio
     end
 
     def get_next_page
-      $driver.css(".flaticon-next")[0].click
+      $driver.css(".flaticon-next")[0].click rescue $driver.save_screenshot("debug.png")
     end
 
     def parse_event_data(event, &foreach_event_blk)
