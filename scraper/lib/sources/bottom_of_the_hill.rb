@@ -28,7 +28,7 @@ class BottomOfTheHill
       }.tap do |data|
         link = parse_details_link(event)
         $driver.new_tab(link) do
-          data[:title] = $driver.title
+          data[:title] = $driver.title.gsub("bottomofthehill: ", "")
           data[:url] = $driver.current_url
           data[:details] = parse_details
         end

@@ -17,10 +17,18 @@ unless ENV["NO_GCS"] == "true"
 end
 
 class Utils
-  def self.print_event_preview(source, data)
+  def self.print_event_preview(source, data, condense_data: false)
     return unless ENV["PRINT_EVENTS"] == "true"
-    # puts("#{source.name} #{data[:date].strftime("%m/%d")}: #{data[:title].gsub("\n", " ")}")
-    pp data
+    if condense_data
+      puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
+    else
+      pp data
+    end
+  end
+
+  def self.quit!
+    $driver&.quit
+    exit!
   end
 end
 
@@ -33,10 +41,10 @@ class Scraper
     GreyArea,
     Knockout,
     TheeParkside,
-    # BottomOfTheHill
+    BottomOfTheHill,
+    Cornerstone
 
     # TODO Venues:
-    # - Cornerstone
     # - Benders
     # - El Rio
     # - Freight and Salvage
@@ -68,6 +76,7 @@ class Scraper
 
     def run(sources=SOURCES, events_limit: nil, persist_mode: :static)
       $driver ||= init_driver
+      at_exit { $driver.quit }
 
       results = sources.
         index_by { |source| source.name }.
@@ -119,11 +128,11 @@ class Scraper
     def run_scraper(source, events_limit: nil, &foreach_event_blk)
       source.run({ events_limit: events_limit }.compact, &foreach_event_blk)
     rescue => e
-      if ENV["TEST"] == "true"
-        raise e
-      else
+      if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
         puts "ERROR scraping #{source.name}: #{e}"
         {}
+      else
+        raise e
       end
     end
 
