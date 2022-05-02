@@ -7,6 +7,10 @@ import $ from 'jquery';
 import _ from 'underscore';
 import moment from 'moment';
 
+import 'bulma/css/bulma.min.css';
+import { Columns, Box } from 'react-bulma-components';
+const { Column } = Columns;
+
 class EventListItem extends React.Component {
   constructor(props) {
     super(props)
@@ -31,8 +35,19 @@ class EventListItem extends React.Component {
 class Test extends React.Component {
   render() {
     return (
-      <div>Test Page
-      <Link to="/">Root</Link><br /></div>
+      <div>
+        <Box>
+          <Columns>
+            <Column>
+              <Box>Foo</Box>
+            </Column>
+            <Column>
+              <Box>Bar</Box>
+            </Column>
+          </Columns>
+         </Box>
+        <Link to="/">Root</Link><br />
+      </div>
     )
   }
 }
