@@ -45,7 +45,8 @@ class DnaLounge
     end
 
     def parse_img(event)
-      host = URI.parse($driver.current_url).host
+      binding.pry
+      host = "http://" + URI.parse($driver.current_url).host
       thumb = $driver.css(".fthumb")[0]
       return "" unless thumb
       path = thumb.attribute("srcset").split(" ")[2]
