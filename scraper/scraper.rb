@@ -42,12 +42,12 @@ class Scraper
     Knockout,
     TheeParkside,
     BottomOfTheHill,
-    Cornerstone
+    Cornerstone,
+    ElRio
 
     # TODO Venues:
-    # - Benders
-    # - El Rio
     # - Freight and Salvage
+    # - Ashkenaz
     # - The Chapel
     # - Greek Theater
     # - Independent
@@ -61,6 +61,13 @@ class Scraper
     # - Zeitgeist
     # - Winter's Tavern
     # - Ivy Room
+    # - New Parish
+    # - UC Berkeley Theater
+
+    # CANNOT SCRAPE (NO PUBLIC CALENDAR)
+    # - Bender's
+    # - Stay Gold Deli
+    # - First Church of the Buzzard
 
     # OTHER VENUES (Lower Priority):
     # - Masonic

@@ -50,6 +50,7 @@ RSpec.describe Scraper do
       it ("gets data for GreyArea") { generic_run_test([GreyArea], 5) }
       it ("gets data for BottomOfTheHill") { generic_run_test([BottomOfTheHill], 10) }
       it ("gets data for Cornerstone") { generic_run_test([Cornerstone], 5) }
+      it ("gets data for ElRio") { generic_run_test([ElRio], 5) }
     end
 
     context "persist_mode: :sql" do
