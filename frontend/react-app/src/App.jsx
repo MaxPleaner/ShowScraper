@@ -1,10 +1,11 @@
 import './App.css';
+
 import React from 'react';
+import { Link } from "react-router-dom";
+
 import $ from 'jquery';
 import _ from 'underscore';
 import moment from 'moment';
-
-
 
 class EventListItem extends React.Component {
   constructor(props) {
@@ -23,6 +24,15 @@ class EventListItem extends React.Component {
           </a>
          </h4>
       </div>
+    )
+  }
+}
+
+class Test extends React.Component {
+  render() {
+    return (
+      <div>Test Page
+      <Link to="/">Root</Link><br /></div>
     )
   }
 }
@@ -69,13 +79,14 @@ class App extends React.Component {
     })
 
     return (
-      <div className="App">
-        <div className="App-body">
-          {events}
+        <div className="App">
+          <Link to="/test">TestPage</Link><br />
+          <div className="App-body">
+            {events}
+          </div>
         </div>
-      </div>
     );
   }
 }
 
-export default App;
+export { App, Test };
