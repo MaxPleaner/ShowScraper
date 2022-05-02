@@ -63,20 +63,43 @@ class Scraper
     # - Ivy Room
     # - New Parish
     # - UC Berkeley Theater
+    # - Masonic
+    # - Paramount
+    # - Fox Theater
+    # - Great Northern
+    # - Hotel Utah
+    # - Amados
+    # - August Hall
+    # - Bimbo's
+    # - Brick and Mortar
+    # - Cafe Du Nord
+    # - Crybaby
+    # - Make Out Room
+    # - Eagle
+    # - Midway
+    # - Milk Bar
+    # - SF Jazz
+    # - Caravan
+    # - Elegant Pub
+    # - Phoenix Theater
+    # - Regency
+    # - Zeitgeist
 
     # CANNOT SCRAPE (NO PUBLIC CALENDAR)
     # - Bender's
     # - Stay Gold Deli
     # - First Church of the Buzzard
+    # - Thee Stork Club (not open yet)
+    # - Red Hat (Concord)
+    # - The Bistro (Hayward)
 
     # OTHER VENUES (Lower Priority):
-    # - Masonic
-    # - Paramount
+    # - Pavilion Concord
+    # - Bill Graham Civic (Meh)
+    # - 1015 Folsom (EDM)
     # - Gilman
     # - Santa Cruz Venues
-    # - Fox Theater
     # - Stanford Ampitheater
-    # - Great Northern
   ]
 
   class << self
