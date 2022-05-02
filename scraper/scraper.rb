@@ -43,10 +43,10 @@ class Scraper
     TheeParkside,
     BottomOfTheHill,
     Cornerstone,
-    ElRio
+    ElRio,
+    FreightAndSalvage
 
     # TODO Venues:
-    # - Freight and Salvage
     # - Ashkenaz
     # - The Chapel
     # - Greek Theater
