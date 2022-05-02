@@ -45,7 +45,6 @@ class DnaLounge
     end
 
     def parse_img(event)
-      binding.pry
       host = "http://" + URI.parse($driver.current_url).host
       thumb = $driver.css(".fthumb")[0]
       return "" unless thumb
