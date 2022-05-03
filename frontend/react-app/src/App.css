@@ -13,6 +13,10 @@
   /*margin: 10px;*/
 }
 
+.App-body-content {
+  padding: 10px;
+}
+
 .App-link {
   color: #61dafb;
 }
@@ -34,6 +38,6 @@
   /*display: inline-block;*/
 }
 
-.Nav .column.selected .box {
+.box.selected {
   background-color: lightblue;
 }

@@ -45,20 +45,22 @@ class Nav extends React.Component {
             <Column className='is-narrow'>
               <Box>Bay Area Shows</Box>
             </Column>
-            <Column className={"is-narrow " + (this.props.route === "ListView" ? "selected" : "")}>
-              <Box>List View</Box>
+            <Column className="is-narrow">
+              <a href='/'>
+                <Box className={this.props.route === "ListView" ? "selected" : ""}>List View</Box>
+              </a>
             </Column>
-            <Column className={"is-narrow " + (this.props.route === "Test" ? "selected" : "")}>
-              <Box>Map View</Box>
+            <Column className="is-narrow">
+              <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
             </Column>
-            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
-              <Box>Venues</Box>
+            <Column className="is-narrow">
+              <Box className={this.props.route === "todo" ? "selected" : ""}>Venues</Box>
             </Column>
-            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
-              <Box>Submit Event</Box>
+            <Column className="is-narrow">
+              <Box className={this.props.route === "todo" ? "selected" : ""}>Submit Event</Box>
             </Column>
-            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
-              <Box>About</Box>
+            <Column className="is-narrow">
+              <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
             </Column>
           </Columns>
         </Box>
@@ -67,9 +69,64 @@ class Nav extends React.Component {
   }
 }
 
-class Test extends React.Component {
+class ListViewManager extends React.Component {
+  constructor(props) {
+    super(props)
+    this.state = { mode: 'day' };
+  }
+
+  changeMode (newMode) {
+    this.setState({...this.state, mode: newMode})
+  }
+
   render() {
-    return (<div><Nav route={this.props.route} /></div>)
+     return (
+      <div className='ListViewManager'>
+        <Columns>
+          <Column className='is-one-quarter'>
+            <Box className='mt-3'>
+              <Columns>
+                <Column>
+                  <a onClick={this.changeMode.bind(this, "day")}>
+                    <Box className={this.state.mode == "day" ? "selected" : ""}>Day</Box>
+                  </a>
+                </Column>
+                <Column>
+                  <a onClick={this.changeMode.bind(this, "week")}>
+                    <Box className={this.state.mode == "week" ? "selected" : ""}>Week</Box>
+                  </a>
+                </Column>
+              </Columns>
+            </Box>
+          </Column>
+          <Column className='is-one-third'>
+          </Column>
+        </Columns>
+        <ListView events={this.props.events}/>
+      </div>
+     )
+  }
+}
+
+class ListView extends React.Component {
+  render() {
+    const events = Object.entries(this.props.events).map(([date, date_events], idx) => {
+      return (
+        <div key={idx} className='Day-group'>
+          <h2>{date}</h2>
+          <div className='Day-events'>
+            {date_events.map((date_event, idx2) => {
+              return <EventListItem key={(idx + 1) + idx2 } event={date_event} />
+            })}
+          </div>
+        </div>
+      )
+    })
+    return (
+      <div className='Events-list'>
+        {events}
+      </div>
+    )
   }
 }
 
@@ -105,30 +162,15 @@ class App extends React.Component {
   }
 
   render() {
-    const events = Object.entries(this.state.events).map(([date, date_events], idx) => {
-      return (
-        <div key={idx} className='Day-group'>
-          <h2>{date}</h2>
-          <div className='Day-events'>
-            {date_events.map((date_event, idx2) => {
-              return <EventListItem key={(idx + 1) + idx2 } event={date_event} />
-            })}
-          </div>
-        </div>
-      )
-    })
-
     return (
-        <div className="App">
-          <div className="App-body">
+        <div className="App-body">
+          <div className="App-body-content">
             <Nav route={this.props.route} />
-            <div className='Events-list'>
-              {events}
-            </div>
+            <ListViewManager events={this.state.events} />
           </div>
         </div>
     );
   }
 }
 
-export { App, Test }
+export { App }
