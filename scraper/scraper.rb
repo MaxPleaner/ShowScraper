@@ -48,6 +48,10 @@ class Scraper
 
       persist_sources_list if persist_mode == :static
 
+      if ENV["ONLY_UPDATE_VENUES"] == "true"
+        Utils.quit!
+      end
+
       results = {}
       errors = []
       sources.each do |source|

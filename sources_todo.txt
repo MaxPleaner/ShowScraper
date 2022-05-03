@@ -1,0 +1,56 @@
+
+/*
+TODO Venues:
+- The Chapel
+- Greek Theater
+- Independent
+- Make Out Room
+- Starline Social Club
+- Rickshaw Stop
+- Warfield
+- Great American Music Hall
+- Fillmore
+- Yoshi's
+- Zeitgeist
+- Winter's Tavern
+- Ivy Room
+- New Parish
+- UC Berkeley Theater
+- Masonic
+- Paramount
+- Fox Theater
+- Great Northern
+- Hotel Utah
+- Amados
+- August Hall
+- Bimbo's
+- Brick and Mortar
+- Cafe Du Nord
+- Crybaby
+- Make Out Room
+- Eagle
+- Midway
+- Milk Bar
+- SF Jazz
+- Caravan
+- Elegant Pub
+- Phoenix Theater
+- Regency
+
+CANNOT SCRAPE (NO PUBLIC CALENDAR)
+- Bender's
+- Stay Gold Deli
+- First Church of the Buzzard
+- Thee Stork Club (not open yet)
+- Red Hat (Concord)
+- The Bistro (Hayward)
+- Ashkenaz (Closed)
+- Gilman
+
+OTHER VENUES (Lower Priority):
+- Pavilion Concord
+- Bill Graham Civic (Meh)
+- 1015 Folsom (EDM)
+- Santa Cruz Venues
+- Stanford Ampitheater
+*/

@@ -1,6 +1,8 @@
 require "google/cloud/storage"
 
 class GCS
+  CACHE_CONTROL = "Cache-Control:private, max-age=0, no-transform"
+
   cattr_accessor :storage, :bucket_name, :bucket
 
   self.storage = Google::Cloud::Storage.new
@@ -8,7 +10,7 @@ class GCS
   self.bucket = storage.bucket(bucket_name)
 
   def self.upload_file(source:, dest:)
-    bucket.create_file(source, dest)
+    bucket.create_file(source, dest, cache_control: CACHE_CONTROL)
   end
 
   def self.upload_text_as_file(text:, dest:)
