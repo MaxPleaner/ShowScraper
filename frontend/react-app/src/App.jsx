@@ -23,7 +23,6 @@ class EventListItem extends React.Component {
              <a href={this.props.event.url}><Box><img className='Event-img' src={this.props.event.img} /></Box></a>
           </Column>
           <Column className=''><Box><b>{this.props.event.source}</b><br />{this.props.event.title}</Box></Column>
-          {/*<Column className=''><Box></Box></Column>*/}
         </Columns>
       </Column>
     )
@@ -83,10 +82,10 @@ class ListViewManager extends React.Component {
     const today = moment(new Date())
 
     if (mode == 'day') {
-      return _.pick(allEvents, today.startOf('day').format());
+      return _.pick(allEvents, today.format('MM-DD-YYYY'));
     } else if (mode == 'week') {
       const days = [...Array(7).keys()].map((i) => {
-        return today.add(i, 'days').startOf('day').format();
+        return today.add(i, 'days').format('MM-DD-YYYY');
       });
       return _.pick(allEvents, days);
     }
@@ -117,6 +116,12 @@ class ListViewManager extends React.Component {
             </Box>
           </Column>
           <Column className='is-one-third'>
+            <Box className='mt-3'>
+              <Columns>
+                <Column>
+                </Column>
+              </Columns>
+            </Box>
           </Column>
         </Columns>
         <ListView events={this.state.events}/>
@@ -167,8 +172,8 @@ class App extends React.Component {
       })
     })
     var groupedData = _.groupBy(newData, (event) => {
-      let date = moment(event.date)
-      return moment(event.date).startOf('day').format();
+      let date = moment(event.date, 'YYYY-MM-DD')
+      return date.format('MM-DD-YYYY')
     })
     this.setState({ events: groupedData });
   }
