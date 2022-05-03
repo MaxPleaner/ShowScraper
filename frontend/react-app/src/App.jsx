@@ -17,14 +17,14 @@ class EventListItem extends React.Component {
   }
   render() {
     return (
-      <div class='Event-box'>
+      <div className='Event-box'>
         <h4>
           <i>({this.props.event.source}) </i>
           <br />
           <span>{this.props.event.title}</span>
           <br />
           <a href={this.props.event.url}>
-            <img class='Event-img' src={this.props.event.img} />
+            <img className='Event-img' src={this.props.event.img} />
           </a>
          </h4>
       </div>
@@ -32,23 +32,44 @@ class EventListItem extends React.Component {
   }
 }
 
-class Test extends React.Component {
+class Nav extends React.Component {
+  constructor(props) {
+    super(props)
+  }
+
   render() {
     return (
-      <div>
+      <div className='Nav'>
         <Box>
           <Columns>
-            <Column>
-              <Box>Foo</Box>
+            <Column className='is-narrow'>
+              <Box>Bay Area Shows</Box>
             </Column>
-            <Column>
-              <Box>Bar</Box>
+            <Column className={"is-narrow " + (this.props.route === "ListView" ? "selected" : "")}>
+              <Box>List View</Box>
+            </Column>
+            <Column className={"is-narrow " + (this.props.route === "Test" ? "selected" : "")}>
+              <Box>Map View</Box>
+            </Column>
+            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
+              <Box>Venues</Box>
+            </Column>
+            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
+              <Box>Submit Event</Box>
+            </Column>
+            <Column className={"is-narrow " + (this.props.route === "todo" ? "selected" : "")}>
+              <Box>About</Box>
             </Column>
           </Columns>
-         </Box>
-        <Link to="/">Root</Link><br />
+        </Box>
       </div>
     )
+  }
+}
+
+class Test extends React.Component {
+  render() {
+    return (<div><Nav route={this.props.route} /></div>)
   }
 }
 
@@ -59,7 +80,7 @@ class App extends React.Component {
     this.state = {events: []};
   }
 
-  async componentDidMount() {
+  async fetchJsonData() {
     var data = await $.getJSON("http://storage.googleapis.com/show-scraper-data/events.json");
     var newData = []
     Object.entries(data).forEach(([source, events]) => {
@@ -79,12 +100,16 @@ class App extends React.Component {
     this.setState({ events: groupedData });
   }
 
+  async componentDidMount() {
+    this.fetchJsonData()
+  }
+
   render() {
     const events = Object.entries(this.state.events).map(([date, date_events], idx) => {
       return (
-        <div className='Day-group'>
+        <div key={idx} className='Day-group'>
           <h2>{date}</h2>
-          <div class='Day-events'>
+          <div className='Day-events'>
             {date_events.map((date_event, idx2) => {
               return <EventListItem key={(idx + 1) + idx2 } event={date_event} />
             })}
@@ -95,13 +120,15 @@ class App extends React.Component {
 
     return (
         <div className="App">
-          <Link to="/test">TestPage</Link><br />
           <div className="App-body">
-            {events}
+            <Nav route={this.props.route} />
+            <div className='Events-list'>
+              {events}
+            </div>
           </div>
         </div>
     );
   }
 }
 
-export { App, Test };
+export { App, Test }
