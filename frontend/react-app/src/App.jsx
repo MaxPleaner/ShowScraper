@@ -42,12 +42,12 @@ class Nav extends React.Component {
             <Column className='is-narrow'>
               <Box>Bay Area Shows</Box>
             </Column>
-            <Column className="is-narrow">
+{/*            <Column className="is-narrow">
               <a href='/'>
                 <Box className={this.props.route === "ListView" ? "selected" : ""}>List View</Box>
               </a>
-            </Column>
-            <Column className="is-narrow">
+            </Column>*/}
+{/*            <Column className="is-narrow">
               <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
             </Column>
             <Column className="is-narrow">
@@ -59,7 +59,7 @@ class Nav extends React.Component {
             <Column className="is-narrow">
               <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
             </Column>
-          </Columns>
+*/}          </Columns>
         </Box>
       </div>
     )
