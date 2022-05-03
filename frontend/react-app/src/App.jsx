@@ -17,17 +17,15 @@ class EventListItem extends React.Component {
   }
   render() {
     return (
-      <div className='Event-box'>
-        <h4>
-          <i>({this.props.event.source}) </i>
-          <br />
-          <span>{this.props.event.title}</span>
-          <br />
-          <a href={this.props.event.url}>
-            <img className='Event-img' src={this.props.event.img} />
-          </a>
-         </h4>
-      </div>
+      <Column className='is-half'>
+        <Columns className='Event-box is-multiline'>
+          <Column className='is-half'>
+             <a href={this.props.event.url}><Box><img className='Event-img' src={this.props.event.img} /></Box></a>
+          </Column>
+          <Column className=''><Box><b>{this.props.event.source}</b><br />{this.props.event.title}</Box></Column>
+          {/*<Column className=''><Box></Box></Column>*/}
+        </Columns>
+      </Column>
     )
   }
 }
@@ -132,12 +130,12 @@ class ListView extends React.Component {
     const events = Object.entries(this.props.events).map(([date, date_events], idx) => {
       return (
         <div key={idx} className='Day-group'>
-          <h2>{date}</h2>
-          <div className='Day-events'>
+          <Box>{date}</Box>
+          <Columns className='Day-events is-multiline'>
             {date_events.map((date_event, idx2) => {
               return <EventListItem key={(idx + 1) + idx2 } event={date_event} />
             })}
-          </div>
+          </Columns>
         </div>
       )
     })
