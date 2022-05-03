@@ -72,11 +72,30 @@ class Nav extends React.Component {
 class ListViewManager extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { mode: 'day' };
+    this.state = { mode: 'day', allEvents: [], events: [] };
+  }
+
+  componentDidUpdate(oldProps) {
+    if (this.props.events != oldProps.events) {
+      this.setState({...this.state, allEvents: this.props.events, events: this.computeEventsList(this.props.events, this.state.mode)})
+    }
+  }
+
+  computeEventsList (allEvents, mode) {
+    const today = moment(new Date())
+
+    if (mode == 'day') {
+      return _.pick(allEvents, today.startOf('day').format());
+    } else if (mode == 'week') {
+      const days = [...Array(7).keys()].map((i) => {
+        return today.add(i, 'days').startOf('day').format();
+      });
+      return _.pick(allEvents, days);
+    }
   }
 
   changeMode (newMode) {
-    this.setState({...this.state, mode: newMode})
+    this.setState({...this.state, mode: newMode, events: this.computeEventsList(this.state.allEvents, newMode)})
   }
 
   render() {
@@ -102,7 +121,7 @@ class ListViewManager extends React.Component {
           <Column className='is-one-third'>
           </Column>
         </Columns>
-        <ListView events={this.props.events}/>
+        <ListView events={this.state.events}/>
       </div>
      )
   }
@@ -153,12 +172,11 @@ class App extends React.Component {
       let date = moment(event.date)
       return moment(event.date).startOf('day').format();
     })
-
     this.setState({ events: groupedData });
   }
 
   async componentDidMount() {
-    this.fetchJsonData()
+    await this.fetchJsonData()
   }
 
   render() {
