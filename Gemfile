@@ -2,6 +2,7 @@ source "http://rubygems.org"
 
 # general utils
 gem 'pry'
+gem 'pry-nav'
 gem 'activesupport'
 gem 'dotenv'
 

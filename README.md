@@ -18,6 +18,14 @@ bucket.
 The front end is written in [React](https://reactjs.org/)
 and styled with [Bulma CSS framework](https://bulma.io/).
 
-## Contributing: Scraper
+## Setup
 
-To fix an existing scraper
+TODO
+
+## Testing
+
+TODO
+
+## Contributing
+
+TODO

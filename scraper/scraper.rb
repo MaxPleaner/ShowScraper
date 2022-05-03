@@ -16,114 +16,58 @@ unless ENV["NO_GCS"] == "true"
   require "#{__dir__}/lib/gcs.rb"
 end
 
-class Scraper
-  SOURCES = [
-    DnaLounge,
-    ElboRoom,
-    ElisMileHighClub,
-    GoldenBull,
-    GreyArea,
-    Knockout,
-    TheeParkside,
-    BottomOfTheHill,
-    Cornerstone,
-    ElRio,
-    FreightAndSalvage,
-    Zeitgeist
-
-    # TODO Venues:
-    # - The Chapel
-    # - Greek Theater
-    # - Independent
-    # - Make Out Room
-    # - Starline Social Club
-    # - Rickshaw Stop
-    # - Warfield
-    # - Great American Music Hall
-    # - Fillmore
-    # - Yoshi's
-    # - Zeitgeist
-    # - Winter's Tavern
-    # - Ivy Room
-    # - New Parish
-    # - UC Berkeley Theater
-    # - Masonic
-    # - Paramount
-    # - Fox Theater
-    # - Great Northern
-    # - Hotel Utah
-    # - Amados
-    # - August Hall
-    # - Bimbo's
-    # - Brick and Mortar
-    # - Cafe Du Nord
-    # - Crybaby
-    # - Make Out Room
-    # - Eagle
-    # - Midway
-    # - Milk Bar
-    # - SF Jazz
-    # - Caravan
-    # - Elegant Pub
-    # - Phoenix Theater
-    # - Regency
-
-    # CANNOT SCRAPE (NO PUBLIC CALENDAR)
-    # - Bender's
-    # - Stay Gold Deli
-    # - First Church of the Buzzard
-    # - Thee Stork Club (not open yet)
-    # - Red Hat (Concord)
-    # - The Bistro (Hayward)
-    # - Ashkenaz (Closed)
-    # - Gilman
-
-    # OTHER VENUES (Lower Priority):
-    # - Pavilion Concord
-    # - Bill Graham Civic (Meh)
-    # - 1015 Folsom (EDM)
-    # - Santa Cruz Venues
-    # - Stanford Ampitheater
-  ].reverse
-
-  class Utils
-    def self.print_event_preview(source, data)
-      return unless ENV["PRINT_EVENTS"] == "true"
-      if ENV["FULL_DETAIL"] == "true"
-        pp data
-      else
-        puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
-      end
-    end
-
-    def self.quit!
-      $driver&.quit
-      exit!
+class Utils
+  def self.print_event_preview(source, data)
+    return unless ENV["PRINT_EVENTS"] == "true"
+    if ENV["PRINT_FULL_DETAIL"] == "true"
+      pp data
+    else
+      puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
     end
   end
+
+  def self.quit!
+    $driver&.quit
+    exit!
+  end
+end
+
+class Scraper
+  SOURCE_LIST_JSON = "#{__dir__}/../sources.json"
+
+  SOURCES = JSON.parse(File.read(SOURCE_LIST_JSON)).map { |source| source["name"].constantize }
+
 
   class << self
 
     def run(sources=SOURCES, events_limit: nil, persist_mode: :static)
+      sources = SOURCES if sources.nil?
+
       $driver ||= init_driver
       at_exit { $driver.quit }
 
-      results = sources.
-        index_by { |source| source.name }.
-        transform_values do |source|
-          run_scraper(source, events_limit: events_limit) do |event_data|
-            if persist_mode == :sql
-              persist_sql(source, event_data)
-            end
+      persist_sources_list if persist_mode == :static
+
+      results = {}
+      errors = []
+      sources.each do |source|
+        event_list = run_scraper(source, events_limit: events_limit) do |event_data|
+          if persist_mode == :sql
+            persist_sql(source, event_data)
           end
         end
-
-      if persist_mode == :static
-        # for static persistence we do it in one big chunk at the end
-        persist_static(results)
+        persist_event_list(source, event_list) if persist_mode == :static
+        results[source] = event_list
+      rescue => e
+        if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
+          puts e, e.backtrace
+          errors.push({ source: source.name, error: e })
+        else
+          raise
+        end
       end
 
-      results
+      [results, errors]
     end
 
     private
@@ -141,14 +85,18 @@ class Scraper
       end
     end
 
-    def persist_static(results)
-      results_json = results.to_json
+    def persist_sources_list
+      GCS.upload_file(source: SOURCE_LIST_JSON, dest: "sources.json")
+    end
+
+    def persist_event_list(source, event_list)
+      json = event_list.to_json
 
       # upload to GCS
-      GCS.upload_text_as_file(text: results_json, dest: "events.json")
+      GCS.upload_text_as_file(text: json, dest: "#{source}.json")
 
       # Also write the file locally
-      File.open("output/events.json", "w") { |f| f.write results_json }
+      File.open("debug/#{source}.json", "w") { |f| f.write json }
     end
 
     def init_driver
@@ -167,13 +115,6 @@ class Scraper
 
     def run_scraper(source, events_limit: nil, &foreach_event_blk)
       source.run({ events_limit: events_limit }.compact, &foreach_event_blk)
-    rescue => e
-      if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
-        puts "ERROR scraping #{source.name}: #{e}"
-        {}
-      else
-        raise e
-      end
     end
 
   end

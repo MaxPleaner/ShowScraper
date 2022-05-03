@@ -84,6 +84,8 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
+    pry-nav (1.0.0)
+      pry (>= 0.9.10, < 0.15)
     public_suffix (4.0.7)
     rack (2.2.3)
     rack-protection (2.2.0)
@@ -146,6 +148,7 @@ DEPENDENCIES
   google-cloud-storage
   pg
   pry
+  pry-nav
   rake
   rspec
   selenium-webdriver

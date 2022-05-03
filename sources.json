@@ -1,0 +1,106 @@
+[
+    {
+      "name": "DnaLounge",
+      "latlng": "37.7712709589196, -122.41278334105019"
+    },
+    {
+      "name": "ElboRoom",
+      "latlng": "37.79735929031427, -122.27594265750385"
+    },
+    {
+      "name": "ElisMileHighClub",
+      "latlng": "37.825963943582, -122.26963881517561"
+    },
+    {
+      "name": "GoldenBull",
+      "latlng": "37.80438048778646, -122.27026978634001"
+    },
+    {
+      "name": "GreyArea",
+      "latlng": "37.754502454358125, -122.41853488819491"
+    },
+    {
+      "name": "Knockout",
+      "latlng": "37.74535330528293, -122.41996965935881"
+    },
+    {
+      "name": "TheeParkside",
+      "latlng": "37.76536616388736, -122.39991100168584"
+    },
+    {
+      "name": "BottomOfTheHill",
+      "latlng": "37.7652322231627, -122.39644963068031"
+    },
+    {
+      "name": "Cornerstone",
+      "latlng": "37.86652335529277, -122.26729071533632"
+    },
+    {
+      "name": "ElRio",
+      "latlng": "37.746912749315676, -122.41929098465583"
+    },
+    {
+      "name": "FreightAndSalvage",
+      "latlng": "37.87107158135359, -122.2696704325259"
+    },
+    {
+      "name": "Zeitgeist",
+      "latlng": "37.770150192891506, -122.42217084602194"
+    }
+]
+
+/*
+TODO Venues:
+- The Chapel
+- Greek Theater
+- Independent
+- Make Out Room
+- Starline Social Club
+- Rickshaw Stop
+- Warfield
+- Great American Music Hall
+- Fillmore
+- Yoshi's
+- Zeitgeist
+- Winter's Tavern
+- Ivy Room
+- New Parish
+- UC Berkeley Theater
+- Masonic
+- Paramount
+- Fox Theater
+- Great Northern
+- Hotel Utah
+- Amados
+- August Hall
+- Bimbo's
+- Brick and Mortar
+- Cafe Du Nord
+- Crybaby
+- Make Out Room
+- Eagle
+- Midway
+- Milk Bar
+- SF Jazz
+- Caravan
+- Elegant Pub
+- Phoenix Theater
+- Regency
+
+CANNOT SCRAPE (NO PUBLIC CALENDAR)
+- Bender's
+- Stay Gold Deli
+- First Church of the Buzzard
+- Thee Stork Club (not open yet)
+- Red Hat (Concord)
+- The Bistro (Hayward)
+- Ashkenaz (Closed)
+- Gilman
+
+OTHER VENUES (Lower Priority):
+- Pavilion Concord
+- Bill Graham Civic (Meh)
+- 1015 Folsom (EDM)
+- Santa Cruz Venues
+- Stanford Ampitheater
+*/
