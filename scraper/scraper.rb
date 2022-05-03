@@ -17,12 +17,12 @@ unless ENV["NO_GCS"] == "true"
 end
 
 class Utils
-  def self.print_event_preview(source, data, condense_data: true)
+  def self.print_event_preview(source, data)
     return unless ENV["PRINT_EVENTS"] == "true"
-    if condense_data
-      puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
-    else
+    if ENV["FULL_DETAIL"] == "true"
       pp data
+    else
+      puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
     end
   end
 
@@ -44,10 +44,10 @@ class Scraper
     BottomOfTheHill,
     Cornerstone,
     ElRio,
-    FreightAndSalvage
+    FreightAndSalvage,
+    Zeitgeist
 
     # TODO Venues:
-    # - Ashkenaz
     # - The Chapel
     # - Greek Theater
     # - Independent
@@ -83,7 +83,6 @@ class Scraper
     # - Elegant Pub
     # - Phoenix Theater
     # - Regency
-    # - Zeitgeist
 
     # CANNOT SCRAPE (NO PUBLIC CALENDAR)
     # - Bender's
@@ -92,12 +91,13 @@ class Scraper
     # - Thee Stork Club (not open yet)
     # - Red Hat (Concord)
     # - The Bistro (Hayward)
+    # - Ashkenaz (Closed)
+    # - Gilman
 
     # OTHER VENUES (Lower Priority):
     # - Pavilion Concord
     # - Bill Graham Civic (Meh)
     # - 1015 Folsom (EDM)
-    # - Gilman
     # - Santa Cruz Venues
     # - Stanford Ampitheater
   ].reverse

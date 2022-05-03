@@ -43,7 +43,7 @@ class ElisMileHighClub
       {
         date: parse_date($driver.css(".event-when")[0].text),
         title: $driver.css(".details .title")[0].text,
-        url: "",
+        url: MAIN_URL,
         img: "",
         details: $driver.css(".event-description")[0].text
       }.tap do
