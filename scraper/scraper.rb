@@ -16,22 +16,6 @@ unless ENV["NO_GCS"] == "true"
   require "#{__dir__}/lib/gcs.rb"
 end
 
-class Utils
-  def self.print_event_preview(source, data)
-    return unless ENV["PRINT_EVENTS"] == "true"
-    if ENV["FULL_DETAIL"] == "true"
-      pp data
-    else
-      puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
-    end
-  end
-
-  def self.quit!
-    $driver&.quit
-    exit!
-  end
-end
-
 class Scraper
   SOURCES = [
     DnaLounge,
@@ -101,6 +85,22 @@ class Scraper
     # - Santa Cruz Venues
     # - Stanford Ampitheater
   ].reverse
+
+  class Utils
+    def self.print_event_preview(source, data)
+      return unless ENV["PRINT_EVENTS"] == "true"
+      if ENV["FULL_DETAIL"] == "true"
+        pp data
+      else
+        puts("#{source.name} #{data[:date]&.strftime("%m/%d")}: #{data[:title]&.gsub("\n", " ")}")
+      end
+    end
+
+    def self.quit!
+      $driver&.quit
+      exit!
+    end
+  end
 
   class << self
 
