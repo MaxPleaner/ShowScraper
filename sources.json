@@ -63,5 +63,10 @@
       "name": "TheChapel",
       "latlng": "37.76068146496075, -122.42128717342376",
       "desc": "Converted ex-chapel featuring a 40-ft. arched ceiling, bar & a wide variety of live-music acts."
+    },
+    {
+      "name": "Independent",
+      "latlng": "37.775904930095464, -122.43747145397509",
+      "desc": "Intimate, no-frills music venue with a full bar that features indie & emerging acts."
     }
 ]
