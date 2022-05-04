@@ -102,6 +102,8 @@ bin/run-scraper --limit=5 --skip-persist --rescue=false --no-scrape sources=Elbo
 
 There are some other configuration options done through ENV, see `.env.example`
 
+Note that every time you run a scraper, it will completely overwrite the list of events for that venue.
+
 ## Testing
 
 There are some basic automated tests for the scrapers. Run `bundle exec rspec` from the root of the repo.
