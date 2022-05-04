@@ -131,7 +131,7 @@ just copy the blurb from Google Maps as well.
 Note, there is no need to explicitly `require` the scraper class anywhere into the codebase.
 Autoloading is already set up based on `sources.json`.
 
-## A note about the /server and /db folders
+## A note about the unused/server and unused/db folders
 
 These are both unused. I kept them here in case I want to have a dedicated backend at some point.
 
