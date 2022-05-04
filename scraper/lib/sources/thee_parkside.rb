@@ -23,12 +23,14 @@ class TheeParkside
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      img = get_high_res_image(event)
+      return unless img # their "bar closed" events have no image
       {
         date: parse_date(event.css(".hmt-event-start-span")[0].text),
         url: "",
         title: event.css(".hmt-event-title")[0].text,
         details: event.css(".hmt-event-subtitle")[0]&.text || "",
-        img: get_high_res_image(event),
+        img: img,
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
@@ -36,8 +38,10 @@ class TheeParkside
 
     def get_high_res_image(event)
       event.css(".hmt-flyer")[0].click
-      link = $driver.
-        css(".graphic-container")[0].
+      graphic_container = $driver.css(".graphic-container")[0]
+      return unless graphic_container
+
+      link = graphic_container.
         attribute("style").
         scan(/url\(\"(.+)\"\)/)[0][0]
 

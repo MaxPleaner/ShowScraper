@@ -1,4 +1,6 @@
 #!/bin/bash
 
-nvm use v14
-cd ./frontend/react-app && yarn && yarn start
+(
+  nvm use v14
+  cd ./frontend/react-app && yarn && yarn start
+)

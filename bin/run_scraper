@@ -8,7 +8,7 @@ OptionParser.new do |opt|
   opt.on('--limit LIMIT') { |val| opts[:limit] = val.to_i }
   opt.on('--skip-persist') { opts[:skip_persist] = true }
   opt.on('--rescue BOOL') { |val| ENV["RESCUE_SCRAPING_ERRORS"] = val }
-  opt.on('--only-update-venues') { ENV["ONLY_UPDATE_VENUES"] = "true" }
+  opt.on('--no-scrape') { ENV["ONLY_UPDATE_VENUES"] = "true" }
   opt.on('--sources SOURCES') do |val|
     opts[:sources] = val.split(",").map do |source|
       source.constantize

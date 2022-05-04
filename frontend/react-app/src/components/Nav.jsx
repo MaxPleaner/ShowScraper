@@ -15,24 +15,26 @@ export default class Nav extends React.Component {
             <Column className='is-narrow'>
               <Box>Bay Area Shows</Box>
             </Column>
-{/*            <Column className="is-narrow">
-              <a href='/'>
+            <Column className="is-narrow">
+              <a href='/ListView'>
                 <Box className={this.props.route === "ListView" ? "selected" : ""}>List View</Box>
               </a>
-            </Column>*/}
+            </Column>
 {/*            <Column className="is-narrow">
               <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
-            </Column>
+            </Column>*/}
             <Column className="is-narrow">
-              <Box className={this.props.route === "todo" ? "selected" : ""}>Venues</Box>
+              <a href='/VenuesListView'>
+                <Box className={this.props.route === "VenuesListView" ? "selected" : ""}>Venues</Box>
+              </a>
             </Column>
-            <Column className="is-narrow">
+{/*            <Column className="is-narrow">
               <Box className={this.props.route === "todo" ? "selected" : ""}>Submit Event</Box>
-            </Column>
-            <Column className="is-narrow">
+            </Column>*/}
+{/*            <Column className="is-narrow">
               <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
-            </Column>
-*/}          </Columns>
+            </Column>*/}
+          </Columns>
         </Box>
       </div>
     )

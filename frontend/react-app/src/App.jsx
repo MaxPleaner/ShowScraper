@@ -7,7 +7,8 @@ import 'bulma/css/bulma.min.css';
 
 
 import Nav from './components/Nav';
-import ListViewManager from './components/ListViewManager';
+import EventListViewManager from './components/EventListViewManager';
+import VenuesList from './components/VenuesList';
 import DataLoader from "./utils/DataLoader"
 
 class App extends React.Component {
@@ -30,7 +31,8 @@ class App extends React.Component {
 
   render() {
     let currentView
-    if (this.props.route == "ListView") { currentView = <ListViewManager events={this.state.events} />; }
+    if (this.props.route == "ListView") { currentView = <EventListViewManager events={this.state.events} />; }
+    if (this.props.route == "VenuesListView") { currentView = <VenuesList venues={this.state.venues} />; }
 
     return (
         <div className="App-body">

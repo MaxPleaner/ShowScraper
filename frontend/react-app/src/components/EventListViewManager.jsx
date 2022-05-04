@@ -2,10 +2,10 @@ import React from 'react';
 import moment from 'moment';
 import { Columns, Box } from 'react-bulma-components';
 const { Column } = Columns;
-import ListView from './ListView'
+import EventListView from './EventListView'
 import _ from 'underscore'
 
-export default class ListViewManager extends React.Component {
+export default class EventListViewManager extends React.Component {
   constructor(props) {
     super(props)
     this.state = { mode: 'day', allEvents: [], events: [], currentDay: moment(new Date()) };
@@ -124,7 +124,13 @@ export default class ListViewManager extends React.Component {
             </Box>
           </Column>
         </Columns>
-        <ListView events={this.state.events}/>
+        {
+          (this.state.allEvents.length == 0) ? (
+            <Box>Loading...</Box>
+          ) : (
+            <EventListView events={this.state.events}/>
+          )
+        }
       </div>
      )
   }

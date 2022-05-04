@@ -10,6 +10,8 @@ root.render(
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App route='ListView' />} />
+        <Route path="/ListView" element={<App route='ListView' />} />
+        <Route path="/VenuesListView" element={<App route='VenuesListView' />} />
       </Routes>
     </BrowserRouter>
   </React.StrictMode>

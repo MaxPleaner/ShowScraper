@@ -1,7 +1,7 @@
 require "google/cloud/storage"
 
 class GCS
-  CACHE_CONTROL = "Cache-Control:private, max-age=0, no-transform"
+  CACHE_CONTROL = "Cache-Control:max-age=300" # 5 minutes cache
 
   cattr_accessor :storage, :bucket_name, :bucket
 
