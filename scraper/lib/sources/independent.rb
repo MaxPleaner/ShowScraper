@@ -48,7 +48,7 @@ class Independent
           document.querySelector(".email-popup-container").remove()
         JS
         {
-          date: parse_date($driver.css(".tw-event-date")[0].text,
+          date: parse_date($driver.css(".tw-event-date")[0].text),
           title: $driver.css(".tw-name").map(&:text).uniq.join(", "),
           url: $driver.current_url,
           img: $driver.css(".tw-image img")[0].attribute("src"),

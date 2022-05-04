@@ -1,19 +1,17 @@
 
 /*
 TODO Venues:
-- Greek Theater
-- Make Out Room
-- Starline Social Club
-- Rickshaw Stop
 - Warfield
 - Great American Music Hall
 - Fillmore
-- Yoshi's
+- Greek Theater
 - Zeitgeist
-- Winter's Tavern
 - Ivy Room
-- New Parish
 - UC Berkeley Theater
+- Rickshaw Stop
+- Make Out Room
+- Yoshi's
+- Winter's Tavern
 - Masonic
 - Paramount
 - Fox Theater
@@ -46,6 +44,7 @@ CANNOT SCRAPE (NO PUBLIC CALENDAR)
 - Gilman
 
 OTHER VENUES (Lower Priority):
+- New Parish
 - Pavilion Concord
 - Bill Graham Civic (Meh)
 - 1015 Folsom (EDM)
