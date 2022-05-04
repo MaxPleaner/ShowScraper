@@ -84,6 +84,7 @@ and then upload the results to GCS.
 --skip-persist
 
 # Don't rescue scraping errors - one broken scraper will stop the whole script
+# If rescue=true (the default) then broken scrapers will just be skipped
 --rescue=false
 
 # Just update the list of venues. Don't actually scrape any events.
