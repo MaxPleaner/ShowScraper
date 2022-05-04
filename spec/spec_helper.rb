@@ -1,6 +1,8 @@
 require 'database_cleaner'
 
 ENV["TEST"] = "true"
+ENV["PRINT_FULL_DETAIL"] = "true"
+ENV["RESCUE_SCRAPING_ERRORS"] = "false"
 
 RSpec.configure do |config|
   config.expect_with :rspec do |expectations|

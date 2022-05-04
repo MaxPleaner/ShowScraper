@@ -20,7 +20,7 @@ RSpec.describe Scraper do
   describe ".run" do
     context("persist_mode: nil") do
       def generic_run_test(sources, events_limit)
-        result = described_class.run(sources, events_limit: events_limit, persist_mode: nil)
+        result, errors = described_class.run(sources, events_limit: events_limit, persist_mode: nil)
         sources.each do |source|
           key = source.name
           expect(result.key?(key)).to be true
@@ -52,7 +52,8 @@ RSpec.describe Scraper do
       it ("gets data for Cornerstone") { generic_run_test([Cornerstone], 5) }
       it ("gets data for ElRio") { generic_run_test([ElRio], 5) }
       it ("gets data for FreightAndSalvage") { generic_run_test([FreightAndSalvage], 5) }
-      it ("gets data for Zeitgeist") { generic_run_test([Zeitgeist], 5) }
+      it ("gets data for Zeitgeist") { generic_run_test([Zeitgeist], 1) }
+      it ("gets data for TheChapel") { generic_run_test([TheChapel], 5) }
     end
 
     context "persist_mode: :sql" do
@@ -69,6 +70,8 @@ RSpec.describe Scraper do
 
     context "persist_mode: :static" do
       it "saves data to s3" do
+        skip("use this for manual testing if needed")
+
         described_class.run(events_limit: 1, persist_mode: :static)
       end
     end

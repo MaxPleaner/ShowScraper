@@ -61,7 +61,7 @@ class Scraper
           end
         end
         persist_event_list(source, event_list) if persist_mode == :static
-        results[source] = event_list
+        results[source.name] = event_list
       rescue => e
         if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
           puts e, e.backtrace

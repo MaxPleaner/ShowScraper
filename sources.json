@@ -1,50 +1,67 @@
 [
     {
       "name": "DnaLounge",
-      "latlng": "37.7712709589196, -122.41278334105019"
+      "latlng": "37.7712709589196, -122.41278334105019",
+      "desc": "A variety of DJ'd theme nights, live acts & drag shows keeps mixed crowds partying until 3 AM."
     },
     {
       "name": "ElboRoom",
-      "latlng": "37.79735929031427, -122.27594265750385"
+      "latlng": "37.79735929031427, -122.27594265750385",
+      "desc": "Bilevel bar featuring a dance floor & wide-ranging music from DJs & bands, plus daily happy hour."
     },
     {
       "name": "ElisMileHighClub",
-      "latlng": "37.825963943582, -122.26963881517561"
+      "latlng": "37.825963943582, -122.26963881517561",
+      "desc": "Former blues institution, now a bustling bar with Cajun-inspired bar bites, live bands & beer."
     },
     {
       "name": "GoldenBull",
-      "latlng": "37.80438048778646, -122.27026978634001"
+      "latlng": "37.80438048778646, -122.27026978634001",
+      "desc": "Lively hangout offering a full bar with craft beer & cocktails, plus pool, live bands & DJs."
     },
     {
       "name": "GreyArea",
-      "latlng": "37.754502454358125, -122.41853488819491"
+      "latlng": "37.754502454358125, -122.41853488819491",
+      "desc": "Sizable, renovated historic theater featuring creative events relating to art and technology."
     },
     {
       "name": "Knockout",
-      "latlng": "37.74535330528293, -122.41996965935881"
+      "latlng": "37.74535330528293, -122.41996965935881",
+      "desc": "DJ dance parties, punk bands & bingo nights are among the offerings at this no-frills bar."
     },
     {
       "name": "TheeParkside",
-      "latlng": "37.76536616388736, -122.39991100168584"
+      "latlng": "37.76536616388736, -122.39991100168584",
+      "desc": "Watering hole with a backyard & a small stage hosting bands spanning indie, punk, metal & country."
     },
     {
       "name": "BottomOfTheHill",
-      "latlng": "37.7652322231627, -122.39644963068031"
+      "latlng": "37.7652322231627, -122.39644963068031",
+      "desc": "From indie rock to hip-hop, this popular club offers a range of live music, plus outdoor seating."
     },
     {
       "name": "Cornerstone",
-      "latlng": "37.86652335529277, -122.26729071533632"
+      "latlng": "37.86652335529277, -122.26729071533632",
+      "desc": "Expansive, multi-faceted beer hall & American kitchen with live music, ping pong & outdoor seating."
     },
     {
       "name": "ElRio",
-      "latlng": "37.746912749315676, -122.41929098465583"
+      "latlng": "37.746912749315676, -122.41929098465583",
+      "desc": "A Mission standby since 1978, this local bar with an expansive patio draws a diverse crowd."
     },
     {
       "name": "FreightAndSalvage",
-      "latlng": "37.87107158135359, -122.2696704325259"
+      "latlng": "37.87107158135359, -122.2696704325259",
+      "desc": "The Freight and Salvage is a nonprofit musical performance venue in Berkeley, California that primarily hosts Americana music and world music acts."
     },
     {
       "name": "Zeitgeist",
-      "latlng": "37.770150192891506, -122.42217084602194"
+      "latlng": "37.770150192891506, -122.42217084602194",
+      "desc": "Craft beers & a spacious patio with picnic benches draw a lively crowd to this popular Mission spot."
+    },
+    {
+      "name": "TheChapel",
+      "latlng": "37.76068146496075, -122.42128717342376",
+      "desc": "Converted ex-chapel featuring a 40-ft. arched ceiling, bar & a wide variety of live-music acts."
     }
 ]
