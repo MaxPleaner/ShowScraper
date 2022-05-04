@@ -123,7 +123,8 @@ just copy the blurb from Google Maps as well.
 
 4. Make sure the class name is the exact same as the `name` value in `sources.json`
 
-5. Fill out the contents of the scraper, using `binding.pry` and the `HEADLESS=false` environment variable as needed.
+5. Fill out the contents of the scraper, using `binding.pry` and the `HEADLESS=false`
+   environment variable as needed for debugging.
 
 6. Add a test case to `scraper_spec.rb` (can just use `generic_run_test` like the other scrapers)
 
