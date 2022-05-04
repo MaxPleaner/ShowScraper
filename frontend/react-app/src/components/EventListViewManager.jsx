@@ -34,8 +34,8 @@ export default class EventListViewManager extends React.Component {
 
   currentDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.format("MM-DD")
-      return moment(new Date()).format("MM-DD") == day ? `${day} (today)` : day;
+      const day = this.state.currentDay.format("MM-DD (dddd)")
+      return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(7, 'days')
       return `${this.state.currentDay.format("MM-DD")} - ${nextWeek.format("MM-DD")}`
@@ -44,8 +44,8 @@ export default class EventListViewManager extends React.Component {
 
   nextDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.clone().add(1, 'days').format("MM-DD")
-      return moment(new Date()).format("MM-DD") == day ? `${day} (today)` : day;
+      const day = this.state.currentDay.clone().add(1, 'days').format("MM-DD (dddd)")
+      return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(7, 'days')
       const nextWeek2 = this.state.currentDay.clone().add(14, 'days')
@@ -55,8 +55,8 @@ export default class EventListViewManager extends React.Component {
 
   prevDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.clone().add(-1, 'days').format("MM-DD")
-      return moment(new Date()).format("MM-DD") == day ? `${day} (today)` : day;
+      const day = this.state.currentDay.clone().add(-1, 'days').format("MM-DD (dddd)")
+      return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(-7, 'days')
       const nextWeek2 = this.state.currentDay.clone()
