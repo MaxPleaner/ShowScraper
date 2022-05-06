@@ -37,6 +37,9 @@ RSpec.describe Scraper do
             }.each do |event_key, type|
               expect(event[event_key]).to be_a(type)
             end
+            %i[date title url].each do |required_key|
+              expect(event[required_key]).not_to be_blank
+            end
           end
         end
       end
@@ -64,6 +67,7 @@ RSpec.describe Scraper do
       it ("gets data for UCBerkeleyTheater") { generic_run_test([UCBerkeleyTheater], 5) }
       it ("gets data for RickshawStop") { generic_run_test([RickshawStop], 5) }
       it ("gets data for MakeOutRoom") { generic_run_test([MakeOutRoom], 5) }
+      it ("gets data for Yoshis") { generic_run_test([Yoshis], 15) }
     end
 
     context "persist_mode: :sql" do

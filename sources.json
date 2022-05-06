@@ -136,5 +136,11 @@
       "commonName": "Make Out Room",
       "latlng": "37.75561626731759, -122.41779494756615",
       "desc": "DJs, live bands & more in a dimly lit, retro setting complete with disco ball above the dance floor."
+    },
+    {
+      "name": "Yoshis",
+      "commonName": "Yoshis",
+      "latlng": "37.7969484364991, -122.27906056138154",
+      "desc": "Combination sushi restaurant & nightclub offering Japanese fare & live music in a relaxed setting."
     }
 ]

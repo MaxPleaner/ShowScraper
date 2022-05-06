@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Make Out Room
 - Yoshi's
 - Winter's Tavern
 - Masonic
