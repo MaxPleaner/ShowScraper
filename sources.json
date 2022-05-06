@@ -118,5 +118,11 @@
       "commonName": "Ivy Room",
       "latlng": "37.89105175708205, -122.29917516931671",
       "desc": "Hip neighborhood bar featuring craft cocktails, quirky vintage decor & regular live music."
+    },
+    {
+      "name": "UCBerkeleyTheater",
+      "commonName": "UC Berkeley Theater",
+      "latlng": "37.87239206650805, -122.26956443572898",
+      "desc": "The UC Theatre is a music venue on University Avenue near Shattuck Avenue in Downtown Berkeley, Berkeley, California, United States. From 1976 until 2001, it was as a movie theater known for a revival house presentation of films."
     }
 ]

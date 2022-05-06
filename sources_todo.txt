@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Ivy Room
 - UC Berkeley Theater
 - Rickshaw Stop
 - Make Out Room
