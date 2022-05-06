@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Warfield
 - Great American Music Hall
 - Fillmore
 - Greek Theater

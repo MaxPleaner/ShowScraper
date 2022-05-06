@@ -94,5 +94,11 @@
       "commonName": "Warfield",
       "latlng": "37.78287720607724, -122.41029925397505",
       "desc": "Intimate venue began as a vaudeville theater in 1922 & now hosts a variety of national music acts."
+    },
+    {
+      "name": "GreatAmericanMusicHall",
+      "commonName": "Great American Music Hall",
+      "latlng": "37.78570726311687, -122.41862030793457",
+      "desc": "Once host to the Grateful Dead, this ornately decked concert venue now books modern mainstream acts."
     }
 ]
