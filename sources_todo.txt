@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Great American Music Hall
 - Fillmore
 - Greek Theater
 - Zeitgeist

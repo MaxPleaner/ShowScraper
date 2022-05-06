@@ -100,5 +100,11 @@
       "commonName": "Great American Music Hall",
       "latlng": "37.78570726311687, -122.41862030793457",
       "desc": "Once host to the Grateful Dead, this ornately decked concert venue now books modern mainstream acts."
+    },
+    {
+      "name": "Fillmore",
+      "commonName": "Fillmore",
+      "latlng": "37.784516137619555, -122.4332164382042",
+      "desc": "Famed '60s counterculture music venue draws crowds for indie & major label acts (capacity: 1,199)."
     }
 ]
