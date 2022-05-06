@@ -124,5 +124,11 @@
       "commonName": "UC Berkeley Theater",
       "latlng": "37.87239206650805, -122.26956443572898",
       "desc": "The UC Theatre is a music venue on University Avenue near Shattuck Avenue in Downtown Berkeley, Berkeley, California, United States. From 1976 until 2001, it was as a movie theater known for a revival house presentation of films."
+    },
+    {
+      "name": "RickshawStop",
+      "commonName": "Rickshaw Stop",
+      "latlng": "37.77667998998165, -122.42038505396386",
+      "desc": "Indie bands & DJs rock crowds in a small, funky space that also offers food & lounge areas."
     }
 ]

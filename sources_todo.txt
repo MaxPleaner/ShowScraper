@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- UC Berkeley Theater
 - Rickshaw Stop
 - Make Out Room
 - Yoshi's
@@ -45,3 +44,6 @@ OTHER VENUES (Lower Priority):
 - Santa Cruz Venues
 - Stanford Ampitheater
 */
+
+OTHER LISTS
+https://ra.co/
