@@ -142,5 +142,11 @@
       "commonName": "Yoshis",
       "latlng": "37.7969484364991, -122.27906056138154",
       "desc": "Combination sushi restaurant & nightclub offering Japanese fare & live music in a relaxed setting."
+    },
+    {
+      "name": "Winters",
+      "commonName": "Winter's Tavern",
+      "latlng": "37.63742865000287, -122.4903133693172",
+      "desc": "Down 'n' dirty bar featuring live rock, folk & bluegrass bands in a rustic, wood-paneled space."
     }
 ]

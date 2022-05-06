@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Yoshi's
 - Winter's Tavern
 - Masonic
 - Paramount

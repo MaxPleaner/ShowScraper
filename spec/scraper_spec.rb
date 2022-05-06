@@ -67,7 +67,8 @@ RSpec.describe Scraper do
       it ("gets data for UCBerkeleyTheater") { generic_run_test([UCBerkeleyTheater], 5) }
       it ("gets data for RickshawStop") { generic_run_test([RickshawStop], 5) }
       it ("gets data for MakeOutRoom") { generic_run_test([MakeOutRoom], 5) }
-      it ("gets data for Yoshis") { generic_run_test([Yoshis], 15) }
+      it ("gets data for Yoshis") { generic_run_test([Yoshis], 5) }
+      it ("gets data for Winters") { generic_run_test([Winters], 15) }
     end
 
     context "persist_mode: :sql" do
