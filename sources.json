@@ -106,5 +106,11 @@
       "commonName": "Fillmore",
       "latlng": "37.784516137619555, -122.4332164382042",
       "desc": "Famed '60s counterculture music venue draws crowds for indie & major label acts (capacity: 1,199)."
+    },
+    {
+      "name": "GreekTheater",
+      "commonName": "Greek Theater",
+      "latlng": "37.87425341626093, -122.25429983863341",
+      "desc": "Located at UC Berkeley, this popular outdoor spot draws well-known bands & other events."
     }
 ]

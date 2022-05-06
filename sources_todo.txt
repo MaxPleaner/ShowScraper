@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Fillmore
 - Greek Theater
 - Zeitgeist
 - Ivy Room
