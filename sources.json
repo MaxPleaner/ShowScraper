@@ -112,5 +112,11 @@
       "commonName": "Greek Theater",
       "latlng": "37.87425341626093, -122.25429983863341",
       "desc": "Located at UC Berkeley, this popular outdoor spot draws well-known bands & other events."
+    },
+    {
+      "name": "IvyRoom",
+      "commonName": "Ivy Room",
+      "latlng": "37.89105175708205, -122.29917516931671",
+      "desc": "Hip neighborhood bar featuring craft cocktails, quirky vintage decor & regular live music."
     }
 ]

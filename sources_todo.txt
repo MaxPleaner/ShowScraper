@@ -1,8 +1,6 @@
 
 /*
 TODO Venues:
-- Greek Theater
-- Zeitgeist
 - Ivy Room
 - UC Berkeley Theater
 - Rickshaw Stop
