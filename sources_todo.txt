@@ -1,7 +1,6 @@
 
 /*
 TODO Venues:
-- Rickshaw Stop
 - Make Out Room
 - Yoshi's
 - Winter's Tavern

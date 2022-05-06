@@ -130,5 +130,11 @@
       "commonName": "Rickshaw Stop",
       "latlng": "37.77667998998165, -122.42038505396386",
       "desc": "Indie bands & DJs rock crowds in a small, funky space that also offers food & lounge areas."
+    },
+    {
+      "name": "MakeOutRoom",
+      "commonName": "Make Out Room",
+      "latlng": "37.75561626731759, -122.41779494756615",
+      "desc": "DJs, live bands & more in a dimly lit, retro setting complete with disco ball above the dance floor."
     }
 ]
