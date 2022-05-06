@@ -37,7 +37,7 @@
     },
     {
       "name": "TheeParkside",
-      "commonName": "Thee Parkside",
+      "commonName": "Parkside",
       "latlng": "37.76536616388736, -122.39991100168584",
       "desc": "Watering hole with a backyard & a small stage hosting bands spanning indie, punk, metal & country."
     },
@@ -73,7 +73,7 @@
     },
     {
       "name": "TheChapel",
-      "commonName": "The Chapel",
+      "commonName": "Chapel",
       "latlng": "37.76068146496075, -122.42128717342376",
       "desc": "Converted ex-chapel featuring a 40-ft. arched ceiling, bar & a wide variety of live-music acts."
     },
@@ -88,5 +88,11 @@
       "commonName": "Starline Social Club",
       "latlng": "37.81276145220253, -122.27209591590031",
       "desc": "Vintage-chic ground-floor bar & lounge plus an upstairs ballroom in a historic former saloon space."
+    },
+    {
+      "name": "Warfield",
+      "commonName": "Warfield",
+      "latlng": "37.78287720607724, -122.41029925397505",
+      "desc": "Intimate venue began as a vaudeville theater in 1922 & now hosts a variety of national music acts."
     }
 ]

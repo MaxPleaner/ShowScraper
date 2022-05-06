@@ -32,6 +32,8 @@ class Utils
   end
 end
 
+def quit!; Utils.quit! end
+
 class Scraper
   SOURCE_LIST_JSON = "#{__dir__}/../sources.json"
 
