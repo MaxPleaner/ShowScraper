@@ -36,9 +36,18 @@ code {
 }
 
 .Event-img {
-  width: 200px;
+  display: block;
+  margin: 0 auto;
+  width: auto;
   height: 120px;
 }
+
+.background{
+  background-color: #282c34;
+  }
+
+  
+
 
 
 .Day-group {

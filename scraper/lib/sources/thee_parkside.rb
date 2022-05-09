@@ -27,7 +27,7 @@ class TheeParkside
       return unless img # their "bar closed" events have no image
       {
         date: parse_date(event.css(".hmt-event-start-span")[0].text),
-        url: "",
+        url: MAIN_URL,
         title: event.css(".hmt-event-title")[0].text,
         details: event.css(".hmt-event-subtitle")[0]&.text || "",
         img: img,

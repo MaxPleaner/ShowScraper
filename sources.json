@@ -1,152 +1,158 @@
 [
     {
       "name": "DnaLounge",
-      "commonName": "DNA Lounge",
+      " ": "DNA Lounge",
       "latlng": "37.7712709589196, -122.41278334105019",
       "desc": "A variety of DJ'd theme nights, live acts & drag shows keeps mixed crowds partying until 3 AM."
     },
     {
       "name": "ElboRoom",
-      "commonName": "Elbo Room",
+      " ": "Elbo Room",
       "latlng": "37.79735929031427, -122.27594265750385",
       "desc": "Bilevel bar featuring a dance floor & wide-ranging music from DJs & bands, plus daily happy hour."
     },
     {
       "name": "ElisMileHighClub",
-      "commonName": "Eli's Mile High Club",
+      " ": "Eli's Mile High Club",
       "latlng": "37.825963943582, -122.26963881517561",
       "desc": "Former blues institution, now a bustling bar with Cajun-inspired bar bites, live bands & beer."
     },
     {
       "name": "GoldenBull",
-      "commonName": "Golden Bull",
+      " ": "Golden Bull",
       "latlng": "37.80438048778646, -122.27026978634001",
       "desc": "Lively hangout offering a full bar with craft beer & cocktails, plus pool, live bands & DJs."
     },
     {
       "name": "GreyArea",
-      "commonName": "Grey Area",
+      " ": "Grey Area",
       "latlng": "37.754502454358125, -122.41853488819491",
       "desc": "Sizable, renovated historic theater featuring creative events relating to art and technology."
     },
     {
       "name": "Knockout",
-      "commonName": "Knockout",
+      " ": "Knockout",
       "latlng": "37.74535330528293, -122.41996965935881",
       "desc": "DJ dance parties, punk bands & bingo nights are among the offerings at this no-frills bar."
     },
     {
       "name": "TheeParkside",
-      "commonName": "Parkside",
+      " ": "Parkside",
       "latlng": "37.76536616388736, -122.39991100168584",
       "desc": "Watering hole with a backyard & a small stage hosting bands spanning indie, punk, metal & country."
     },
     {
       "name": "BottomOfTheHill",
-      "commonName": "Bottom Of The Hill",
+      " ": "Bottom Of The Hill",
       "latlng": "37.7652322231627, -122.39644963068031",
       "desc": "From indie rock to hip-hop, this popular club offers a range of live music, plus outdoor seating."
     },
     {
       "name": "Cornerstone",
-      "commonName": "Cornerstone Brewery",
+      " ": "Cornerstone Brewery",
       "latlng": "37.86652335529277, -122.26729071533632",
       "desc": "Expansive, multi-faceted beer hall & American kitchen with live music, ping pong & outdoor seating."
     },
     {
       "name": "ElRio",
-      "commonName": "El Rio",
+      " ": "El Rio",
       "latlng": "37.746912749315676, -122.41929098465583",
       "desc": "A Mission standby since 1978, this local bar with an expansive patio draws a diverse crowd."
     },
     {
       "name": "FreightAndSalvage",
-      "commonName": "Freight And Salvage",
+      " ": "Freight And Salvage",
       "latlng": "37.87107158135359, -122.2696704325259",
       "desc": "The Freight and Salvage is a nonprofit musical performance venue in Berkeley, California that primarily hosts Americana music and world music acts."
     },
     {
       "name": "Zeitgeist",
-      "commonName": "Zeitgeist",
+      " ": "Zeitgeist",
       "latlng": "37.770150192891506, -122.42217084602194",
       "desc": "Craft beers & a spacious patio with picnic benches draw a lively crowd to this popular Mission spot."
     },
     {
       "name": "TheChapel",
-      "commonName": "Chapel",
+      " ": "Chapel",
       "latlng": "37.76068146496075, -122.42128717342376",
       "desc": "Converted ex-chapel featuring a 40-ft. arched ceiling, bar & a wide variety of live-music acts."
     },
     {
       "name": "Independent",
-      "commonName": "Independent",
+      " ": "Independent",
       "latlng": "37.775904930095464, -122.43747145397509",
       "desc": "Intimate, no-frills music venue with a full bar that features indie & emerging acts."
     },
     {
       "name": "Starline",
-      "commonName": "Starline Social Club",
+      " ": "Starline Social Club",
       "latlng": "37.81276145220253, -122.27209591590031",
       "desc": "Vintage-chic ground-floor bar & lounge plus an upstairs ballroom in a historic former saloon space."
     },
     {
       "name": "Warfield",
-      "commonName": "Warfield",
+      " ": "Warfield",
       "latlng": "37.78287720607724, -122.41029925397505",
       "desc": "Intimate venue began as a vaudeville theater in 1922 & now hosts a variety of national music acts."
     },
     {
       "name": "GreatAmericanMusicHall",
-      "commonName": "Great American Music Hall",
+      " ": "Great American Music Hall",
       "latlng": "37.78570726311687, -122.41862030793457",
       "desc": "Once host to the Grateful Dead, this ornately decked concert venue now books modern mainstream acts."
     },
     {
       "name": "Fillmore",
-      "commonName": "Fillmore",
+      " ": "Fillmore",
       "latlng": "37.784516137619555, -122.4332164382042",
       "desc": "Famed '60s counterculture music venue draws crowds for indie & major label acts (capacity: 1,199)."
     },
     {
       "name": "GreekTheater",
-      "commonName": "Greek Theater",
+      " ": "Greek Theater",
       "latlng": "37.87425341626093, -122.25429983863341",
       "desc": "Located at UC Berkeley, this popular outdoor spot draws well-known bands & other events."
     },
     {
       "name": "IvyRoom",
-      "commonName": "Ivy Room",
+      " ": "Ivy Room",
       "latlng": "37.89105175708205, -122.29917516931671",
       "desc": "Hip neighborhood bar featuring craft cocktails, quirky vintage decor & regular live music."
     },
     {
       "name": "UCBerkeleyTheater",
-      "commonName": "UC Berkeley Theater",
+      " ": "UC Berkeley Theater",
       "latlng": "37.87239206650805, -122.26956443572898",
       "desc": "The UC Theatre is a music venue on University Avenue near Shattuck Avenue in Downtown Berkeley, Berkeley, California, United States. From 1976 until 2001, it was as a movie theater known for a revival house presentation of films."
     },
     {
       "name": "RickshawStop",
-      "commonName": "Rickshaw Stop",
+      " ": "Rickshaw Stop",
       "latlng": "37.77667998998165, -122.42038505396386",
       "desc": "Indie bands & DJs rock crowds in a small, funky space that also offers food & lounge areas."
     },
     {
       "name": "MakeOutRoom",
-      "commonName": "Make Out Room",
+      " ": "Make Out Room",
       "latlng": "37.75561626731759, -122.41779494756615",
       "desc": "DJs, live bands & more in a dimly lit, retro setting complete with disco ball above the dance floor."
     },
     {
       "name": "Yoshis",
-      "commonName": "Yoshis",
+      " ": "Yoshis",
       "latlng": "37.7969484364991, -122.27906056138154",
       "desc": "Combination sushi restaurant & nightclub offering Japanese fare & live music in a relaxed setting."
     },
     {
       "name": "Winters",
-      "commonName": "Winter's Tavern",
+      " ": "Winter's Tavern",
       "latlng": "37.63742865000287, -122.4903133693172",
       "desc": "Down 'n' dirty bar featuring live rock, folk & bluegrass bands in a rustic, wood-paneled space."
+    },
+    {
+      "name": "Regency",
+      " ": "Regency Ballroom",
+      "latlng": "37.78837882837116, -122.42124163863345",
+      "desc": "Built in 1909, this ornate & intimate theater showcases contemporary bands & live DJ events."
     }
 ]

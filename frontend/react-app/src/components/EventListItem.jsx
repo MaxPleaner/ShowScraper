@@ -11,13 +11,18 @@ export default class EventListItem extends React.Component {
     if (imgSrc == "") {
       imgSrc = "/MissingImage.png"
     }
+    const maxTitleLength = 80
+    let title = this.props.event.title;
+    if (title.length > maxTitleLength) {
+      title = title.slice(0,maxTitleLength) + "..."
+    }
     return (
-      <Column className='is-half'>
-        <Columns className='Event-box is-multiline'>
-          <Column className='is-half'>
-             <a href={this.props.event.url}><Box><img className='Event-img' src={imgSrc} /></Box></a>
+      <Column className='is-full-tablet is-half-desktop'>
+        <Columns className='Event-box'>
+          <Column className='is-one-third'>
+             <a href={this.props.event.url}><Box ><img className='Event-img' src={imgSrc} /></Box></a>
           </Column>
-          <Column className=''><Box><b>{this.props.event.source.name}</b><br />{this.props.event.title}</Box></Column>
+          <Column className='is-two-thirds'><b>{this.props.event.source.commonName}</b><br />{title}</Column>
         </Columns>
       </Column>
     )

@@ -28,8 +28,10 @@ results, errors = Scraper.run(
 puts "done\n"
 
 warnings = []
+
 Dir.glob("./debug/*.json").each do |file|
   name = File.basename(file).gsub(".json", "")
+  next if opts[:sources] && !opts[:sources].include?(name)
   num_events = JSON.parse(File.read(file)).length
   if num_events == 0
     warnings.push(name)

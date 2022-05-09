@@ -1,14 +1,9 @@
 
 /*
 TODO Venues:
-- Winter's Tavern
-- Masonic
-- Paramount
-- Fox Theater
-- Great Northern
+- Regency
 - Hotel Utah
 - Amados
-- August Hall
 - Bimbo's
 - Brick and Mortar
 - Cafe Du Nord
@@ -18,10 +13,14 @@ TODO Venues:
 - Midway
 - Milk Bar
 - SF Jazz
+- August Hall
+- Masonic
+- Paramount
+- Fox Theater
+- Great Northern
 - Caravan
 - Elegant Pub
 - Phoenix Theater
-- Regency
 
 CANNOT SCRAPE (NO PUBLIC CALENDAR)
 - Bender's
