@@ -23,13 +23,12 @@ class Regency
     def parse_event_data(event, &foreach_event_blk)
       link = event.attribute("href")
       $driver.new_tab(link) do
-        binding.pry
         {
           date: DateTime.parse($driver.css(".date")[0].text.gsub("DATE\n", "")),
           url: $driver.current_url,
           img: $driver.css(".event_image img")[0].attribute("src"),
-          title:,
-          desc: 
+          title: $driver.css(".page_header_left")[0].text.gsub("\n", " ").gsub("Goldenvoice Presents ", ""),
+          details: ""
         }
       end.
         tap { |data| Utils.print_event_preview(self, data) }.
