@@ -25,9 +25,12 @@ class FreightAndSalvage
 
     def get_events
       sleep load_time
-      $driver.css(".tn-events-calendar__event").uniq do |link|
-        link.attribute("href")
-      end # for some reason they're all there twice.
+      $driver.css(".tn-events-calendar__day").select do |event|
+        event.css(".tn-events-calendar__event").any?
+      end.uniq do |event|
+        # for some reason they're all there twice.
+        event.css(".tn-events-calendar__event")[0].attribute("href")
+      end
     end
 
     def get_next_page
@@ -36,21 +39,25 @@ class FreightAndSalvage
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
+      link = event.css(".tn-events-calendar__event")[0].attribute("href")
+      date = parse_date(event)
       $driver.new_tab(link) do
         {
-          date: parse_date($driver.css(".the-date")[0].text),
-          img: $driver.css(".tn-prod-season-header__image")[0].attribute("src"),
-          title: $driver.css(".the-title")[0].text,
+          date: date,
+          img: $driver.css(".tn-prod-season-header__image")[0]&.attribute("src") || "",
+          title: $driver.css(".the-title")[0]&.text || $driver.title,
           url: $driver.current_url,
-          details: $driver.css(".tn-prod-season-header__description-text-content")[0].text
+          details: $driver.css(".tn-prod-season-header__description-text-content")[0]&.text || ""
         }
       end.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 
-    def parse_date(date_string)
+    def parse_date(event)
+      date_string = event.css("span").find do |span|
+        span.attribute("id").include?("tn-events-day-cell")
+      end.text
       DateTime.parse(date_string)
     end
   end

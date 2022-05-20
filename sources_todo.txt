@@ -1,5 +1,4 @@
 
-ERROR: Cornerstone failed to scrape. Skipped.
 ERROR: FreightAndSalvage failed to scrape. Skipped.
 ERROR: TheChapel failed to scrape. Skipped.
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
