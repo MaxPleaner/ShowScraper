@@ -1,5 +1,3 @@
-ERROR: Yoshis failed to scrape. Skipped.
-
 /*
 TODO Venues:
 - Regency
