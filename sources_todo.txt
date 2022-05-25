@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Hotel Utah
 - Amados
 - Bimbo's
 - Brick and Mortar
