@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Regency
 - Hotel Utah
 - Amados
 - Bimbo's
