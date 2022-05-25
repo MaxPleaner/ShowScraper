@@ -31,25 +31,36 @@ class GreatAmericanMusicHall
       link = event.attribute("href").value
       $driver.navigate.to(link)
       {
-        date: parse_date($driver.css("[itemprop='startDate']")[0].text),
-        img: $driver.css("[itemprop='image']")[0].attribute("src"),
+        date: parse_date,
+        img: parse_img,
         title: parse_title,
         url: $driver.current_url,
-        details: $driver.css(".event-details")[0].text
+        details: $driver.css(".event-details")[0]&.text || ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 
-    def parse_title
-      title = $driver.css(".event-h2")[0].text
-      # hacky but we make do
-      subtitle = $driver.css(".event-bar-left > div:nth-child(2) > h3:nth-child(4)")[0]&.text
-      [title, subtitle].compact.join(", ")
+    def parse_img
+      $driver.css("[itemprop='image']")[0]&.attribute("src") ||
+        $driver.css("img.listing-hero-image.listing-image--main")[0]&.attribute("src") ||
+        ""
     end
 
-    def parse_date(date_string)
-      DateTime.parse(date_string)
+    def parse_title
+      title = $driver.css(".event-h2")[0]&.text
+      # hacky but we make do
+      subtitle = $driver.css(".event-bar-left > div:nth-child(2) > h3:nth-child(4)")[0]&.text
+      result = [title, subtitle].compact.join(", ")
+      return result if result.present?
+      $driver.css("[data-automation='artist-list']").map(&:text).reject(&:blank?).join(", ").gsub("\n", ", ")
+    end
+
+    def parse_date
+      date_str = $driver.css("[itemprop='startDate']")[0]&.text ||
+        $driver.css("[data-automation='event-details-time'] p")[2]&.text
+
+      DateTime.parse(date_str)
     end
   end
 end

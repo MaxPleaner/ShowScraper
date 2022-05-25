@@ -1,5 +1,4 @@
 
-ERROR: TheChapel failed to scrape. Skipped.
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
 ERROR: RickshawStop failed to scrape. Skipped.
 ERROR: Yoshis failed to scrape. Skipped.
