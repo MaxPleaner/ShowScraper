@@ -39,13 +39,16 @@ class RickshawStop
             details: $driver.css("[data-automation='about-this-event-sc']")[0].text
           }
         elsif $driver.current_url.include?("wl.seetickets.us")
-          {
-            date: DateTime.parse($driver.css("[itemprop='startDate']")[0].attribute("datetime")),
-            img: $driver.css("[itemprop='image']")[0].attribute("src"),
-            title: $driver.css("[itemprop='name']")[0].text,
-            url: $driver.current_url,
-            details: $driver.css(".event-details")[0].text
-          }
+          title = $driver.css("[itemprop='name']")[0].text
+          if title != "PRIVATE EVENT"
+            {
+              date: DateTime.parse($driver.css("[itemprop='startDate']")[0].attribute("datetime")),
+              img: $driver.css("[itemprop='image']")[0].attribute("src"),
+              title: title,
+              url: $driver.current_url,
+              details: $driver.css(".event-details")[0].text
+            }
+          end
         else
           # There are other event sources here (e.g. rav.co, possibly more)
           # rav.co is not semantic css. We can't reliably scrape this.
@@ -59,8 +62,10 @@ class RickshawStop
           }
         end
       end.
-        tap { |data| Utils.print_event_preview(self, data) }.
-        tap { |data| foreach_event_blk&.call(data) }
+        tap { |data| Utils.print_event_preview(self, data) if data }.
+        tap { |data| foreach_event_blk&.call(data) if data }
+    rescue => e
+      binding.pry
     end
   end
 end
