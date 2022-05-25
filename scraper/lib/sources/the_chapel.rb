@@ -29,14 +29,26 @@ class TheChapel
       $driver.new_tab(link) do
         {
           date: date,
-          img: $driver.css("[itemprop='image']")[0].attribute("src"),
-          title: $driver.css("[itemprop='name']")[0].text,
+          img: parse_img,
+          title: parse_title,
           url: $driver.current_url,
-          details: $driver.css(".event-details")[0].text
+          details: $driver.css(".event-details")[0]&.text || ""
         }
       end.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
+    end
+
+    def parse_title
+      $driver.css("[itemprop='name']")[0]&.text ||
+        $driver.css("[data-automation='listing-event-description']")[0]&.text ||
+        $driver.title
+    end
+
+    def parse_img
+      $driver.css("[itemprop='image']")[0]&.attribute("src") ||
+        $driver.css("img.listing-hero-image.listing-image--main")[0]&.attribute("src") ||
+        ""
     end
 
     def parse_date(date_string)
