@@ -40,7 +40,7 @@ class Yoshis
       $driver.execute_script("window.scrollBy(0,document.body.scrollHeight)")
 
       # close pesky popup
-      $driver.css(".fancybox-button--close")[0].click
+      $driver.css(".fancybox-button--close")[0]&.click
       sleep 1
 
       $driver.css(".event-indv")
@@ -60,6 +60,8 @@ class Yoshis
       }.
       tap { |data| Utils.print_event_preview(self, data) }.
       tap { |data| foreach_event_blk&.call(data) }
+    rescue => e
+      binding.pry
     end
 
     def parse_title(event)
