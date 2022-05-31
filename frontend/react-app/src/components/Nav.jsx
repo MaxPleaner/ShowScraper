@@ -17,7 +17,7 @@ export default class Nav extends React.Component {
                   <div class='site-title mybox'>Bay Area Shows</div>
                 </Column>
                 <Column className="is-narrow">
-                  <a href='/ListView'>
+                  <a href='/ShowScraper/ListView'>
                     <div className={`mybox ${this.props.route === "ListView" ? "selected" : ""}`}>List View</div>
                   </a>
                 </Column>
@@ -25,7 +25,7 @@ export default class Nav extends React.Component {
                   <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
                 </Column>*/}
                 <Column className="is-narrow">
-                  <a href='/VenuesListView'>
+                  <a href='/ShowScraper/VenuesListView'>
                     <div className={`mybox ${this.props.route === "VenuesListView" ? "selected" : ""}`}>Venues</div>
                   </a>
                 </Column>
