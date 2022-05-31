@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Crybaby
 - Make Out Room
 - Eagle
 - Midway

@@ -184,5 +184,11 @@
       "commonName": "Cafe Du Nord",
       "latlng": "37.76723474909922, -122.43041839999998",
       "desc": "Show nights bring New American eats, drinks & live music to this historic former speakeasy space."
+    },
+    {
+      "name": "Crybaby",
+      "commonName": "Crybaby",
+      "latlng": "37.80935823009132, -122.26943678465838",
+      "desc": "Crybaby is a live music venue, dance club & events space in downtown Oakland that pushes creativity through the lens of sound and visuals."
     }
 ]
