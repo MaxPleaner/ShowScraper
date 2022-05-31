@@ -139,14 +139,25 @@
 
 .daygroup-title {
   margin-bottom: 15px;
+  font-size: 1.5em;
 }
 
 .Event-box {
-  outline: 1px solid white;
-  border-radius: 20px;
+  outline: 2px solid rgb(170,170,170);
+  /*border-radius*/: 20px;
   padding: 5px;
   margin: 2px !important;
   /*display: inline-block;*/
+}
+
+.event-venue {
+  display: inline-block;
+}
+
+.event-title {
+  display: inline-block;
+  font-weight: bold;
+  font-size: 1.3em;
 }
 
 .box.selected {

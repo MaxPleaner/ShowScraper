@@ -26,7 +26,15 @@ export default class EventListItem extends React.Component {
                {/*</div>*/}
              </a>
           </Column>
-          <Column className='is-two-thirds'><b>{this.props.event.source.commonName}</b><br />{title}</Column>
+          <Column className='is-two-thirds'>
+            <div class='event-venue'>
+              {this.props.event.source.commonName}
+             </div>
+             <br />
+             <div class='event-title'>
+               {title}
+             </div>
+          </Column>
         </Columns>
       </Column>
     )
