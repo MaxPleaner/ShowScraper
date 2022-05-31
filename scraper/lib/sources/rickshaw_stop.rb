@@ -31,12 +31,14 @@ class RickshawStop
       link = event.css("#event_tickets")[0].attribute("href")
       $driver.new_tab(link) do
         if $driver.current_url.include?("eventbrite")
+          date_str = $driver.css(".event-details__data meta")[0]&.attribute("content")
+          date_str ||= $driver.css("[data-testid='event-start-date-time']")[0].text
           {
-            date: DateTime.parse($driver.css(".event-details__data meta")[0].attribute("content")),
+            date: DateTime.parse(date_str),
             img: $driver.css(".listing-hero-image")[0].attribute("src"),
             title: $driver.title,
             url: $driver.current_url,
-            details: $driver.css("[data-automation='about-this-event-sc']")[0].text
+            details: $driver.css("[data-automation='about-this-event-sc']")[0]&.text || ""
           }
         elsif $driver.current_url.include?("wl.seetickets.us")
           title = $driver.css("[itemprop='name']")[0].text
