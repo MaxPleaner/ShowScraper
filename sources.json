@@ -190,5 +190,11 @@
       "commonName": "Crybaby",
       "latlng": "37.80935823009132, -122.26943678465838",
       "desc": "Crybaby is a live music venue, dance club & events space in downtown Oakland that pushes creativity through the lens of sound and visuals."
+    },
+    {
+      "name": "Eagle",
+      "commonName": "Eagle",
+      "latlng": "37.771076377872284, -122.41413888690153",
+      "desc": "Revival of a legendary LBGT leather bar with periodic drag shows, theme nights & big heated patio."
     }
 ]

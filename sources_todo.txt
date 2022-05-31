@@ -1,7 +1,5 @@
 /*
 TODO Venues:
-- Make Out Room
-- Eagle
 - Midway
 - Milk Bar
 - SF Jazz
