@@ -172,5 +172,11 @@
       "commonName": "Bimbos",
       "latlng": "37.80450644920101, -122.41537657726685",
       "desc": "World-famous acts play this swanky, 1950s-era music club loaded with red velvet & chandeliers."
+    },
+    {
+      "name": "BrickAndMortar",
+      "commonName": "Brick and Mortar",
+      "latlng": "37.76987211703599, -122.42041027300945",
+      "desc": "Talent ranges from bluegrass to hip-hop at this modest-sized music venue near the freeway."
     }
 ]

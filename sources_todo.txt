@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Brick and Mortar
 - Cafe Du Nord
 - Crybaby
 - Make Out Room
