@@ -202,5 +202,11 @@
       "commonName": "Midway SF",
       "latlng": "37.749718528282344, -122.38586606136657",
       "desc": "The Midway is a one-of-a-kind space, dedicated to bringing art, entertainment, and education under one synergistic & collaborative roof."
+    },
+    {
+      "name": "MilkBar",
+      "commonName": "Milk Bar",
+      "latlng": "37.770107525377185, -122.45268443068328",
+      "desc": "Club with local bands & DJs spinning anything from dubstep to dancehall, plus comedians some nights."
     }
 ]

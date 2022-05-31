@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Milk Bar
 - SF Jazz
 - August Hall
 - Masonic
