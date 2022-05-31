@@ -1,7 +1,5 @@
 /*
 TODO Venues:
-- Amados
-- Bimbo's
 - Brick and Mortar
 - Cafe Du Nord
 - Crybaby

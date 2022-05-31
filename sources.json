@@ -166,5 +166,11 @@
       "commonName": "Amados",
       "latlng": "37.7574511174347, -122.4213731",
       "desc": "Established in 2015. Amado's is an underground music venue + bar + restaurant in the heart of San Francisco's Mission District. Live music, private rentals, and pop-ups."
+    },
+    {
+      "name": "Bimbos",
+      "commonName": "Bimbos",
+      "latlng": "37.80450644920101, -122.41537657726685",
+      "desc": "World-famous acts play this swanky, 1950s-era music club loaded with red velvet & chandeliers."
     }
 ]
