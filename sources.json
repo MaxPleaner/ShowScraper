@@ -214,5 +214,11 @@
       "commonName": "SF Jazz",
       "latlng": "37.77714742893529, -122.42107310055866",
       "desc": "This nightspot presents a line-up of internationally renowned jazz performers live on stage."
+    },
+    {
+      "name": "AugustHall",
+      "commonName": "August Hall",
+      "latlng": "37.78826379086476, -122.4095993232918",
+      "desc": "A HISTORIC VENUE REBORN IN DOWNTOWN SAN FRANCISCO Live music and entertainment with special events, three full bars, and food by Fifth Arrow."
     }
 ]
