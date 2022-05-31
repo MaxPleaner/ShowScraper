@@ -196,5 +196,11 @@
       "commonName": "Eagle",
       "latlng": "37.771076377872284, -122.41413888690153",
       "desc": "Revival of a legendary LBGT leather bar with periodic drag shows, theme nights & big heated patio."
+    },
+    {
+      "name": "Midway",
+      "commonName": "Midway SF",
+      "latlng": "37.749718528282344, -122.38586606136657",
+      "desc": "The Midway is a one-of-a-kind space, dedicated to bringing art, entertainment, and education under one synergistic & collaborative roof."
     }
 ]

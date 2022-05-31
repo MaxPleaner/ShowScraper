@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Midway
 - Milk Bar
 - SF Jazz
 - August Hall
