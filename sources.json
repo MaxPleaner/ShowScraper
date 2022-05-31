@@ -226,5 +226,11 @@
       "commonName": "Masonic",
       "latlng": "37.79180844613184, -122.41270335025152",
       "desc": "Mid-century modern space built in 1958 that hosts notable music acts in an auditorium with balcony."
+    },
+    {
+      "name": "Paramount",
+      "commonName": "Paramount Theater",
+      "latlng": "37.81034969822523, -122.26805023863342",
+      "desc": "Art Deco theater opened in 1931 hosting ballet & symphony performances, plus classic movies."
     }
 ]
