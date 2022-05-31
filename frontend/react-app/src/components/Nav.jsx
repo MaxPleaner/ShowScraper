@@ -10,24 +10,27 @@ export default class Nav extends React.Component {
   render() {
     return (
       <div className='Nav'>
-        <Box>
           <Columns>
-            <Column className='is-narrow'>
-              <Box>Bay Area Shows</Box>
-            </Column>
-            <Column className="is-narrow">
-              <a href='/ListView'>
-                <Box className={this.props.route === "ListView" ? "selected" : ""}>List View</Box>
-              </a>
-            </Column>
-{/*            <Column className="is-narrow">
-              <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
-            </Column>*/}
-            <Column className="is-narrow">
-              <a href='/VenuesListView'>
-                <Box className={this.props.route === "VenuesListView" ? "selected" : ""}>Venues</Box>
-              </a>
-            </Column>
+            <Column className='is-full'>
+              <Columns className='is-centered'>
+                <Column className='is-narrow'>
+                  <div class='site-title mybox'>Bay Area Shows</div>
+                </Column>
+                <Column className="is-narrow">
+                  <a href='/ListView'>
+                    <div className={`mybox ${this.props.route === "ListView" ? "selected" : ""}`}>List View</div>
+                  </a>
+                </Column>
+    {/*            <Column className="is-narrow">
+                  <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
+                </Column>*/}
+                <Column className="is-narrow">
+                  <a href='/VenuesListView'>
+                    <div className={`mybox ${this.props.route === "VenuesListView" ? "selected" : ""}`}>Venues</div>
+                  </a>
+                </Column>
+               </Columns>
+              </Column>
 {/*            <Column className="is-narrow">
               <Box className={this.props.route === "todo" ? "selected" : ""}>Submit Event</Box>
             </Column>*/}
@@ -35,7 +38,7 @@ export default class Nav extends React.Component {
               <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
             </Column>*/}
           </Columns>
-        </Box>
+          <hr />
       </div>
     )
   }

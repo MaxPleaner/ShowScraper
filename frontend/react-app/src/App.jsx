@@ -2,6 +2,7 @@ import './App.css';
 
 import React from 'react';
 import 'bulma/css/bulma.min.css';
+import './vendor/handdrawn.css';
 
 // import { Link } from "react-router-dom";
 

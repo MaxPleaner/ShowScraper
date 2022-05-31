@@ -2,246 +2,369 @@
     {
       "name": "DnaLounge",
       "commonName": "DNA Lounge",
+      "website": "https://www.dnalounge.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.7712709589196, -122.41278334105019",
       "desc": "A variety of DJ'd theme nights, live acts & drag shows keeps mixed crowds partying until 3 AM."
     },
     {
       "name": "ElboRoom",
       "commonName": "Elbo Room",
+      "website": "https://www.elboroomjacklondon.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.79735929031427, -122.27594265750385",
       "desc": "Bilevel bar featuring a dance floor & wide-ranging music from DJs & bands, plus daily happy hour."
     },
     {
       "name": "ElisMileHighClub",
       "commonName": "Eli's Mile High Club",
+      "website": "http://elismilehigh.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.825963943582, -122.26963881517561",
       "desc": "Former blues institution, now a bustling bar with Cajun-inspired bar bites, live bands & beer."
     },
     {
       "name": "GoldenBull",
       "commonName": "Golden Bull",
+      "website": "https://goldenbullbar.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.80438048778646, -122.27026978634001",
       "desc": "Lively hangout offering a full bar with craft beer & cocktails, plus pool, live bands & DJs."
     },
     {
       "name": "GreyArea",
       "commonName": "Grey Area",
+      "website": "https://grayarea.org/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.754502454358125, -122.41853488819491",
       "desc": "Sizable, renovated historic theater featuring creative events relating to art and technology."
     },
     {
       "name": "Knockout",
       "commonName": "Knockout",
+      "website": "https://theknockoutsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.74535330528293, -122.41996965935881",
       "desc": "DJ dance parties, punk bands & bingo nights are among the offerings at this no-frills bar."
     },
     {
       "name": "TheeParkside",
       "commonName": "Parkside",
+      "website": "https://www.theeparkside.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.76536616388736, -122.39991100168584",
       "desc": "Watering hole with a backyard & a small stage hosting bands spanning indie, punk, metal & country."
     },
     {
       "name": "BottomOfTheHill",
       "commonName": "Bottom Of The Hill",
+      "website": "http://www.bottomofthehill.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.7652322231627, -122.39644963068031",
       "desc": "From indie rock to hip-hop, this popular club offers a range of live music, plus outdoor seating."
     },
     {
       "name": "Cornerstone",
       "commonName": "Cornerstone Brewery",
+      "website": "https://cornerstoneberkeley.com/music-venue/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.86652335529277, -122.26729071533632",
       "desc": "Expansive, multi-faceted beer hall & American kitchen with live music, ping pong & outdoor seating."
     },
     {
       "name": "ElRio",
       "commonName": "El Rio",
+      "website": "https://www.elriosf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.746912749315676, -122.41929098465583",
       "desc": "A Mission standby since 1978, this local bar with an expansive patio draws a diverse crowd."
     },
     {
       "name": "FreightAndSalvage",
       "commonName": "Freight And Salvage",
+      "website": "https://thefreight.org/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.87107158135359, -122.2696704325259",
       "desc": "The Freight and Salvage is a nonprofit musical performance venue in Berkeley, California that primarily hosts Americana music and world music acts."
     },
     {
       "name": "Zeitgeist",
       "commonName": "Zeitgeist",
+      "website": "https://www.zeitgeistsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.770150192891506, -122.42217084602194",
       "desc": "Craft beers & a spacious patio with picnic benches draw a lively crowd to this popular Mission spot."
     },
     {
       "name": "TheChapel",
       "commonName": "Chapel",
+      "website": "https://thechapelsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.76068146496075, -122.42128717342376",
       "desc": "Converted ex-chapel featuring a 40-ft. arched ceiling, bar & a wide variety of live-music acts."
     },
     {
       "name": "Independent",
       "commonName": "Independent",
+      "website": "http://theindependentsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.775904930095464, -122.43747145397509",
       "desc": "Intimate, no-frills music venue with a full bar that features indie & emerging acts."
     },
     {
       "name": "Starline",
       "commonName": "Starline Social Club",
+      "website": "https://starlinesocialclub.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.81276145220253, -122.27209591590031",
       "desc": "Vintage-chic ground-floor bar & lounge plus an upstairs ballroom in a historic former saloon space."
     },
     {
       "name": "Warfield",
       "commonName": "Warfield",
+      "website": "https://www.thewarfieldtheatre.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.78287720607724, -122.41029925397505",
       "desc": "Intimate venue began as a vaudeville theater in 1922 & now hosts a variety of national music acts."
     },
     {
       "name": "GreatAmericanMusicHall",
       "commonName": "Great American Music Hall",
+      "website": "https://gamh.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.78570726311687, -122.41862030793457",
       "desc": "Once host to the Grateful Dead, this ornately decked concert venue now books modern mainstream acts."
     },
     {
       "name": "Fillmore",
       "commonName": "Fillmore",
+      "website": "https://www.livenation.com/venue/KovZpZAE6eeA/the-fillmore-events",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.784516137619555, -122.4332164382042",
       "desc": "Famed '60s counterculture music venue draws crowds for indie & major label acts (capacity: 1,199)."
     },
     {
       "name": "GreekTheater",
       "commonName": "Greek Theater",
+      "website": "https://thegreekberkeley.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.87425341626093, -122.25429983863341",
       "desc": "Located at UC Berkeley, this popular outdoor spot draws well-known bands & other events."
     },
     {
       "name": "IvyRoom",
       "commonName": "Ivy Room",
+      "website": "https://www.ivyroom.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.89105175708205, -122.29917516931671",
       "desc": "Hip neighborhood bar featuring craft cocktails, quirky vintage decor & regular live music."
     },
     {
       "name": "UCBerkeleyTheater",
       "commonName": "UC Berkeley Theater",
+      "website": "https://theuctheatre.org/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.87239206650805, -122.26956443572898",
       "desc": "The UC Theatre is a music venue on University Avenue near Shattuck Avenue in Downtown Berkeley, Berkeley, California, United States. From 1976 until 2001, it was as a movie theater known for a revival house presentation of films."
     },
     {
       "name": "RickshawStop",
       "commonName": "Rickshaw Stop",
+      "website": "https://rickshawstop.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.77667998998165, -122.42038505396386",
       "desc": "Indie bands & DJs rock crowds in a small, funky space that also offers food & lounge areas."
     },
     {
       "name": "MakeOutRoom",
       "commonName": "Make Out Room",
+      "website": "http://www.makeoutroom.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.75561626731759, -122.41779494756615",
       "desc": "DJs, live bands & more in a dimly lit, retro setting complete with disco ball above the dance floor."
     },
     {
       "name": "Yoshis",
       "commonName": "Yoshis",
+      "website": "https://yoshis.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.7969484364991, -122.27906056138154",
       "desc": "Combination sushi restaurant & nightclub offering Japanese fare & live music in a relaxed setting."
     },
     {
       "name": "Winters",
       "commonName": "Winter's Tavern",
+      "website": "https://winterstavern.com/",
+      "region": "Other",
+      "mapLink": "",
       "latlng": "37.63742865000287, -122.4903133693172",
       "desc": "Down 'n' dirty bar featuring live rock, folk & bluegrass bands in a rustic, wood-paneled space."
     },
     {
       "name": "Regency",
       "commonName": "Regency Ballroom",
+      "website": "https://www.theregencyballroom.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.78837882837116, -122.42124163863345",
       "desc": "Built in 1909, this ornate & intimate theater showcases contemporary bands & live DJ events."
     },
     {
       "name": "HotelUtah",
       "commonName": "Hotel Utah",
+      "website": "https://hotelutah.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.7803159134943, -122.39774497726685",
       "desc": "Serving serve fine drinks, tasty food, and hot music for your enterta."
     },
     {
       "name": "Amados",
       "commonName": "Amados",
+      "website": "http://www.amadossf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.7574511174347, -122.4213731",
       "desc": "Established in 2015. Amado's is an underground music venue + bar + restaurant in the heart of San Francisco's Mission District. Live music, private rentals, and pop-ups."
     },
     {
       "name": "Bimbos",
       "commonName": "Bimbos",
+      "website": "https://bimbos365club.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.80450644920101, -122.41537657726685",
       "desc": "World-famous acts play this swanky, 1950s-era music club loaded with red velvet & chandeliers."
     },
     {
       "name": "BrickAndMortar",
       "commonName": "Brick and Mortar",
+      "website": "https://www.brickandmortarmusic.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.76987211703599, -122.42041027300945",
       "desc": "Talent ranges from bluegrass to hip-hop at this modest-sized music venue near the freeway."
     },
     {
       "name": "CafeDuNord",
       "commonName": "Cafe Du Nord",
+      "website": "https://cafedunord.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.76723474909922, -122.43041839999998",
       "desc": "Show nights bring New American eats, drinks & live music to this historic former speakeasy space."
     },
     {
       "name": "Crybaby",
       "commonName": "Crybaby",
+      "website": "https://crybaby.live/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.80935823009132, -122.26943678465838",
       "desc": "Crybaby is a live music venue, dance club & events space in downtown Oakland that pushes creativity through the lens of sound and visuals."
     },
     {
       "name": "Eagle",
       "commonName": "Eagle",
+      "website": "https://sf-eagle.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.771076377872284, -122.41413888690153",
       "desc": "Revival of a legendary LBGT leather bar with periodic drag shows, theme nights & big heated patio."
     },
     {
       "name": "Midway",
       "commonName": "Midway SF",
+      "website": "https://themidwaysf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.749718528282344, -122.38586606136657",
       "desc": "The Midway is a one-of-a-kind space, dedicated to bringing art, entertainment, and education under one synergistic & collaborative roof."
     },
     {
       "name": "MilkBar",
       "commonName": "Milk Bar",
+      "website": "https://www.eventbrite.com/o/the-milk-bar-presents-6806338175",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.770107525377185, -122.45268443068328",
       "desc": "Club with local bands & DJs spinning anything from dubstep to dancehall, plus comedians some nights."
     },
     {
       "name": "SfJazz",
       "commonName": "SF Jazz",
+      "website": "https://www.sfjazz.org/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.77714742893529, -122.42107310055866",
       "desc": "This nightspot presents a line-up of internationally renowned jazz performers live on stage."
     },
     {
       "name": "AugustHall",
       "commonName": "August Hall",
+      "website": "https://www.augusthallsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.78826379086476, -122.4095993232918",
       "desc": "A HISTORIC VENUE REBORN IN DOWNTOWN SAN FRANCISCO Live music and entertainment with special events, three full bars, and food by Fifth Arrow."
     },
     {
       "name": "Masonic",
       "commonName": "Masonic",
+      "website": "https://www.livenation.com/venue/KovZpZAJ6nlA/the-masonic-events",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.79180844613184, -122.41270335025152",
       "desc": "Mid-century modern space built in 1958 that hosts notable music acts in an auditorium with balcony."
     },
     {
       "name": "Paramount",
       "commonName": "Paramount Theater",
+      "website": "https://www.paramountoakland.org/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.81034969822523, -122.26805023863342",
       "desc": "Art Deco theater opened in 1931 hosting ballet & symphony performances, plus classic movies."
     },
     {
       "name": "FoxTheater",
       "commonName": "Fox Theater",
+      "website": "https://thefoxoakland.com/",
+      "region": "East Bay",
+      "mapLink": "",
       "latlng": "37.80868250063513, -122.2702571269811",
       "desc": "Live music venue in a historic building housing an art school, bar, restaurant & courtyard."
     },
     {
       "name": "GreatNorthern",
       "commonName": "Great Northern",
+      "website": "https://www.thegreatnorthernsf.com/",
+      "region": "San Francisco",
+      "mapLink": "",
       "latlng": "37.76824966403541, -122.40624810795016",
       "desc": "DJs, live music & bottle service featured in an energetic, industrial setting with art-deco accents."
     }

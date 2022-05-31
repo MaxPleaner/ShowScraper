@@ -5,10 +5,19 @@ const { Column } = Columns;
 import EventListView from './EventListView'
 import _ from 'underscore'
 
+const DEFAULT_MODE = 'week'
+
+// The format of the dates in the JSON files
+const FILE_DATE_FORMAT = 'MM-DD-YYYY';
+// Format for a single day
+const SINGLE_DAY_FORMAT = 'M/DD (dddd)'
+// Format when a date is shown in a range
+const WEEK_DAY_FORMAT = "M/DD"
+
 export default class EventListViewManager extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { mode: 'day', allEvents: [], events: [], currentDay: moment(new Date()) };
+    this.state = { mode: DEFAULT_MODE, allEvents: [], events: [], currentDay: moment(new Date()) };
   }
 
   componentDidUpdate(oldProps) {
@@ -19,10 +28,10 @@ export default class EventListViewManager extends React.Component {
 
   computeEventsList (allEvents, currentDay, mode) {
     if (mode == 'day') {
-      return _.pick(allEvents, currentDay.format('MM-DD-YYYY'));
+      return _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT));
     } else if (mode == 'week') {
       const days = [...Array(7).keys()].map((i) => {
-        return currentDay.clone().add(i, 'days').format('MM-DD-YYYY');
+        return currentDay.clone().add(i, 'days').format(FILE_DATE_FORMAT);
       });
       return _.pick(allEvents, days);
     }
@@ -34,33 +43,33 @@ export default class EventListViewManager extends React.Component {
 
   currentDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.format("MM-DD (dddd)")
+      const day = this.state.currentDay.format(SINGLE_DAY_FORMAT)
       return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(7, 'days')
-      return `${this.state.currentDay.format("MM-DD")} - ${nextWeek.format("MM-DD")}`
+      return `${this.state.currentDay.format(WEEK_DAY_FORMAT)} to ${nextWeek.format(WEEK_DAY_FORMAT)}`
     }
   }
 
   nextDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.clone().add(1, 'days').format("MM-DD (dddd)")
+      const day = this.state.currentDay.clone().add(1, 'days').format(SINGLE_DAY_FORMAT)
       return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(7, 'days')
       const nextWeek2 = this.state.currentDay.clone().add(14, 'days')
-      return `${nextWeek.format("MM-DD")} - ${nextWeek2.format("MM-DD")}`
+      return `${nextWeek.format(WEEK_DAY_FORMAT)} to ${nextWeek2.format(WEEK_DAY_FORMAT)}`
     }
   }
 
   prevDateEntry() {
     if (this.state.mode == 'day') {
-      const day = this.state.currentDay.clone().add(-1, 'days').format("MM-DD (dddd)")
+      const day = this.state.currentDay.clone().add(-1, 'days').format(SINGLE_DAY_FORMAT)
       return day
     } else if (this.state.mode == 'week') {
       const nextWeek = this.state.currentDay.clone().add(-7, 'days')
       const nextWeek2 = this.state.currentDay.clone()
-      return `${nextWeek.format("MM-DD")} - ${nextWeek2.format("MM-DD")}`
+      return `${nextWeek.format(WEEK_DAY_FORMAT)} to ${nextWeek2.format(WEEK_DAY_FORMAT)}`
     }
   }
 
@@ -88,7 +97,7 @@ export default class EventListViewManager extends React.Component {
      return (
       <div className='ListViewManager'>
         <Columns>
-          <Column className='is-one-quarter'>
+{/*          <Column className='is-one-quarter'>
             <Box className='mt-3'>
               <Columns>
                 <Column>
@@ -103,30 +112,28 @@ export default class EventListViewManager extends React.Component {
                 </Column>
               </Columns>
             </Box>
-          </Column>
+          </Column>*/}
           <Column className='is-one-half'>
-            <Box className='mt-3'>
               <Columns>
                 <Column>
                   <a onClick={this.goToPrevDate.bind(this)}>
-                    <Box>{this.prevDateEntry()}</Box>
+                    <div class='date-range-select hd-border mybox'>{this.prevDateEntry()}</div>
                   </a>
                 </Column>
                 <Column>
-                  <Box className='selected'>{this.currentDateEntry()}</Box>
+                  <div class='date-range-select-static hd-border mybox selected'>{this.currentDateEntry()}</div>
                 </Column>
                 <Column>
                   <a onClick={this.goToNextDate.bind(this)}>
-                    <Box>{this.nextDateEntry()}</Box>
+                    <div class='date-range-select hd-border mybox'>{this.nextDateEntry()}</div>
                   </a>
                 </Column>
               </Columns>
-            </Box>
           </Column>
         </Columns>
         {
           (this.state.allEvents.length == 0) ? (
-            <Box>Loading...</Box>
+            <div class='hd-border mybox'>Loading...</div>
           ) : (
             <EventListView events={this.state.events}/>
           )

@@ -20,7 +20,11 @@ export default class EventListItem extends React.Component {
       <Column className='is-full-tablet is-half-desktop'>
         <Columns className='Event-box'>
           <Column className='is-one-third'>
-             <a href={this.props.event.url}><Box ><img className='Event-img' src={imgSrc} /></Box></a>
+             <a href={this.props.event.url}>
+               {/*<div class='img-background'>*/}
+                 <img className='Event-img' src={imgSrc} />
+               {/*</div>*/}
+             </a>
           </Column>
           <Column className='is-two-thirds'><b>{this.props.event.source.commonName}</b><br />{title}</Column>
         </Columns>

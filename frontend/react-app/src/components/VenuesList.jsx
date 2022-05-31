@@ -16,35 +16,58 @@ export default class VenuesList extends React.Component {
     }
   }
 
-  render() {
-    const venues = this.state.venues.map((venue, idx) => {
+  buildVenuesList(venues) {
+    return venues.map((venue, idx) => {
       return (
-        <Column key={idx} className='venue is-half'>
-          <Box>
+        <Column key={idx} className='is-half'>
+          <div class='venue'>
             <Columns>
-              <Column className='is-full venue-name'>
-                <Box>{venue.commonName}</Box>
+              <Column className='is-one-third venue-name'>
+                {venue.commonName}
+              </Column>
+              <Column className='is-one-third venue-website'>
+                <a href={venue.website}>Website</a>
+              </Column>
+              <Column className='is-one-third venue-view-events'>
+                View events
               </Column>
               <Column className='is-full venue-description'>
-                <Box>{venue.desc}</Box>
+                {venue.desc}
               </Column>
             </Columns>
-          </Box>
+          </div>
         </Column>
       )
     })
+  }
+
+  render() {
+    const sfVenues = this.state.venues.filter((venue) => venue.region == "San Francisco")
+    const eastBayVenues = this.state.venues.filter((venue) => venue.region == "East Bay")
+    const otherVenues = this.state.venues.filter((venue) => venue.region == "Other")
     return (
-    <Box className='mt-3'>
-      {
-        this.state.venues.length == 0 ? (
-          <Box>... Loading ... </Box>
-        ) : (
-          <Columns className='VenuesList is-multiline'>
-              {venues}
-          </Columns>
-        )
-      }
-    </Box>
+      <div className='mybox mt-3'>
+        {
+          this.state.venues.length == 0 ? (
+            <div className='hd-border mybox'>... Loading ... </div>
+          ) : (
+            <div>
+              <div className='venue-region-title'>San Francisco</div>
+              <Columns className='VenuesList is-multiline'>
+                  {this.buildVenuesList(sfVenues)}
+              </Columns>
+              <div className='venue-region-title'>EastBay</div>
+              <Columns className='VenuesList is-multiline'>
+                  {this.buildVenuesList(eastBayVenues)}
+              </Columns>
+              <div className='venue-region-title'>Other</div>
+              <Columns className='VenuesList is-multiline'>
+                  {this.buildVenuesList(otherVenues)}
+              </Columns>
+            </div>
+          )
+        }
+      </div>
     )
   }
 }

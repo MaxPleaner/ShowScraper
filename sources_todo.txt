@@ -2,6 +2,9 @@ ERROR: HotelUtah failed to scrape. Skipped.
 
 /*
 TODO Venues:
+- New Parish
+
+MAYBE Later:
 - Caravan
 - Elegant Pub
 - Phoenix Theater
@@ -17,7 +20,6 @@ CANNOT SCRAPE (NO PUBLIC CALENDAR)
 - Gilman
 
 OTHER VENUES (Lower Priority):
-- New Parish
 - Pavilion Concord
 - Bill Graham Civic (Meh)
 - 1015 Folsom (EDM)
