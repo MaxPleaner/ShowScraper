@@ -13,6 +13,12 @@
   /*margin: 10px;*/
 }
 
+.clearfix::after {
+  content: "";
+  clear: both;
+  display: table;
+}
+
 .App-body-content {
   padding: 10px;
 }
@@ -98,50 +104,67 @@
   /*margin: 2px !important;*/
   /*padding: 10px;*/
   /*height: 150px;*/
-  outline: 1px solid white;
+  outline: 2px solid rgb(170,170,170);
   /*border-radius*/: 20px;
   padding: 15px;
+  /*min-height: 250px;*/
   /*margin: 2px !important;*/
 }
 
 .venue-name {
+  min-width: 200px;
+  float: left;
   font-weight: bold;
+  font-size: 1.1em;
+  display: inline-block;
 }
 
 .venue-link {
+  float: right;
+  padding: 0 10px;
+  margin-right: 10px;
+  background-color: #0C7B93 !important;
+  color: white;
+  outline: 1px solid rgb(170, 170, 170);
+  /*border: 1px solid black;*/
+}
+
+.venue-link:hover {
+  background-color: #27496D !important;
+  color: white;
 }
 
 .venue-view-events {
+  margin-right: 10px;
+  padding: 0 10px;
+  float: right;
+  /*border: 1px solid black;*/
+  display: inline-block;
+  background-color: #0C7B93 !important;
+  color: white;
+  outline: 1px solid rgb(170, 170, 170);
+}
+
+.venue-view-events:hover {
+  background-color: #27496D !important;
+  color: white;
 }
 
 .venue-description {
+  display: inline-block;
+  margin-top: 10px;
   font-style: italic;
+  /*min-height: 150px;*/
 }
 
 .venue-region-title {
-  background-color: darkgrey !important;
+  background-color: #27496D !important;
   display: block;
   font-size: 1.5em;
   margin-bottom: 15px;
   padding: 10px;
-}
-
-.venue-website a, .venue-website a:visited {
-  color: lightgreen;
-  display: block;
-}
-
-.venue-website a:hover {
-  background-color: darkred;
-}
-
-.venue-name, .venue-website, .venue-view-events {
-  border: 1px solid pink;
-  /*border-radius: 20px;*/
   text-align: center;
 }
-
-
 
 .Day-group {
   /*margin-right: 20px;*/
@@ -151,12 +174,13 @@
 
 .daygroup-title {
   margin-bottom: 15px;
-  font-size: 1.5em;
+  font-size: 2em;
+  text-align: center;
 }
 
 .Event-box {
   outline: 2px solid rgb(170,170,170);
-  /*border-radius*/: 20px;
+  border-radius: 10px;
   padding: 5px;
   margin: 2px !important;
   /*display: inline-block;*/

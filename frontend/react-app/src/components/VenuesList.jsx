@@ -29,7 +29,8 @@ export default class VenuesList extends React.Component {
               <a class='venue-link' href={venue.website}>Website</a>
               {/*</Column>*/}
               {/*<Column className='is-one-third venue-view-events'>*/}
-              <div class='venue-view-events'>View events</div>
+              {/*<a class='venue-view-events'>View events</a>*/}
+              <div class='clearfix'></div>
               {/*</Column>*/}
               {/*<Column className='is-full venue-description'>*/}
               <div class='venue-description'>{venue.desc}</div>
