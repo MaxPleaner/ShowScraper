@@ -4,14 +4,14 @@ import $ from 'jquery';
 
 export default class DataLoader {
   static async loadVenueData() {
-    const data = await $.getJSON("http://storage.googleapis.com/show-scraper-data/sources.json", { _: new Date().getTime()})
+    const data = await $.getJSON("https://storage.googleapis.com/show-scraper-data/sources.json", { _: new Date().getTime()})
     return data
   }
 
   static async loadEventData(venues) {
     const results = []
     for (const venue of venues) {
-      const url = `http://storage.googleapis.com/show-scraper-data/${venue.name}.json`
+      const url = `https://storage.googleapis.com/show-scraper-data/${venue.name}.json`
       const events = await $.getJSON(url);
       events.forEach((event) => {
         let newEvent = {
