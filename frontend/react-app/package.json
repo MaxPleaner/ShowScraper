@@ -1,7 +1,7 @@
 {
   "name": "react-app",
   "version": "0.1.0",
-  "homepage": "https://maxpleaner.github.io/ShowScraper",
+  "homepage": "https://maxpleaner.github.io/ShowScraper/",
   "private": true,
   "dependencies": {
     "bulma": "^0.9.3",
