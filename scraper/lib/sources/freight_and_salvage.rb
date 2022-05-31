@@ -36,6 +36,7 @@ class FreightAndSalvage
     def get_next_page
       # no idea why theres all these duplicate things but we need to get the third "next" button
       $driver.css(".tn-btn-datepicker__btn-period-prev-next--btn-next")[2].click
+      sleep load_time
     end
 
     def parse_event_data(event, &foreach_event_blk)

@@ -1,4 +1,3 @@
-WARNING: Midway produced 0 events!
 ERROR: FreightAndSalvage failed to scrape. Skipped.
 ERROR: Fillmore failed to scrape. Skipped.
 ERROR: RickshawStop failed to scrape. Skipped.
