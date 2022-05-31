@@ -7,7 +7,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <HashRouter basename={process.env.PUBLIC_URL}>
+    <HashRouter basename="https://maxpleaner.github.io/ShowScraper">
       <Routes>
         <Route path="/" element={<App route='ListView' />} />
         <Route path="/ListView" element={<App route='ListView' />} />
