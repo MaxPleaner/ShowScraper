@@ -208,5 +208,11 @@
       "commonName": "Milk Bar",
       "latlng": "37.770107525377185, -122.45268443068328",
       "desc": "Club with local bands & DJs spinning anything from dubstep to dancehall, plus comedians some nights."
+    },
+    {
+      "name": "SfJazz",
+      "commonName": "SF Jazz",
+      "latlng": "37.77714742893529, -122.42107310055866",
+      "desc": "This nightspot presents a line-up of internationally renowned jazz performers live on stage."
     }
 ]

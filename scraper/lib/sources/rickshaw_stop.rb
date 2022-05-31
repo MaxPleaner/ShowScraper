@@ -40,9 +40,10 @@ class RickshawStop
           }
         elsif $driver.current_url.include?("wl.seetickets.us")
           title = $driver.css("[itemprop='name']")[0].text
-          if title != "PRIVATE EVENT"
+          date_str = $driver.css("[itemprop='startDate']")[0].attribute("datetime")
+          if title != "PRIVATE EVENT" && date_str.present?
             {
-              date: DateTime.parse($driver.css("[itemprop='startDate']")[0].attribute("datetime")),
+              date: DateTime.parse(date_str),
               img: $driver.css("[itemprop='image']")[0].attribute("src"),
               title: title,
               url: $driver.current_url,
@@ -64,8 +65,6 @@ class RickshawStop
       end.
         tap { |data| Utils.print_event_preview(self, data) if data }.
         tap { |data| foreach_event_blk&.call(data) if data }
-    rescue => e
-      binding.pry
     end
   end
 end

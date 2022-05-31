@@ -23,18 +23,20 @@ class Midway
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css(".event-details .date")[0].text),
-        img: parse_img(event),
-        title: event.css(".title")[0].text,
-        url: event.css(".title a")[0].attribute("href"),
+        date: parse_date(event),
+        img: event.css(".event-image img")[0].attribute("src"),
+        title: event.css(".event-info-title")[0].text,
+        url: event.css(".event-image")[0].attribute("href"),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     end
 
-    def parse_img(event)
-      event.css(".cropped-image")[0].attribute("style").scan(/url\(\"(.+)\"\)/)[0][0]
+    def parse_date(event)
+      month = event.css(".event-date-month")[0].text
+      day = event.css(".event-date-day")[0].text
+      DateTime.parse("#{month}/#{day}")
     end
   end
 end
