@@ -38,7 +38,6 @@ export default class Nav extends React.Component {
               <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
             </Column>*/}
           </Columns>
-          <hr />
       </div>
     )
   }
