@@ -18,17 +18,17 @@ export default class Nav extends React.Component {
                   <div class='site-title mybox'>Bay Area Shows</div>
                 </Column>
                 <Column className="is-narrow">
-                  <a href='/ListView'>
+                  <Link to='/ListView'>
                     <div className={`mybox ${this.props.route === "ListView" ? "selected" : ""}`}>List View</div>
-                  </a>
+                  </Link>
                 </Column>
     {/*            <Column className="is-narrow">
                   <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
                 </Column>*/}
                 <Column className="is-narrow">
-                  <a href='/VenuesListView'>
+                  <Link to='/VenuesListView'>
                     <div className={`mybox ${this.props.route === "VenuesListView" ? "selected" : ""}`}>Venues</div>
-                  </a>
+                  </Link>
                 </Column>
                </Columns>
               </Column>
