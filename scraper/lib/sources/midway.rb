@@ -18,15 +18,16 @@ class Midway
     private
 
     def get_events
+      sleep self.load_time
       $driver.css(".category-MusicEvent")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       {
         date: parse_date(event),
-        img: event.css(".event-image img")[0].attribute("src"),
-        title: event.css(".event-info-title")[0].text,
-        url: event.css(".event-image")[0].attribute("href"),
+        img: parse_img(event),
+        title: event.css(".title")[0].text,
+        url: event.css(".event-details a")[0].attribute("href"),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
@@ -34,9 +35,11 @@ class Midway
     end
 
     def parse_date(event)
-      month = event.css(".event-date-month")[0].text
-      day = event.css(".event-date-day")[0].text
-      DateTime.parse("#{month}/#{day}")
+      DateTime.parse(event.css(".date")[0].text)
+    end
+
+    def parse_img(event)
+      event.css(".cropped-image")[0].attribute("style").scan(/url\(\"(.+)\"\)/)[0][0]
     end
   end
 end
