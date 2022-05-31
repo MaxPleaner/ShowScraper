@@ -6,10 +6,13 @@ class BottomOfTheHill
   self.events_limit = 200
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
-    get_events.each.with_index.map do |event, index|
+    index = 0
+    get_events.each.map do |event|
       next if index >= events_limit
       next if event.css(".date").empty? # they have non-events in the same table
-      parse_event_data(event, &foreach_event_blk)
+      result = parse_event_data(event, &foreach_event_blk)
+      index += 1 if result
+      result
     end.compact
   end
 

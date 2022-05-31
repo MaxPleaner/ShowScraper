@@ -42,7 +42,7 @@ class Bimbos
     def parse_date(event)
       # TODO: no year
       month = event.css(".tm-event-month")[0].text
-      day = event.css(".tm-event-day")[0].text
+      day = event.css(".tm-event-date")[0].text
       DateTime.parse("#{month} #{day}")
     end
   end

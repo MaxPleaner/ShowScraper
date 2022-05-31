@@ -10,11 +10,14 @@ class RickshawStop
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     $driver.get(MAIN_URL)
-    get_events.map.with_index do |event, index|
+    index = 0
+    get_events.map do |event|
       next if index >= events_limit
       fallback_date = DateTime.parse(event.css(".value-title")[0].text)
       fallback_img = $driver.css(".detail_seetickets_image img")[0].attribute("src")
-      parse_event_data(event, fallback_date, fallback_img, &foreach_event_blk)
+      result = parse_event_data(event, fallback_date, fallback_img, &foreach_event_blk)
+      index += 1 if result
+      result
     end.compact
   end
 
