@@ -232,5 +232,11 @@
       "commonName": "Paramount Theater",
       "latlng": "37.81034969822523, -122.26805023863342",
       "desc": "Art Deco theater opened in 1931 hosting ballet & symphony performances, plus classic movies."
+    },
+    {
+      "name": "FoxTheater",
+      "commonName": "Fox Theater",
+      "latlng": "37.80868250063513, -122.2702571269811",
+      "desc": "Live music venue in a historic building housing an art school, bar, restaurant & courtyard."
     }
 ]
