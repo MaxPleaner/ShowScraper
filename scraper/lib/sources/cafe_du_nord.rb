@@ -1,6 +1,6 @@
-class BrickAndMortar
+class CafeDuNord
   # Single page!!
-  MAIN_URL = "https://www.brickandmortarmusic.com/"
+  MAIN_URL = "https://cafedunord.com/"
 
   cattr_accessor :events_limit, :load_time
   self.events_limit = 200
@@ -25,12 +25,18 @@ class BrickAndMortar
       {
         date: parse_date(event),
         img: event.css(".tw-image img")[0].attribute("src"),
-        title: event.css(".tw-name")[0].text,
+        title: parse_title(event),
         url: event.css(".tw-image a")[0].attribute("href"),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
+    end
+
+    def parse_title(event)
+      headliner = event.css(".tw-name")[0].text
+      support = event.css(".support")[0]&.text
+      [headliner, support].compact.join(", ").gsub("\n", ", ")
     end
 
     def parse_date(event)

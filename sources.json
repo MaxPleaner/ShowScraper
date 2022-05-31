@@ -178,5 +178,11 @@
       "commonName": "Brick and Mortar",
       "latlng": "37.76987211703599, -122.42041027300945",
       "desc": "Talent ranges from bluegrass to hip-hop at this modest-sized music venue near the freeway."
+    },
+    {
+      "name": "CafeDuNord",
+      "commonName": "Cafe Du Nord",
+      "latlng": "37.76723474909922, -122.43041839999998",
+      "desc": "Show nights bring New American eats, drinks & live music to this historic former speakeasy space."
     }
 ]

@@ -1,6 +1,5 @@
 /*
 TODO Venues:
-- Cafe Du Nord
 - Crybaby
 - Make Out Room
 - Eagle
