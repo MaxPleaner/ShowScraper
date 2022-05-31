@@ -1,4 +1,3 @@
-ERROR: RickshawStop failed to scrape. Skipped.
 ERROR: HotelUtah failed to scrape. Skipped.
 
 /*
