@@ -6,7 +6,6 @@ ERROR: HotelUtah failed to scrape. Skipped.
 
 /*
 TODO Venues:
-- Masonic
 - Paramount
 - Fox Theater
 - Great Northern

@@ -1,4 +1,4 @@
-class Fillmore
+class Masonic
   # "Load more" type site
   # However they have aggressive bot detection.
   # So we just parse super minimal info here.
@@ -7,7 +7,7 @@ class Fillmore
   self.pages_limit = 5
   self.events_limit = 200
 
-  MAIN_URL = "https://www.livenation.com/venue/KovZpZAE6eeA/the-fillmore-events"
+  MAIN_URL = "https://www.livenation.com/venue/KovZpZAJ6nlA/the-masonic-events"
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     $driver.navigate.to(MAIN_URL)
@@ -29,6 +29,8 @@ class Fillmore
     end
 
     def get_all_pages
+      sleep 2
+
       # ewww gross iframe
       $driver.execute_script 'document.querySelectorAll("iframe").forEach((iframe) => iframe.remove())'
 

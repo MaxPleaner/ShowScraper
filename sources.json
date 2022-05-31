@@ -220,5 +220,11 @@
       "commonName": "August Hall",
       "latlng": "37.78826379086476, -122.4095993232918",
       "desc": "A HISTORIC VENUE REBORN IN DOWNTOWN SAN FRANCISCO Live music and entertainment with special events, three full bars, and food by Fifth Arrow."
+    },
+    {
+      "name": "Masonic",
+      "commonName": "Masonic",
+      "latlng": "37.79180844613184, -122.41270335025152",
+      "desc": "Mid-century modern space built in 1958 that hosts notable music acts in an auditorium with balcony."
     }
 ]
