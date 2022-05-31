@@ -238,5 +238,11 @@
       "commonName": "Fox Theater",
       "latlng": "37.80868250063513, -122.2702571269811",
       "desc": "Live music venue in a historic building housing an art school, bar, restaurant & courtyard."
+    },
+    {
+      "name": "GreatNorthern",
+      "commonName": "Great Northern",
+      "latlng": "37.76824966403541, -122.40624810795016",
+      "desc": "DJs, live music & bottle service featured in an energetic, industrial setting with art-deco accents."
     }
 ]
