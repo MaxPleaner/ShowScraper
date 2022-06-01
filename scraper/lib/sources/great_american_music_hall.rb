@@ -39,6 +39,13 @@ class GreatAmericanMusicHall
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
+      rescue => e
+        if e.message.include?("cannot determine loading status") || e.message.include?("target frame detached")
+          sleep 2
+          retry
+        else
+          binding.pry
+        end
     end
 
     def parse_img

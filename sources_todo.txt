@@ -1,4 +1,3 @@
-ERROR: Warfield failed to scrape. Skipped.
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
 ERROR: Fillmore failed to scrape. Skipped.
 ERROR: RickshawStop failed to scrape. Skipped.
