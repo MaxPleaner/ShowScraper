@@ -25,21 +25,20 @@ class BottomOfTheHill
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      link = parse_details_link(event)
+      title = event.css(".band").map(&:text).join(", ")
+      return if title.blank?
       {
         date: parse_date(event.css(".date").map(&:text).reject(&:blank?).first),
         img: parse_img(event) || "",
-      }.tap do |data|
-        link = parse_details_link(event)
-        $driver.new_tab(link) do
-          data[:title] = $driver.title.gsub("bottomofthehill: ", "")
-          data[:url] = $driver.current_url
-          data[:details] = parse_details
-        end
-      end.
+        title: title,
+        url: link,
+        details: "",
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
-    rescue
-      binding.pry
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
     def parse_img(event)
