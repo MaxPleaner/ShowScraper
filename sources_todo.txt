@@ -1,5 +1,3 @@
-ERROR: BottomOfTheHill failed to scrape. Skipped.
-ERROR: Independent failed to scrape. Skipped.
 ERROR: Warfield failed to scrape. Skipped.
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
 ERROR: Fillmore failed to scrape. Skipped.

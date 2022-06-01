@@ -23,7 +23,7 @@ class Warfield
     private
 
     def get_events
-      $driver.css(".thumb a")
+      $driver.css("#eventsList .entry")
     end
 
     def get_next_page
@@ -31,18 +31,20 @@ class Warfield
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: parse_date($driver.css(".date")[0].text.split("\n")[1]),
-          url: $driver.current_url,
-          img: $driver.css(".event_image img")[0].attribute("src"),
-          title: $driver.css(".page_header_container h1,h4").map(&:text).join(" "),
-          details: ($driver.css(".bio")[0]&.text || "").gsub("ARTIST INFORMATION\n", "").gsub("\nREAD MORE", ""),
-        }
-      end.
+      link = event.css(".thumb a")[0].attribute("href")
+      date = event.css(".date")[0].text
+      return if date.include?("TBD")
+      {
+        date: parse_date(date),
+        url: link,
+        img: event.css(".thumb img")[0].attribute("src"),
+        title: event.css(".title")[0].text.gsub("\n", " "),
+        details: "",
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
+      rescue => e
+        binding.pry
     end
 
     def parse_date(date_string)
