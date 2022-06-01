@@ -15,7 +15,7 @@ export default class Nav extends React.Component {
             <Column className='is-full'>
               <Columns className='is-centered'>
                 <Column className='is-narrow'>
-                  <div class='site-title mybox'>Bay Area Shows</div>
+                  <div className='site-title mybox'>Bay Area Shows</div>
                 </Column>
                 <Column className="is-narrow">
                   <Link to='/ListView'>

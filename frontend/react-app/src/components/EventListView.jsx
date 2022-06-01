@@ -9,7 +9,7 @@ export default class ListView extends React.Component {
     const events = Object.entries(this.props.events).map(([date, date_events], idx) => {
       return (
         <div key={idx} className='Day-group'>
-          <div class='daygroup-title'>{moment(date).format("M/DD (dddd)")}</div>
+          <div className='daygroup-title'>{moment(date).format("M/DD (dddd)")}</div>
           <Columns className='Day-events is-multiline'>
             {date_events.map((date_event, idx2) => {
               return <EventListItem key={(idx + 1) + idx2 } event={date_event} />

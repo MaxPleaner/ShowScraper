@@ -7,7 +7,7 @@ import _ from 'underscore'
 export default class VenuesList extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { venues: [] };
+    this.state = { venues: props.venues || [] };
   }
 
   componentDidUpdate(oldProps) {
@@ -20,20 +20,20 @@ export default class VenuesList extends React.Component {
     return venues.map((venue, idx) => {
       return (
         <Column key={idx} className='is-half'>
-          <div class='venue'>
+          <div className='venue'>
 {/*            <Columns>
               <Column className='is-one-third venue-name'>*/}
-              <div class='venue-name'>{venue.commonName}</div>
+              <div className='venue-name'>{venue.commonName}</div>
               {/*</Column>*/}
               {/*<Column className='is-one-third venue-website'>*/}
-              <a class='venue-link' href={venue.website}>Website</a>
+              <a className='venue-link' href={venue.website}>Website</a>
               {/*</Column>*/}
               {/*<Column className='is-one-third venue-view-events'>*/}
-              {/*<a class='venue-view-events'>View events</a>*/}
-              <div class='clearfix'></div>
+              {/*<a className='venue-view-events'>View events</a>*/}
+              <div className='clearfix'></div>
               {/*</Column>*/}
               {/*<Column className='is-full venue-description'>*/}
-              <div class='venue-description'>{venue.desc}</div>
+              <div className='venue-description'>{venue.desc}</div>
               {/*</Column>*/}
             {/*</Columns>*/}
           </div>

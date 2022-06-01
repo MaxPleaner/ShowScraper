@@ -17,7 +17,14 @@ const WEEK_DAY_FORMAT = "M/DD"
 export default class EventListViewManager extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { mode: DEFAULT_MODE, allEvents: [], events: [], currentDay: moment(new Date()) };
+    const currentDay = moment(new Date());
+    const allEvents = props.events || [];
+    this.state = {
+      mode: DEFAULT_MODE,
+      allEvents: allEvents,
+      events: this.computeEventsList(allEvents, currentDay, DEFAULT_MODE),
+      currentDay: currentDay
+    };
   }
 
   componentDidUpdate(oldProps) {
@@ -117,15 +124,15 @@ export default class EventListViewManager extends React.Component {
               <Columns>
                 <Column>
                   <a onClick={this.goToPrevDate.bind(this)}>
-                    <div class='date-range-select hd-border mybox'>{this.prevDateEntry()}</div>
+                    <div className='date-range-select hd-border mybox'>{this.prevDateEntry()}</div>
                   </a>
                 </Column>
                 <Column>
-                  <div class='date-range-select-static hd-border mybox selected'>{this.currentDateEntry()}</div>
+                  <div className='date-range-select-static hd-border mybox selected'>{this.currentDateEntry()}</div>
                 </Column>
                 <Column>
                   <a onClick={this.goToNextDate.bind(this)}>
-                    <div class='date-range-select hd-border mybox'>{this.nextDateEntry()}</div>
+                    <div className='date-range-select hd-border mybox'>{this.nextDateEntry()}</div>
                   </a>
                 </Column>
               </Columns>
@@ -133,7 +140,7 @@ export default class EventListViewManager extends React.Component {
         </Columns>
         {
           (this.state.allEvents.length == 0) ? (
-            <div class='hd-border mybox'>Loading...</div>
+            <div className='hd-border mybox'>Loading...</div>
           ) : (
             <EventListView events={this.state.events}/>
           )
