@@ -1,18 +1,18 @@
 {
   "files": {
-    "main.css": "/ShowScraper/static/css/main.51b03ce7.css",
-    "main.js": "/ShowScraper/static/js/main.dc6a267e.js",
-    "static/media/paper_texture310_dark.png": "/ShowScraper/static/media/paper_texture310_dark.09a80dfa3105ea632c35.png",
-    "static/media/hatching_adjusted.png": "/ShowScraper/static/media/hatching_adjusted.561b8dbe72e68cb365bf.png",
-    "static/media/icons.eot": "/ShowScraper/static/media/icons.0e66b12cd571c0e232ac.eot",
-    "static/media/icons.ttf": "/ShowScraper/static/media/icons.6b4bceed591430863e23.ttf",
-    "static/media/icons.woff": "/ShowScraper/static/media/icons.54df8cd2144b1356f797.woff",
-    "index.html": "/ShowScraper/index.html",
-    "main.51b03ce7.css.map": "/ShowScraper/static/css/main.51b03ce7.css.map",
-    "main.dc6a267e.js.map": "/ShowScraper/static/js/main.dc6a267e.js.map"
+    "main.css": "/bayareashows.org/static/css/main.12e9c28f.css",
+    "main.js": "/bayareashows.org/static/js/main.03d9defa.js",
+    "static/media/paper_texture310_dark.png": "/bayareashows.org/static/media/paper_texture310_dark.09a80dfa3105ea632c35.png",
+    "static/media/hatching_adjusted.png": "/bayareashows.org/static/media/hatching_adjusted.561b8dbe72e68cb365bf.png",
+    "static/media/icons.eot": "/bayareashows.org/static/media/icons.0e66b12cd571c0e232ac.eot",
+    "static/media/icons.ttf": "/bayareashows.org/static/media/icons.6b4bceed591430863e23.ttf",
+    "static/media/icons.woff": "/bayareashows.org/static/media/icons.54df8cd2144b1356f797.woff",
+    "index.html": "/bayareashows.org/index.html",
+    "main.12e9c28f.css.map": "/bayareashows.org/static/css/main.12e9c28f.css.map",
+    "main.03d9defa.js.map": "/bayareashows.org/static/js/main.03d9defa.js.map"
   },
   "entrypoints": [
-    "static/css/main.51b03ce7.css",
-    "static/js/main.dc6a267e.js"
+    "static/css/main.12e9c28f.css",
+    "static/js/main.03d9defa.js"
   ]
 }
