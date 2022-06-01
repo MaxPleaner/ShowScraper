@@ -7,7 +7,7 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <HashRouter basename={process.env.PUBLIC_URL}>
+    <HashRouter basename="/ShowScraper">
       <Routes>
         <Route exact path="/" element={<App route='ListView' />} />
         <Route path="/ListView" element={<App route='ListView' />} />
