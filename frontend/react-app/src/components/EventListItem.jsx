@@ -1,6 +1,7 @@
 import React from 'react';
 import { Columns, Box } from 'react-bulma-components';
 const { Column } = Columns;
+import MissingImage from '../MissingImage.png'
 
 export default class EventListItem extends React.Component {
   constructor(props) {
@@ -9,7 +10,7 @@ export default class EventListItem extends React.Component {
   render() {
     let imgSrc = this.props.event.img;
     if (imgSrc == "") {
-      imgSrc = "/MissingImage.png"
+      imgSrc = MissingImage;
     }
     const maxTitleLength = 80
     let title = this.props.event.title;
@@ -22,7 +23,11 @@ export default class EventListItem extends React.Component {
           <Column className='is-one-third'>
              <a href={this.props.event.url}>
                {/*<div className='img-background'>*/}
-                 <img className='Event-img' src={imgSrc} />
+                 <img
+                   className='Event-img'
+                   src={imgSrc}
+                   onError={this.onImageError}
+                  />
                {/*</div>*/}
              </a>
           </Column>
@@ -38,5 +43,10 @@ export default class EventListItem extends React.Component {
         </Columns>
       </Column>
     )
+  }
+
+  onImageError(e) {
+    e.currentTarget.onerror=null
+    e.currentTarget.src=MissingImage
   }
 }

@@ -1,4 +1,13 @@
-ERROR: HotelUtah failed to scrape. Skipped.
+ERROR: BottomOfTheHill failed to scrape. Skipped.
+ERROR: Independent failed to scrape. Skipped.
+ERROR: Warfield failed to scrape. Skipped.
+ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
+ERROR: Fillmore failed to scrape. Skipped.
+ERROR: RickshawStop failed to scrape. Skipped.
+ERROR: Yoshis failed to scrape. Skipped.
+ERROR: AugustHall failed to scrape. Skipped.
+ERROR: Masonic failed to scrape. Skipped.
+ERROR: Paramount failed to scrape. Skipped.
 
 /*
 TODO Venues:

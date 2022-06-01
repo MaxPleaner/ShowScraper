@@ -26,7 +26,7 @@ class BottomOfTheHill
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: parse_date(event.css(".date")[0].text),
+        date: parse_date(event.css(".date").map(&:text).reject(&:blank?).first),
         img: parse_img(event) || "",
       }.tap do |data|
         link = parse_details_link(event)
@@ -38,6 +38,8 @@ class BottomOfTheHill
       end.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
+    rescue
+      binding.pry
     end
 
     def parse_img(event)
