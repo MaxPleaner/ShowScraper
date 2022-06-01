@@ -70,6 +70,8 @@ class RickshawStop
       end.
         tap { |data| Utils.print_event_preview(self, data) if data }.
         tap { |data| foreach_event_blk&.call(data) if data }
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
   end
 end

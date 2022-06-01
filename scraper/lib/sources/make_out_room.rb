@@ -52,6 +52,8 @@ class MakeOutRoom
           tap { |data| Utils.print_event_preview(self, data) }.
           tap { |data| foreach_event_blk&.call(data) }
       end
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
     def parse_date(event)

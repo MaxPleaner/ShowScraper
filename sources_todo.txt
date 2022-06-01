@@ -1,3 +1,21 @@
+REWRITE ??
+- Cornerstone
+- DNA
+- El Rio
+- Elbo Room
+- Freight and Salvage
+- Golden Bull
+- Great American Music Hall
+- Greek Theater
+- Grey Area
+- Ivy Room
+- Regency
+- Rickshaw Stop
+- Starline
+- The Chapel
+- UC Berkeley
+- Winters
+
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
 ERROR: Fillmore failed to scrape. Skipped.
 ERROR: RickshawStop failed to scrape. Skipped.

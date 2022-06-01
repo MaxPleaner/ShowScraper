@@ -37,6 +37,8 @@ class GreyArea
           {}
         end
       end
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
     def parse_img

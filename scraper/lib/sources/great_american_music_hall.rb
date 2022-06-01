@@ -44,7 +44,7 @@ class GreatAmericanMusicHall
           sleep 2
           retry
         else
-          binding.pry
+          ENV["DEBUGGER"] == "true" ? binding.pry : raise
         end
     end
 
