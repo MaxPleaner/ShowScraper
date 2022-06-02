@@ -6,31 +6,43 @@ class ElboRoom
   self.events_limit = 200
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
-    get_events.each_index.map do |index|
-      next if index >= events_limit
-      parse_event_data(index, &foreach_event_blk)
+    events = []
+    get_events.each do |event|
+      next if events.count >= events_limit
+      result = parse_event_data(event, &foreach_event_blk)
+      next unless result
+      events.push(result)
     end.compact
   end
 
   class << self
     private
 
-    def get_events
-      $driver.navigate.to(MAIN_URL)
-      $driver.css("[data-hook='title'] a")
+    def get_all_pages
+      4.times do
+        sleep 2
+        load_more = $driver.css("[data-hook='load-more-button']")[0]
+        return unless load_more
+        load_more.click rescue next
+      end
     end
 
-    def parse_event_data(index, &foreach_event_blk)
-      $driver.new_tab(MAIN_URL) do
-        $driver.css("[data-hook='title'] a")[index].click
-        {
-          date: parse_date($driver.css("[data-hook='event-full-date']")[0].text),
-          url: $driver.current_url,
-          title: $driver.css("[data-hook='event-title']")[0].text,
-          img: $driver.css("[data-hook='event-image'] img")[0].attribute("src"),
-          details: $driver.css("[data-hook='event-description']")[0].text,
-        }
-      end.
+    def get_events
+      $driver.navigate.to(MAIN_URL)
+      get_all_pages
+      $driver.css("[data-hook='events-card']")
+    end
+
+    def parse_event_data(event, &foreach_event_blk)
+      date = event.css("[data-hook='short-date']")[0].text
+      return if date.blank?
+      {
+        date: DateTime.parse(date),
+        url: event.css("[data-hook='ev-rsvp-button']")[0].attribute("href"),
+        title: event.css("[data-hook='title']")[0].text,
+        img: event.css("[data-hook='image']")[0].attribute("src"),
+        details: "",
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
