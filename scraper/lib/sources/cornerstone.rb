@@ -21,30 +21,22 @@ class Cornerstone
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.css(".event-name a")[0].attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: parse_date($driver.css("[itemprop='startDate']")[0].text),
-          title: parse_title,
-          url: $driver.current_url,
-          img: $driver.css("[itemprop='image']")[0]&.attribute("src") || "",
-          details: $driver.css(".event-details")[0].text
-        }
-      end.
+      {
+        date: parse_date(event),
+        title: event.css(".event-name")[0].text,
+        url: event.css(".event-name a")[0].attribute("href"),
+        img: event.css(".attachment-post-thumbnail")[0]&.attribute("src") || "",
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
-    def parse_title
-      title = $driver.css(".talent-list").map(&:text).reject(&:blank?).join(", ")
-      title = title.present? ? title : $driver.css("input#eventname")[0]&.attribute("value")
-      title = title.present? ? title : $driver.css(".event-h2[itemprop='name']")[0].text
-      title || ""
-    end
-
-    def parse_date(date_string)
+    def parse_date(event)
+      # todo: no year
+      date_string = event.css(".dates")[0].text
       DateTime.parse(date_string)
     end
   end
