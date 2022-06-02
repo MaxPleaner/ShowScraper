@@ -1,21 +1,19 @@
 class ElRio
-  MAIN_URL = "https://tockify.com/elriosf2/monthly" # secret page from elriosf.com
+  # This is the iframe rendered from "https://www.elriosf.com/calendar"
+  MAIN_URL = "https://tockify.com/elriosf2/agenda"
 
-  cattr_accessor :months_limit, :events_limit, :load_time
-  self.months_limit = 3
+  cattr_accessor :events_limit, :load_time
   self.events_limit = 200
   self.load_time = 3
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    months_limit.times do |i|
-      get_events.map do |event|
-        next if events.count >= events_limit
-        events.push(parse_event_data(event, &foreach_event_blk))
-      end
+    get_all_pages
+    get_events.map do |event|
+      next if events.count >= events_limit
+      events.push(parse_event_data(event, &foreach_event_blk))
       break if events.count >= events_limit
-      get_next_page unless i == months_limit - 1
     end
     events
   end
@@ -23,34 +21,32 @@ class ElRio
   class << self
     private
 
-    def get_events
-      sleep load_time
-      $driver.css(".d-title")
+    def get_all_pages
+      # binding.pry
+      4.times do
+        sleep 2
+        load_more = $driver.css(".btn-loadMore")[0]
+        return unless load_more
+        load_more.click rescue next
+      end
     end
 
-    def get_next_page
-      $driver.css(".flaticon-next")[0].click rescue $driver.save_screenshot("debug.png")
+    def get_events
+      $driver.css(".agendaItem")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: parse_date($driver.css(".d-when")[0].text),
-          img: $driver.css(".d-text img")[0].attribute("src"),
-          title: $driver.css("h1.d-headerText")[0].text,
-          url: $driver.current_url,
-          details: $driver.css(".eventDetail__what__description")[0].text
-        }
-      end.
+      {
+        date: DateTime.parse(event.css(".d-when")[0].text),
+        img: event.css(".agendaItem__image__img")[0].attribute("src"),
+        title: event.css(".d-title")[0].text,
+        url: event.css(".d-title a")[0].attribute("href"),
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
-    end
-
-    def parse_date(date_string)
-      DateTime.parse(date_string)
     end
   end
 end
