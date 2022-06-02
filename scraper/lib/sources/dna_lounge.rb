@@ -11,7 +11,9 @@ class DnaLounge
     months_limit.times do |i|
       get_events.each do |event|
         next if events.count >= events_limit
-        events.push(parse_event_data(event, &foreach_event_blk))
+        result = parse_event_data(event, &foreach_event_blk)
+        next unless result
+        events.push(result)
       end
       break if events.count >= events_limit
       get_next_page unless i == months_limit - 1
@@ -31,19 +33,28 @@ class DnaLounge
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      date = parse_date(event)
+      return if date < Date.today
       $driver.new_tab(event.attribute("href")) do
         {
           url: $driver.current_url,
           img: parse_img(event),
-          date: parse_date(event),
+          date: date,
           title: parse_title(event),
-          details: parse_details(event)
+          details: ""
         }
       end.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
+    end
+
+    def parse_date(event)
+      link = event.attribute("href")
+      regex = /https:\/\/www.dnalounge.com\/calendar\/(\d+)\/(\d+)-(\d+)/
+      year, month, day = link.scan(regex)[0]
+      DateTime.parse("#{day}/#{month}/#{year}")
     end
 
     def parse_img(event)
@@ -57,23 +68,6 @@ class DnaLounge
     def parse_title(event)
       title = $driver.css(".event_title")[0].text
       title.blank? ? $driver.title : title
-    end
-
-    def parse_date(event)
-      date = $driver.css(".event_date")[0].text
-      time = $driver.css(".time")[0].text.split(" ")[0]
-      year = $driver.current_url.split("/")[2]
-      date_string = "#{date}, #{year}, #{time}"
-      DateTime.parse(date_string)
-    end
-
-    def parse_details(event)
-      genre = $driver.css(".genre")[0]&.text || ""
-      age = $driver.css(".age")[0].text
-      price = $driver.css(".price")[0].text
-      blurb = $driver.css(".event_blurb")[0].text
-
-      [genre, age, price, blurb].reject(&:blank?).join("\n")
     end
   end
 end
