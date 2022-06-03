@@ -41,21 +41,6 @@ class GreatAmericanMusicHall
         ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
-    def parse_img
-      $driver.css("[itemprop='image']")[0]&.attribute("src") ||
-        $driver.css("img.listing-hero-image.listing-image--main")[0]&.attribute("src") ||
-        ""
-    end
-
-    def parse_title
-      title = $driver.css(".event-h2")[0]&.text
-      # hacky but we make do
-      subtitle = $driver.css(".event-bar-left > div:nth-child(2) > h3:nth-child(4)")[0]&.text
-      result = [title, subtitle].compact.join(", ")
-      return result if result.present?
-      $driver.css("[data-automation='artist-list']").map(&:text).reject(&:blank?).join(", ").gsub("\n", ", ")
-    end
-
     def parse_date(event)
       date_str = event.css(".date")[0].text
       month, day = date_str.scan(/(\d+)\.(\d+)/)[0]
