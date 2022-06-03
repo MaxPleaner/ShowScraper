@@ -1,6 +1,4 @@
 REWRITE ??
-- UC Berkeley
-- Winters
 
 ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
 ERROR: Fillmore failed to scrape. Skipped.
