@@ -46,7 +46,7 @@ class SfJazz
 
     def parse_date(event)
       month = event.css(".event-date-month")[0].text
-      day = event.css(".event-date-day")[0].text
+      day = event.css(".event-date-date")[0].text
       DateTime.parse("#{month}/#{day}")
     end
   end

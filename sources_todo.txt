@@ -6,7 +6,6 @@ SLOW SCRAPERS
 - WINTERS
 
 OTHER ISSUES
-- milk bar date parsing wrong
 - SF Jazz date parsing wrong
 - August hall error
 - Masonic error
