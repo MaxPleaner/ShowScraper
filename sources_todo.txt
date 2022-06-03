@@ -6,7 +6,6 @@ SLOW SCRAPERS
 - WINTERS
 
 OTHER ISSUES
-- SF Jazz date parsing wrong
 - August hall error
 - Masonic error
 - paramount error

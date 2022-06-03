@@ -20,7 +20,7 @@ class AugustHall
         events.push(parse_event_data(event, &foreach_event_blk))
       end
       break if events.count >= events_limit
-      got_next_page = get_next_page unless i == months_limit - 1
+      got_next_page = get_next_page
       break unless got_next_page
     end
     events
