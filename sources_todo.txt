@@ -1,6 +1,4 @@
 REWRITE ??
-- Rickshaw Stop
-- Starline
 - The Chapel
 - UC Berkeley
 - Winters

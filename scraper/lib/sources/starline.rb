@@ -18,29 +18,21 @@ class Starline
     private
 
     def get_events
-      $driver.css(".eventMainWrapper .eventMoreInfo a")
+      $driver.css(".eventMainWrapper")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: parse_date($driver.css(".eventStDate")[0].text),
-          img: $driver.css(".singleEventImage.wp-post-image")[0].attribute("src"),
-          title: $driver.css("#eventTitle")[0].text,
-          url: $driver.current_url,
-          details: $driver.css(".singleEventDescription")[0].text
-        }
-      end.
+      {
+        date: DateTime.parse(event.css("#eventDate")[0].text),
+        img: event.css(".eventListImage")[0].attribute("src"),
+        title: event.css("#eventTitle")[0].text,
+        url: event.css(".eventMoreInfo a")[0].attribute("href"),
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
-    end
-
-    def parse_date(date_string)
-      # TODO: no year
-      DateTime.parse(date_string)
     end
   end
 end
