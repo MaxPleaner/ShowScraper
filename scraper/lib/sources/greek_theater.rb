@@ -17,20 +17,18 @@ class GreekTheater
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".more-info")
+      $driver.css(".content-information")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: parse_date($driver.css(".single-date-show")[0].text),
-          title: $driver.css(".show-title,.support").map(&:text).join(", ").gsub("\n", " "),
-          url: $driver.current_url,
-          img: $driver.css(".wp-post-image")[0].attribute("src"),
-          details: $driver.css(".attraction-list")[0].text
-        }
-      end.
+      link = event.css(".more-info")[0].attribute("href")
+      {
+        date: DateTime.parse(event.css("[itemprop='startDate']")[0].attribute("content")),
+        title: parse_title(event),
+        url: link,
+        img: event.css(".wp-post-image")[0]&.attribute("src") || "",
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
@@ -39,6 +37,12 @@ class GreekTheater
 
     def parse_date(date_string)
       DateTime.parse(date_string)
+    end
+
+    def parse_title(event)
+      title = event.css(".show-title")[0].text
+      support = event.css(".support")[0]&.text
+      [title, support].compact.join(", ").gsub("\n", ", ")
     end
   end
 end
