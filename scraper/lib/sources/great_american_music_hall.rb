@@ -13,7 +13,7 @@ class GreatAmericanMusicHall
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     nokogiri = Nokogiri.parse(URI.open(MAIN_URL).read)
-    events = nokogiri.css("#event_tickets")
+    events = nokogiri.css(".calendar-day-event")
     events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
@@ -28,24 +28,17 @@ class GreatAmericanMusicHall
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href").value
-      $driver.navigate.to(link)
       {
-        date: parse_date,
-        img: parse_img,
-        title: parse_title,
-        url: $driver.current_url,
-        details: $driver.css(".event-details")[0]&.text || ""
+        date: parse_date(event),
+        img: event.css(".detail_seetickets_image img")[0].attribute("src").value,
+        title: event.css(".event-title")[0].text,
+        url: event.css(".event-title")[0].attribute("href").value,
+        details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
       rescue => e
-        if e.message.include?("cannot determine loading status") || e.message.include?("target frame detached")
-          sleep 2
-          retry
-        else
-          ENV["DEBUGGER"] == "true" ? binding.pry : raise
-        end
+        ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
     def parse_img
@@ -63,11 +56,10 @@ class GreatAmericanMusicHall
       $driver.css("[data-automation='artist-list']").map(&:text).reject(&:blank?).join(", ").gsub("\n", ", ")
     end
 
-    def parse_date
-      date_str = $driver.css("[itemprop='startDate']")[0]&.text ||
-        $driver.css("[data-automation='event-details-time'] p")[2]&.text
-
-      DateTime.parse(date_str)
+    def parse_date(event)
+      date_str = event.css(".date")[0].text
+      month, day = date_str.scan(/(\d+)\.(\d+)/)[0]
+      DateTime.parse("#{month}/#{day}")
     end
   end
 end
