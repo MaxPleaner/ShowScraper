@@ -6,10 +6,14 @@ class Regency
   self.events_limit = 200
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
-    get_events.each.with_index.map do |event, index|
-      next if index >= events_limit
-      parse_event_data(event, &foreach_event_blk)
-    end.compact
+    events = []
+    get_events.each do |event|
+      next if events.count >= events_limit
+      result = parse_event_data(event, &foreach_event_blk)
+      next unless result
+      events.push result
+    end
+    events
   end
 
   class << self
@@ -17,20 +21,19 @@ class Regency
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css("#eventsList .entry .thumb a")
+      $driver.css(".entry")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: DateTime.parse($driver.css(".date")[0].text.gsub("DATE\n", "")),
-          url: $driver.current_url,
-          img: $driver.css(".event_image img")[0].attribute("src"),
-          title: $driver.css(".page_header_left")[0].text.gsub("\n", " ").gsub("Goldenvoice Presents ", ""),
-          details: ""
-        }
-      end.
+      date = event.css(".date")[0].text
+      return if date.blank?
+      {
+        date: DateTime.parse(date),
+        url: event.css(".carousel_item_title_small a")[0].attribute("href"),
+        img: event.css(".thumb img")[0].attribute("src"),
+        title: event.css(".carousel_item_title_small a")[0].text,
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
