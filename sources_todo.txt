@@ -6,7 +6,6 @@ SLOW SCRAPERS
 - WINTERS
 
 OTHER ISSUES
-- Masonic error
 - paramount error
 
 /*
