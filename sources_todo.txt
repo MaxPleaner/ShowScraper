@@ -1,6 +1,4 @@
 REWRITE ??
-- Grey Area
-- Ivy Room
 - Regency
 - Rickshaw Stop
 - Starline
