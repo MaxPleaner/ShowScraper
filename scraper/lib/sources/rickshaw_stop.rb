@@ -13,9 +13,7 @@ class RickshawStop
     index = 0
     get_events.map do |event|
       next if index >= events_limit
-      fallback_date = DateTime.parse(event.css(".value-title")[0].text)
-      fallback_img = $driver.css(".detail_seetickets_image img")[0].attribute("src")
-      result = parse_event_data(event, fallback_date, fallback_img, &foreach_event_blk)
+      result = parse_event_data(event, &foreach_event_blk)
       index += 1 if result
       result
     end.compact
@@ -30,44 +28,18 @@ class RickshawStop
       end
     end
 
-    def parse_event_data(event, fallback_date, fallback_img, &foreach_event_blk)
+    def parse_event_data(event, &foreach_event_blk)
       link = event.css("#event_tickets")[0].attribute("href")
-      $driver.new_tab(link) do
-        if $driver.current_url.include?("eventbrite")
-          date_str = $driver.css(".event-details__data meta")[0]&.attribute("content")
-          date_str ||= $driver.css("[data-testid='event-start-date-time']")[0].text
-          {
-            date: DateTime.parse(date_str),
-            img: $driver.css(".listing-hero-image")[0].attribute("src"),
-            title: $driver.title,
-            url: $driver.current_url,
-            details: $driver.css("[data-automation='about-this-event-sc']")[0]&.text || ""
-          }
-        elsif $driver.current_url.include?("wl.seetickets.us")
-          title = $driver.css("[itemprop='name']")[0].text
-          date_str = $driver.css("[itemprop='startDate']")[0].attribute("datetime")
-          if title != "PRIVATE EVENT" && date_str.present?
-            {
-              date: DateTime.parse(date_str),
-              img: $driver.css("[itemprop='image']")[0].attribute("src"),
-              title: title,
-              url: $driver.current_url,
-              details: $driver.css(".event-details")[0].text
-            }
-          end
-        else
-          # There are other event sources here (e.g. rav.co, possibly more)
-          # rav.co is not semantic css. We can't reliably scrape this.
-          # However we can use some fallback
-          {
-            date: fallback_date,
-            title: $driver.title,
-            img: fallback_img,
-            url: $driver.current_url,
-            details: ""
-          }
-        end
-      end.
+      date = DateTime.parse(event.css(".value-title")[0].text)
+      img = event.css(".detail_seetickets_image img")[0].attribute("src")
+      title = event.css(".event-title")[0].text
+      {
+        date: date,
+        img: img,
+        title: title,
+        url: link,
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) if data }.
         tap { |data| foreach_event_blk&.call(data) if data }
     rescue => e

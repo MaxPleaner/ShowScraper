@@ -1,5 +1,4 @@
 REWRITE ??
-- Regency
 - Rickshaw Stop
 - Starline
 - The Chapel
