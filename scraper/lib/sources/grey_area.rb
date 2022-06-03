@@ -21,34 +21,23 @@ class GreyArea
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      $driver.new_tab(event.attribute("href")) do
-        # we have to check this here because there's a redirect
-        if $driver.current_url.include?("/event/")
-          {
-            img: parse_img,
-            title: $driver.css("h2.heading")[0]&.text || $driver.title,
-            url: $driver.current_url,
-            date: parse_date($driver.css(".meta-date")[0].text),
-            details: $driver.css(".body-text").map(&:text).join("\n")
-          }.
-            tap { |data| Utils.print_event_preview(self, data) }.
-            tap { |data| foreach_event_blk&.call(data) }
-        else
-          {}
-        end
-      end
+      {
+        img: parse_img(event),
+        title: event.css(".item-title")[0].text,
+        url: event.attribute("href"),
+        date: DateTime.parse(event.css(".date")[0].text),
+        details: ""
+      }.
+        tap { |data| Utils.print_event_preview(self, data) }.
+        tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
-    def parse_img
-      style = $driver.css(".full-width-image .image")[0]&.attribute("style")
+    def parse_img(event)
+      style = $driver.css(".image")[0]&.attribute("style")
       return "" unless style
       style.scan(/url\(\"(.+)\"\)/)[0][0]
-    end
-
-    def parse_date(date_string)
-      DateTime.parse(date_string)
     end
   end
 end
