@@ -1,12 +1,22 @@
-REWRITE ??
+SLOW SCRAPERS
+- DNA
+- GOLDEN BULL
+- KNOCKOUT
+- IVY ROOM
+- WINTERS
 
-ERROR: GreatAmericanMusicHall failed to scrape. Skipped.
-ERROR: Fillmore failed to scrape. Skipped.
-ERROR: RickshawStop failed to scrape. Skipped.
-ERROR: Yoshis failed to scrape. Skipped.
-ERROR: AugustHall failed to scrape. Skipped.
-ERROR: Masonic failed to scrape. Skipped.
-ERROR: Paramount failed to scrape. Skipped.
+RERUN
+- INDEPENDENT
+- FILLMORE
+- YOSHIS
+
+OTHER ISSUES
+- Fillmore dates are 1 day ahead
+- milk bar date parsing wrong
+- SF Jazz date parsing wrong
+- August hall error
+- Masonic error
+- paramount error
 
 /*
 TODO Venues:

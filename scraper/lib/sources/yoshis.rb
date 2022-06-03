@@ -54,7 +54,7 @@ class Yoshis
       {
         url: event.css(".eimage a")[0].attribute("href"),
         img: event.css(".eimage img")[0].attribute("src"),
-        date: DateTime.parse(event.css(".edate")[0].text),
+        date: parse_date(event),
         title: parse_title(event),
         details: ""
       }.
@@ -68,6 +68,12 @@ class Yoshis
       title = event.css(".etitle")[0].text
       parts = title.split("\n")
       [parts[1], parts[0]].compact.join(" - ")
+    end
+
+    def parse_date(event)
+      date_str = event.css(".edate")[0].text
+      month, day = date_str.split("\n")[0].scan(/(\d+)\.(\d+)/)[0]
+      DateTime.parse("#{month}/#{day}")
     end
   end
 end

@@ -63,6 +63,8 @@ class Fillmore
         img = event.attribute("outerHTML").scan(/srcSet="([^"]+)"/)[0][0].split(",")[6].lstrip
       end
       img
+    rescue
+      ""
     end
   end
 end

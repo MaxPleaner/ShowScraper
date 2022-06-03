@@ -24,6 +24,7 @@ class Independent
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      next unless event.css(".tw-event-date")[0]
       {
         date: parse_date(event),
         img: event.css(".tw-image img")[0].attribute("src"),
