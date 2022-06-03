@@ -18,22 +18,17 @@ class UCBerkeleyTheater
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".eventListings li a").select do |event|
-        event.text == "MORE INFO"
-      end
+      $driver.css(".eventListings li")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      link = event.attribute("href")
-      $driver.new_tab(link) do
-        {
-          date: DateTime.parse($driver.css(".ed-title .date")[0].text),
-          url: $driver.current_url,
-          title: $driver.css(".eventName2")[0].text,
-          img: $driver.css(".ed-img")[0].attribute("src"),
-          details: $driver.css("#ed-desc")[0].text
-        }
-      end.
+      {
+        date: DateTime.parse(event.css(".date")[0].text),
+        url: event.css("a").find { |link| link.text == "MORE INFO" }.attribute("href"),
+        title: event.css("h2,h3").map(&:text).join(", ").gsub("\n", ", "),
+        img: event.css("img")[0].attribute("src"),
+        details: ""
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e

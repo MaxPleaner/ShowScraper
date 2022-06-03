@@ -1,5 +1,4 @@
 REWRITE ??
-- The Chapel
 - UC Berkeley
 - Winters
 
