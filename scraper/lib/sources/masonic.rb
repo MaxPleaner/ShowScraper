@@ -41,11 +41,14 @@ class Masonic
         load_more.click
         sleep 1
       end
+      $driver.execute_script("window.scrollBy(0,document.body.scrollHeight)")
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      time = event.css("time")[0]
+      return unless time
       {
-        date: DateTime.parse(event.css("time")[0].attribute("datetime")),
+        date: DateTime.parse(time.attribute("datetime")) - 1.day,
         url: event.attribute("href"),
         img: parse_img(event),
         title: event.css("header h3")[0].text,
@@ -65,6 +68,9 @@ class Masonic
         img = event.attribute("outerHTML").scan(/srcSet="([^"]+)"/)[0][0].split(",")[6].lstrip
       end
       img
+    rescue => e
+      puts "<skipping image>"
+      ""
     end
   end
 end

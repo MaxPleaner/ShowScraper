@@ -6,7 +6,6 @@ SLOW SCRAPERS
 - WINTERS
 
 OTHER ISSUES
-- August hall error
 - Masonic error
 - paramount error
 
