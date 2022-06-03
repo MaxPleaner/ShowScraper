@@ -51,6 +51,7 @@ class Yoshis
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      return unless event.css(".eimage a")[0]
       {
         url: event.css(".eimage a")[0].attribute("href"),
         img: event.css(".eimage img")[0].attribute("src"),

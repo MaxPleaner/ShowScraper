@@ -43,7 +43,7 @@ class Fillmore
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css("time")[0].attribute("datetime")),
+        date: DateTime.parse(event.css("time")[0].attribute("datetime")) - 1.day,
         url: event.attribute("href"),
         img: parse_img(event),
         title: event.css("header h3")[0].text,

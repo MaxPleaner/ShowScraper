@@ -5,13 +5,7 @@ SLOW SCRAPERS
 - IVY ROOM
 - WINTERS
 
-RERUN
-- INDEPENDENT
-- FILLMORE
-- YOSHIS
-
 OTHER ISSUES
-- Fillmore dates are 1 day ahead
 - milk bar date parsing wrong
 - SF Jazz date parsing wrong
 - August hall error
