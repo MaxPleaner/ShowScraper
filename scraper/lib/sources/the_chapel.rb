@@ -25,7 +25,7 @@ class TheChapel
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css(".date")[0].text),
+        date: parse_date(event),
         img: event.css(".detail_seetickets_image img")[0].attribute("src"),
         title: event.css(".event-title")[0].text,
         url: event.css("#event_tickets")[0].attribute("href"),
@@ -35,6 +35,12 @@ class TheChapel
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
+    end
+
+    def parse_date(event)
+      date_str = event.css(".date")[0].text
+      month, day = date_str.scan(/(\d+)\.(\d+)/)[0]
+      DateTime.parse("#{month}/#{day}")
     end
   end
 end
