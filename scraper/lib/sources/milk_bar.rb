@@ -9,15 +9,11 @@ class MilkBar
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    months_limit.times do |i|
-      get_events.each do |event|
-        next if events.count >= events_limit
-        result = parse_event_data(event, &foreach_event_blk)
-        events.push(result) if result.present?
-      end
-      break if events.count >= events_limit
-      has_new_page = get_next_page unless i == months_limit - 1
-      break unless has_new_page
+    5.times { get_next_page }
+    get_events.each do |event|
+      next if events.count >= events_limit
+      result = parse_event_data(event, &foreach_event_blk)
+      events.push(result) if result.present?
     end
     events
   end
@@ -33,6 +29,7 @@ class MilkBar
       btns = $driver.css(".organizer-profile__show-more button")
       return false unless btns.length > 1
       btns[0].click
+      sleep 1
       true
     end
 
@@ -54,8 +51,14 @@ class MilkBar
 
     def parse_date(event)
       date_str = event.css(".eds-event-card-content__sub-title")[0].text
-      date_str = date_str.split("+")[0]
-      DateTime.parse(date_str)
+      if date_str.include?("Today")
+        DateTime.now
+      elsif date_str.include?("Tomorrow")
+        DateTime.now + 1.day
+      else
+        date_str = date_str.split("+")[0]
+        DateTime.parse(date_str)
+      end
     end
   end
 end
