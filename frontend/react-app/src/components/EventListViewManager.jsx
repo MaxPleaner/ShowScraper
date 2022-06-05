@@ -103,7 +103,7 @@ export default class EventListViewManager extends React.Component {
   render() {
      return (
       <div className='ListViewManager'>
-        <Columns>
+        <Columns className='date-range-selects'>
 {/*          <Column className='is-one-quarter'>
             <Box className='mt-3'>
               <Columns>
@@ -120,7 +120,7 @@ export default class EventListViewManager extends React.Component {
               </Columns>
             </Box>
           </Column>*/}
-          <Column className='is-one-half'>
+          <Column className=''>
               <Columns>
                 <Column>
                   <a onClick={this.goToPrevDate.bind(this)}>

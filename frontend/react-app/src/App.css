@@ -42,6 +42,10 @@
   color: white;
 }
 
+.Nav .column {
+  padding: 0.2rem;
+}
+
 .Nav a, a:visited {
   display: block;
   background-color: #0C7B93 !important;
@@ -58,6 +62,10 @@
   display: block;
   background-color: #27496D !important;
   text-align: center;
+}
+
+.date-range-selects .column {
+  padding: 0.2rem;
 }
 
 .ListViewManager .date-range-select {
@@ -179,11 +187,21 @@
 }
 
 .Event-box {
+  display: flex;
   outline: 2px solid rgb(170,170,170);
   border-radius: 10px;
   padding: 5px;
   margin: 2px !important;
   /*display: inline-block;*/
+  /*transition: outline 0.3s ease-in;*/
+}
+
+.Event-box:hover {
+  outline: 2px solid black;
+}
+
+.event-link {
+  color: white !important;
 }
 
 .event-venue {

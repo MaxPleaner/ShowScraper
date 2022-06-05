@@ -11,8 +11,8 @@ export default class Nav extends React.Component {
   render() {
     return (
       <div className='Nav'>
-          <Columns>
-            <Column className='is-full'>
+          {/*<Columns>*/}
+            <Column className=''>
               <Columns className='is-centered'>
                 <Column className='is-narrow'>
                   <div className='site-title mybox'>Bay Area Shows</div>
@@ -38,7 +38,7 @@ export default class Nav extends React.Component {
 {/*            <Column className="is-narrow">
               <Box className={this.props.route === "todo" ? "selected" : ""}>About</Box>
             </Column>*/}
-          </Columns>
+          {/*</Columns>*/}
       </div>
     )
   }

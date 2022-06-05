@@ -19,9 +19,9 @@ export default class EventListItem extends React.Component {
     }
     return (
       <Column className='is-full-tablet is-half-desktop'>
+       <a className='event-link' href={this.props.event.url}>
         <Columns className='Event-box'>
           <Column className='is-one-third'>
-             <a href={this.props.event.url}>
                {/*<div className='img-background'>*/}
                  <img
                    className='Event-img'
@@ -29,7 +29,6 @@ export default class EventListItem extends React.Component {
                    onError={this.onImageError}
                   />
                {/*</div>*/}
-             </a>
           </Column>
           <Column className='is-two-thirds'>
             <div className='event-venue'>
@@ -41,6 +40,7 @@ export default class EventListItem extends React.Component {
              </div>
           </Column>
         </Columns>
+       </a>
       </Column>
     )
   }
