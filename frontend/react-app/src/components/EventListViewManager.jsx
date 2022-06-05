@@ -103,7 +103,7 @@ export default class EventListViewManager extends React.Component {
   render() {
      return (
       <div className='ListViewManager'>
-        <Columns className='date-range-selects'>
+        
 {/*          <Column className='is-one-quarter'>
             <Box className='mt-3'>
               <Columns>
@@ -120,24 +120,24 @@ export default class EventListViewManager extends React.Component {
               </Columns>
             </Box>
           </Column>*/}
-          <Column className=''>
-              <Columns>
-                <Column>
+          
+              
+               <div class = 'eventDates'>
+
                   <a onClick={this.goToPrevDate.bind(this)}>
                     <div className='date-range-select hd-border mybox'>{this.prevDateEntry()}</div>
                   </a>
-                </Column>
-                <Column>
+               
                   <div className='date-range-select-static hd-border mybox selected'>{this.currentDateEntry()}</div>
-                </Column>
-                <Column>
+                
+                
                   <a onClick={this.goToNextDate.bind(this)}>
                     <div className='date-range-select hd-border mybox'>{this.nextDateEntry()}</div>
                   </a>
-                </Column>
-              </Columns>
-          </Column>
-        </Columns>
+               </div>
+                
+              
+       
         {
           (this.state.allEvents.length == 0) ? (
             <div className='hd-border mybox'>Loading...</div>

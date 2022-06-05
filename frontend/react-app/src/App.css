@@ -105,6 +105,11 @@
   /*background-color: DarkSlateBlue;*/
 }
 
+.eventDates{
+  display: flex;
+  justify-content: center;
+}
+
 .venue {
   /*background-color: black;*/
   /*color: white;*/
