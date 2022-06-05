@@ -16,7 +16,7 @@ class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = { events: [], venues: {} };
+    this.state = { events: [], venues: [] };
   }
 
   async fetchJsonData() {
