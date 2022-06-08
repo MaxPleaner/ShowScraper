@@ -42,12 +42,11 @@ class BottomOfTheHill
     end
 
     def parse_img(event)
-      # binding.pry
       event.css("img").map do |event|
         event.attribute("src")
       end.find do |img|
         img =~ /http:\/\/www.bottomofthehill.com\/f/
-      end.tap { |path| puts "PATH: #{path}" }
+      end
     end
 
     def parse_details_link(event)
