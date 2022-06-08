@@ -367,5 +367,14 @@
       "mapLink": "",
       "latlng": "37.76824966403541, -122.40624810795016",
       "desc": "DJs, live music & bottle service featured in an energetic, industrial setting with art-deco accents."
+    },
+    {
+      "name": "NewParish",
+      "commonName": "New Parish",
+      "website": "https://www.ticketweb.com/venue/the-new-parish-oakland-ca/428995",
+      "region": "East Bay",
+      "mapLink": "",
+      "latlng": "37.80845199278953, -122.27004137934561",
+      "desc": "Live reggae, roots & world music are featured at this intimate venue with an outdoor patio."
     }
 ]
