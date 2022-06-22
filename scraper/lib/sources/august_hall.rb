@@ -34,6 +34,10 @@ class AugustHall
     end
 
     def get_next_page
+      $driver.execute_script <<-JS
+        var cookieBar = document.querySelector('#cookie-law-info-bar');
+        if (cookieBar) { cookieBar.remove() };
+      JS
       link = $driver.css(".next a")[0]
       return false unless link
       link.click
