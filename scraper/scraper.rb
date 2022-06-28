@@ -39,7 +39,6 @@ class Scraper
 
   SOURCES = JSON.parse(File.read(SOURCE_LIST_JSON)).map { |source| source["name"].constantize }
 
-
   class << self
 
     def run(sources=SOURCES, events_limit: nil, persist_mode: :static)

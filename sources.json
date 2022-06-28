@@ -232,7 +232,7 @@
       "mapLink": "",
       "latlng": "37.78837882837116, -122.42124163863345",
       "desc": "Built in 1909, this ornate & intimate theater showcases contemporary bands & live DJ events."
-    },
+  },
     {
       "name": "HotelUtah",
       "commonName": "Hotel Utah",
@@ -376,5 +376,14 @@
       "mapLink": "",
       "latlng": "37.80845199278953, -122.27004137934561",
       "desc": "Live reggae, roots & world music are featured at this intimate venue with an outdoor patio."
+    },
+    {
+      "name": "TheList",
+      "commonName": "The List",
+      "website": "http://www.foopee.com/punk/the-list/",
+      "region": "Other",
+      "mapLink": "",
+      "latlng": "",
+      "desc": "Another listing of shows. We fetch events from here that aren't supported by the other scrapers."
     }
 ]
