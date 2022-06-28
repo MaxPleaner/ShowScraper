@@ -32,7 +32,8 @@ class App extends React.Component {
 
   render() {
     let currentView
-    if (this.props.route == "ListView") { currentView = <EventListViewManager events={this.state.events} />; }
+    if (this.props.route == "TextAndImagesView") { currentView = <EventListViewManager events={this.state.events} />; }
+    if (this.props.route == "TextView") { currentView = <EventListViewManager events={this.state.events} textOnly={true} />; }
     if (this.props.route == "VenuesListView") { currentView = <VenuesList venues={this.state.venues} />; }
 
     return (

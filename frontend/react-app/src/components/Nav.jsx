@@ -18,8 +18,13 @@ export default class Nav extends React.Component {
                   <div className='site-title mybox'>Bay Area Shows</div>
                 </Column>
                 <Column className="is-narrow">
-                  <Link to='/ListView'>
-                    <div className={`mybox ${this.props.route === "ListView" ? "selected" : ""}`}>List View</div>
+                  <Link to='/TextView'>
+                    <div className={`mybox ${this.props.route === "TextView" ? "selected" : ""}`}>Text</div>
+                  </Link>
+                </Column>
+                <Column className="is-narrow">
+                  <Link to='/TextAndImagesView'>
+                    <div className={`mybox ${(this.props.route === "TextAndImagesView") ? "selected" : ""}`}>Text + Images</div>
                   </Link>
                 </Column>
     {/*            <Column className="is-narrow">

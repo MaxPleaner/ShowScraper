@@ -230,3 +230,31 @@ a .box {
 a .box:hover {
   background-color:  lightblue;
 }
+
+.textViewEntry {
+  outline: 1px solid black;
+  margin-bottom: 1px;
+  overflow: hidden;
+}
+
+.textViewEntry .textViewVenue {
+  font-weight: bold;
+  /*float: right;*/
+  font-size: 1.2em;
+  padding: 4px;
+  background-color: grey;
+}
+
+.textViewEntry .textViewTitle {
+  /*float: left;*/
+  margin-left: 10px;
+  /*outline: 1px solid red;*/
+}
+
+.textViewEntry .textViewLink, .textViewEntry .textViewLink:visited {
+  color: darkblue;
+  font-size: 1.2em;
+  font-family: Impact;
+  letter-spacing: 1px;
+}
+
