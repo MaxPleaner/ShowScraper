@@ -56,7 +56,9 @@ class NewParish
     end
 
     def parse_date(event)
-      str = event.css(".event-date")[1].text.split(" ").first(3).join(" ")
+      str = [1, 0].map do |idx|
+        event.css(".event-date")[idx].text.split(" ").first(3).join(" ")
+      end.reject(&:blank?).first
       DateTime.parse(str)
     end
   end
