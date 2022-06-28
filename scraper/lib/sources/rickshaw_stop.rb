@@ -30,7 +30,7 @@ class RickshawStop
 
     def parse_event_data(event, &foreach_event_blk)
       link = event.css("#event_tickets")[0].attribute("href")
-      date = DateTime.parse(event.css(".value-title")[0].text)
+      date = DateTime.parse(event.css(".value-title")[0].text.gsub(".", "/"))
       img = event.css(".detail_seetickets_image img")[0].attribute("src")
       title = event.css(".event-title")[0].text
       {
