@@ -95,7 +95,9 @@ class Scraper
     end
 
     def persist_event_list(source, event_list)
-      json = event_list.to_json
+      # Sometimes there are duplicate events, mainly caused by calendar views
+      # showing the previous / next months events.
+      json = event_list.uniq.to_json
 
       # upload to GCS
       GCS.upload_text_as_file(text: json, dest: "#{source}.json")
