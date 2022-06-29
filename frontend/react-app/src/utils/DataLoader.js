@@ -12,7 +12,11 @@ export default class DataLoader {
     const results = []
     for (const venue of venues) {
       const url = `https://storage.googleapis.com/show-scraper-data/${venue.name}.json`
-      const events = await $.getJSON(url);
+      const events = await $.ajax({
+        cache: false,
+        url: url,
+        dataType: "json",
+      });
       events.forEach((event) => {
         let newEvent = {
           ...event,
