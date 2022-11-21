@@ -93,7 +93,7 @@ class TheList
         "Brick and Mortar",
         "Cafe Du Nord",
         "Crybaby",
-        "Eagle",
+        # "Eagle",
         "Midway",
         "Milk",
         "August Hall",

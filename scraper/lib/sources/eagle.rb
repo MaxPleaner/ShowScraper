@@ -5,6 +5,8 @@ class Eagle
   # They only have rock shows every once in a while, anyway.
   MAIN_URL = "https://sf-eagle.com/mec-category/performance/"
 
+  DISABLED = true
+
   cattr_accessor :events_limit, :load_time
   self.events_limit = 200
   self.load_time = 3

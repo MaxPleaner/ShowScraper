@@ -56,6 +56,7 @@ class Scraper
       results = {}
       errors = []
       sources.each do |source|
+        next if source.const_defined?(:DISABLED) && source::DISABLED
         event_list = run_scraper(source, events_limit: events_limit) do |event_data|
           if persist_mode == :sql
             persist_sql(source, event_data)

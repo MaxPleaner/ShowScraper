@@ -31,11 +31,12 @@ class Knockout
 		def parse_event_data(event, &foreach_event_blk)
 			{
 				date: parse_date(event.css(".tribe-event-date-start")[0].text),
-				url: event.css(".tribe-event-url")[0].attribute("href"),
-				title: event.css(".tribe-event-url")[0].text,
+				url: event.css(".tribe-common-anchor-thin")[0]&.attribute("href") || "",
+				title: event.css(".tribe-common-anchor-thin")[0].text,
 				details: "",
 			}.tap do |data|
-				data[:img] = fetch_full_res_image(data)
+				data[:img] = event.css(".tribe-events-calendar-list__event-featured-image")[0]&.attribute("src")
+				# data[:img] = fetch_full_res_image(data)
 			end.
 				tap { |data| Utils.print_event_preview(self, data) }.
 				tap { |data| foreach_event_blk&.call(data) }

@@ -35,7 +35,7 @@ class Winters
       $driver.new_tab(event.attribute("href")) do
         {
           url: $driver.current_url,
-          img: $driver.css(".featured-image img")[0].attribute("src"),
+          img: $driver.css(".featured-image img")[0]&.attribute("src"),
           date: DateTime.parse($driver.css("time")[0].attribute("datetime")),
           title: $driver.css(".entry-title")[0].text,
           details: ""

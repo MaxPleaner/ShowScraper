@@ -50,8 +50,15 @@ class GoldenBull
     end
 
     def parse_date(date_string)
-      # TODO: also parse time, the data is available.
-      DateTime.parse(date_string)
+      begin
+        tries = 0
+        # TODO: also parse time, the data is available.
+        DateTime.parse(date_string)
+      rescue
+        sleep 3
+        retry if (tries += 1) < 3
+        raise
+      end
     end
   end
 end
