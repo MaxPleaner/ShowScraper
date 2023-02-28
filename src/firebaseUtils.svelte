@@ -1,6 +1,6 @@
 <script context="module" lang="coffee">
   import { initializeApp } from 'firebase/app';
-  import { getDatabase, ref, onValue, get, child } from 'firebase/database';
+  import { getDatabase, ref, onValue, get, set, remove, child } from 'firebase/database';
   import { getAuth, onAuthStateChanged, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
   import PubSub from 'pubsub-js'
   # import {  } from "firebase/firestore"
@@ -50,12 +50,39 @@
         Object.assign(userShaders, privateDataSnapshop.val())
     return userShaders
 
+  saveShader = (name, shaderText, params, isPublic) ->
+    return [null, "Not logged in; cannot save"] unless _firebaseState.user
+    if name.length == 0
+      return [null, "shader name is empty"]
+    if name.includes("/")
+      return [null, "shader name cannot contain slashes"]
+
+    bucket = if isPublic then "public" else "private"
+    otherBucket = if isPublic then "private" else "public"
+    key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
+    removeKey = "userShaders/#{_firebaseState.user.uid}/shaders/#{otherBucket}/#{name}"
+    remove(ref(db, removeKey))
+    shaderObj = {
+      shaderMainText: shaderText,
+      paramsJson: JSON.stringify(params)
+    }
+    set ref(db, key), shaderObj
+    return [shaderObj, null]
+
+  deleteShader = (name) ->
+    return "Not logged in; cannot delete" unless _firebaseState.user
+    ["public", "private"].forEach (bucket) ->
+      key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
+      remove(ref(db, key))
+
   export {
     firebaseApp,
     db,
     initLogin,
     initLogout
     _firebaseState,
-    getUserShaders
+    getUserShaders,
+    saveShader,
+    deleteShader
   }
 </script>

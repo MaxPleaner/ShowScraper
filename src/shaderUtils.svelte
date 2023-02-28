@@ -4,6 +4,7 @@
   shaderState =
     shaderObj: null
     cam: null
+    paramValues: {}
 
   DefaultShader = """
     vec3 image(vec2 uv, vec3 color) {
@@ -31,7 +32,13 @@
     pFive.draw = ->
       shaderState.shaderObj.setUniform('tex0', shaderState.cam)
       shaderState.shaderObj.setUniform('iResolution',[710, 400])
-      pFive.rect(0,0,100,100)
+
+      for paramName, paramVal of shaderState.paramValues
+        shaderState.shaderObj.setUniform(paramName, paramVal.val)
+
+      # Need to add some geometry to get shaders working;
+      # this isn't actually visible
+      pFive.rect(0,0,1,1)
 
   buildShader = (shaderText, params) ->
     paramsString = params.map (param) ->
@@ -68,7 +75,6 @@
     """
 
   buildAndValidateShader = (shaderText, params) ->
-    console.log(params)
     finalShaderText = buildShader(shaderText, params)
     newShaderObj = pFive.createShader(defaultVertShader, finalShaderText)
     shaderError = checkShaderError(shaderState.shaderObj, finalShaderText)
