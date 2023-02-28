@@ -57,7 +57,6 @@
   deleteButtonClick = ->
     return unless confirm "are you sure?"
     name = jQuery("#shader-name").val()
-    console.log("TODO: private/public support in delete")
     err = deleteShader(name)
     return alert(err) if err
     delete firebaseState.userShaders[name]
@@ -70,9 +69,11 @@
     [newShaderObj, shaderError] = buildAndValidateShader(shaderText, params)
     if (shaderError)
       alert(shaderError)
+      false
     else
       shaderState.shaderObj = newShaderObj
       pFive.shader(shaderState.shaderObj)
+      true
 
   switchTab = ->
     button = jQuery(this)
@@ -92,7 +93,11 @@
     params = JSON.parse(shaderData.paramsJson)
     shaderState.paramValues = {}
     jQuery("#shader-name").val(name)
-    tryUseShader(shaderData.shaderMainText, params)
+    success = tryUseShader(shaderData.shaderMainText, params)
+    params.forEach (param) ->
+      shaderState.paramValues[param.paramName] =
+        type: "float",
+        val: param.default
 
   clearShader = ->
     loadShader "",
@@ -104,13 +109,36 @@
     alert("cleared")
 
   updateParamName = ->
-    alert("TODO")
+    input = jQuery(this)
+    oldName = input.data("param-name")
+    newName = input.val()
+    oldParam = params.find (param) -> param.paramName == oldName
+    oldParam.paramName = newName
+    params = params
+    jQuery("[data-param-name='#{oldName}']").data("param-name", newName)
+    oldVal = shaderState.paramValues[oldName]
+    delete shaderState.paramValues[oldName]
+    shaderState.paramValues[newName] = oldVal
 
   addParam = ->
-    alert("TODO")
+    console.log("TODO: make param types compatible with app")
+    params.push
+      paramName: "",
+      type: "FOO.BAR.FloatShaderParam",
+      default: 1.0,
+      min: 0.0,
+      max: 10.0,
+    params = params
+    shaderState.paramValues[""] =
+      type: "float",
+      val: 1.0
 
   deleteParam = ->
-    alert("TODO")
+    return unless confirm("are you sure?")
+    field = jQuery(this)
+    paramName = field.data("param-name")
+    delete shaderState.paramValues[paramName]
+    params = params.filter (param) -> param.paramName != paramName
 
   floatParamDirectSet = ->
     field = jQuery(this)
@@ -129,6 +157,13 @@
     param.min = field.val()
     params = params
 
+  floatParamDefaultChanged = ->
+    field = jQuery(this)
+    paramName = field.data("param-name")
+    param = params.find (param) -> param.paramName == paramName
+    param.default = field.val()
+    params = params
+    shaderState.paramValues[paramName].val = field.val()
 
   floatParamMaxChanged = ->
     field = jQuery(this)
@@ -191,7 +226,9 @@
               <input
                 type="text"
                 class="paramName"
+                data-param-name={param.paramName}
                 value={param.paramName}
+                placeholder="param name"
                 on:change={updateParamName}
               />
               ({param.type.split(".").slice(-1)[0]})
@@ -203,6 +240,16 @@
                   step="0.01"
                   value={param.default || 1.0}
                   on:change={floatParamDirectSet}
+                />
+              </b>
+              <b>Default:
+                <input
+                  class="float-param-default small-number-input"
+                  data-param-name={param.paramName}
+                  type="number"
+                  step="0.01"
+                  value={param.default || 1.0}
+                  on:change={floatParamDefaultChanged}
                 />
               </b>
               <b>Min:

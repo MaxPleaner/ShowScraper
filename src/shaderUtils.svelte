@@ -34,7 +34,8 @@
       shaderState.shaderObj.setUniform('iResolution',[710, 400])
 
       for paramName, paramVal of shaderState.paramValues
-        shaderState.shaderObj.setUniform(paramName, paramVal.val)
+        if paramName.length > 0
+          shaderState.shaderObj.setUniform(paramName, paramVal.val)
 
       # Need to add some geometry to get shaders working;
       # this isn't actually visible
