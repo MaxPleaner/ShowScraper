@@ -7,6 +7,13 @@
     paramValues: {}
 
   DefaultShader = """
+    //////////////////////////////////////////////////////////////
+    //  Fill in the image function below to write your shader!  //
+    //  Built-ins:                                              //
+    //    - iResolution (vec2)                                  //
+    //    - sampleCamera (function, takes uv arg)               //
+    //////////////////////////////////////////////////////////////
+
     vec3 image(vec2 uv, vec3 color) {
       return color;
     }
@@ -35,11 +42,25 @@
 
       for paramName, paramVal of shaderState.paramValues
         if paramName.length > 0
-          shaderState.shaderObj.setUniform(paramName, paramVal.val)
+          if paramVal.type == "color"
+            console.log("SETTING COLOR #{paramName} #{paramVal.val}")
+            finalVal = hexToVec3(paramVal.val)
+          else
+            console.log("SETTING FLOAT #{paramName} #{paramVal.val}")
+            finalVal = paramVal.val
+          shaderState.shaderObj.setUniform(paramName, finalVal)
 
       # Need to add some geometry to get shaders working;
       # this isn't actually visible
       pFive.rect(0,0,1,1)
+
+  hexToVec3 = (hex) ->
+    result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex)
+    if result then [
+      parseFloat(parseInt(result[1], 16)) / 255.0,
+      parseFloat(parseInt(result[2], 16)) / 255.0,
+      parseFloat(parseInt(result[3], 16)) / 255.0
+    ] else [0.0, 0.0, 0.0]
 
   buildShader = (shaderText, params) ->
     paramsString = params.map (param) ->

@@ -30,6 +30,8 @@
     updateState "user", user
     userShaders = if user then await getUserShaders(user.uid) else {}
     updateState "userShaders", userShaders
+    isAdmin = user?.uid == "X8Seokq0dqaDUfNciKJC4LOeBe13"
+    updateState "isAdmin", isAdmin
 
   initLogin = ->
     signInWithPopup(auth, provider)
@@ -37,31 +39,78 @@
   initLogout = ->
     auth.signOut()
 
-  getUserShaders = (userId) ->
+  getTemplateShaders = ->
+    dbRef = ref(db)
+    templateShaders = {}
+    dataSnapshot = await get(child(dbRef, "templateShaders"))
+    if dataSnapshot.exists()
+      Object.assign(templateShaders, dataSnapshot.val())
+    updateState "templateShaders", templateShaders
+
+  getUserShaders = (userId, onlyPublic = false) ->
     return [] unless _firebaseState.user
     dbRef = ref(db)
     userShaders = {}
     publicDataSnapshot = await get(child(dbRef, "userShaders/#{userId}/shaders/public"))
     if publicDataSnapshot.exists()
-      Object.assign(userShaders, publicDataSnapshot.val())
-    if _firebaseState.user.uid == userId
+      shaders = publicDataSnapshot.val()
+      for name, data of shaders
+        data.isPublic = true
+      Object.assign(userShaders, shaders)
+    if _firebaseState.user.uid == userId && !onlyPublic
       privateDataSnapshop = await get(child(dbRef, "userShaders/#{userId}/shaders/private"))
       if privateDataSnapshop.exists()
-        Object.assign(userShaders, privateDataSnapshop.val())
+        shaders = privateDataSnapshop.val()
+        for name, data of shaders
+          data.isPublic = false
+        Object.assign(userShaders, shaders)
     return userShaders
 
-  saveShader = (name, shaderText, params, isPublic) ->
+  getUserList = ->
+    dbRef = ref(db)
+    userList = []
+    publicDataSnapshot = await get(child(dbRef, "usernames"))
+    if publicDataSnapshot.exists()
+      for uid, { name, publicShadersCount } of publicDataSnapshot.val()
+        if uid != _firebaseState.user?.uid && publicShadersCount > 0
+          userList.push({uid, name, publicShadersCount})
+    updateState "userList", userList
+
+  updateUserShaderCount = ->
+    return unless _firebaseState.user
+    userShaders = await getUserShaders(_firebaseState.user.uid, true)
+    count = Object.keys(userShaders).length
+    key = "usernames/#{_firebaseState.user.uid}/publicShadersCount"
+    set ref(db, key), count
+
+  saveShader = (name, shaderText, params, isPublic, isTemplate) ->
     return [null, "Not logged in; cannot save"] unless _firebaseState.user
     if name.length == 0
       return [null, "shader name is empty"]
     if name.includes("/")
       return [null, "shader name cannot contain slashes"]
 
-    bucket = if isPublic then "public" else "private"
-    otherBucket = if isPublic then "private" else "public"
-    key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
-    removeKey = "userShaders/#{_firebaseState.user.uid}/shaders/#{otherBucket}/#{name}"
-    remove(ref(db, removeKey))
+    result = if isTemplate
+      saveTemplateShader(name, shaderText, params)
+    else
+      bucket = if isPublic then "public" else "private"
+      otherBucket = if isPublic then "private" else "public"
+      key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
+      removeKey = "userShaders/#{_firebaseState.user.uid}/shaders/#{otherBucket}/#{name}"
+      remove(ref(db, removeKey))
+      shaderObj = {
+        shaderMainText: shaderText,
+        paramsJson: JSON.stringify(params)
+        isPublic: isPublic
+      }
+      set ref(db, key), shaderObj
+      [shaderObj, null]
+
+    updateUserShaderCount()
+    result
+
+  saveTemplateShader = (name, shaderText, params) ->
+    key = "templateShaders/#{name}"
     shaderObj = {
       shaderMainText: shaderText,
       paramsJson: JSON.stringify(params)
@@ -71,9 +120,18 @@
 
   deleteShader = (name) ->
     return "Not logged in; cannot delete" unless _firebaseState.user
-    ["public", "private"].forEach (bucket) ->
-      key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
-      remove(ref(db, key))
+    if isTemplate
+      deleteTemplateShader(name)
+    else
+      ["public", "private"].forEach (bucket) ->
+        key = "userShaders/#{_firebaseState.user.uid}/shaders/#{bucket}/#{name}"
+        remove(ref(db, key))
+      updateUserShaderCount()
+    null
+
+  deleteTemplateShader = (name) ->
+    key = "templateShaders/#{name}"
+    remove(ref(db, key))
 
   export {
     firebaseApp,
@@ -82,6 +140,8 @@
     initLogout
     _firebaseState,
     getUserShaders,
+    getTemplateShaders,
+    getUserList,
     saveShader,
     deleteShader
   }

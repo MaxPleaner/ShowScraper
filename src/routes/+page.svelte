@@ -13,13 +13,23 @@
   } from "./../../src/shaderUtils.svelte"
   import {
     firebaseApp, db, initLogin, initLogout, _firebaseState, getUserShaders,
-    saveShader, deleteShader
+    getTemplateShaders, getUserList, saveShader, deleteShader
   } from "./../../src/firebaseUtils.svelte"
   import PubSub from 'pubsub-js'
+
+  import "@melloware/coloris/dist/coloris.css";
+  import Coloris from "@melloware/coloris";
+
+  if (browser)
+    Coloris.init();
+    Coloris({el: ".color-picker", alpha: false});
+    window.$ = jQuery
 
   pFive = null
   editorView = null
   params = []
+  discoverUserUid = null
+  isShaderPublic = false
 
   firebaseState = _firebaseState
   PubSub.subscribe "firebaseStateUpdated", ->
@@ -34,33 +44,44 @@
 
     editorView.dispatch
       changes:
-        from: 0,
-        to: editorView.state.doc.length,
+        from: 0
+        to: editorView.state.doc.length
         insert: DefaultShader
 
+    getTemplateShaders()
+    getUserList()
+
   updateButtonClick = ->
-    tryUseShader(editorView.state.doc.toString(), params)
+    tryUseShader editorView.state.doc.toString(), params
 
   saveButtonClick = ->
     shaderText = editorView.state.doc.toString()
     tryUseShader(shaderText, params)
     name = jQuery("#shader-name").val()
-    console.log("TODO: public/private toggle")
     isPublic = jQuery("#isPublic")[0].checked
-    [shaderObj, error] = await saveShader(name, shaderText, params, isPublic)
+    isTemplate = jQuery("#isTemplate")[0].checked
+    [shaderObj, error] = await saveShader(name, shaderText, params, isPublic, isTemplate)
     if error
       alert(error)
     else
       alert("saved")
-      firebaseState.userShaders[name] = shaderObj
+      if firebaseState.user && firebaseState.user.uid == discoverUserUid
+        firebaseState.discoverShaders[firebaseState.user.uid][name] = shaderObj
+      if isTemplate
+        firebaseState.templateShaders[name] = shaderObj
+      else
+        firebaseState.userShaders[name] = shaderObj
 
   deleteButtonClick = ->
     return unless confirm "are you sure?"
     name = jQuery("#shader-name").val()
     err = deleteShader(name)
     return alert(err) if err
+    if firebaseState.user && firebaseState.user.uid == discoverUserUid
+      delete firebaseState.discoverShaders[firebaseState.user.uid][name]
     delete firebaseState.userShaders[name]
     firebaseState.userShaders = firebaseState.userShaders
+    firebaseState.discoverShaders[firebaseState.user.uid] = firebaseState.discoverShaders[firebaseState.user.uid]
     alert("deleted")
     clearShader()
 
@@ -94,9 +115,16 @@
     shaderState.paramValues = {}
     jQuery("#shader-name").val(name)
     success = tryUseShader(shaderData.shaderMainText, params)
+    isShaderPublic = shaderData.isPublic
+    for key, val of shaderState.paramValues
+      delete shaderState.paramValues[key]
     params.forEach (param) ->
+      valueType = if param.type.includes("ColorShaderParam")
+        "color"
+      else if param.type.includes("FloatShaderParam")
+        "float"
       shaderState.paramValues[param.paramName] =
-        type: "float",
+        type: valueType,
         val: param.default
 
   clearShader = ->
@@ -110,12 +138,13 @@
 
   updateParamName = ->
     input = jQuery(this)
-    oldName = input.data("param-name")
+    section = input.closest(".shaderParam")
+    oldName = section.attr("data-param-name")
     newName = input.val()
     oldParam = params.find (param) -> param.paramName == oldName
     oldParam.paramName = newName
     params = params
-    jQuery("[data-param-name='#{oldName}']").data("param-name", newName)
+    section.attr("data-param-name", newName)
     oldVal = shaderState.paramValues[oldName]
     delete shaderState.paramValues[oldName]
     shaderState.paramValues[newName] = oldVal
@@ -136,14 +165,54 @@
   deleteParam = ->
     return unless confirm("are you sure?")
     field = jQuery(this)
-    paramName = field.data("param-name")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
     delete shaderState.paramValues[paramName]
     params = params.filter (param) -> param.paramName != paramName
 
+  paramTypeChange = ->
+    select = jQuery(this)
+    newType = select.val().split(".").slice(-1)[0]
+    section = select.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    options = section.find(".shaderOptions")
+    options.addClass("hidden")
+    activeOption = section.find(".shaderOptions[data-param-type='#{newType}']")
+    activeOption.removeClass("hidden")
+
+    param = params.find (param) -> param.paramName == paramName
+    if newType == "FloatShaderParam"
+      Object.assign(param, type: "Foo.Bar.FloatShaderParam", default: 1.0, min: 0.0, max: 10.0)
+      shaderState.paramValues[paramName] = { type: "float", val: 1.0 }
+    else if newType == "ColorShaderParam"
+      shaderState.paramValues[paramName] = { type: "color", val: "#ff0000" }
+      Object.assign(param, type: "Foo.Bar.ColorShaderParam", default: "#ff0000")
+
+    params = params
+
+  colorParamDirectSet = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    shaderState.paramValues[paramName] = {
+      type: "color",
+      val: field.val()
+    }
+
+  colorParamDefaultChanged = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    param = params.find (param) -> param.paramName == paramName
+    param.default = field.val()
+    params = params
+    shaderState.paramValues[paramName].val = field.val()
+
   floatParamDirectSet = ->
     field = jQuery(this)
-    paramName = field.data("param-name")
-    slider = jQuery(".float-param-slider[data-param-name='#{paramName}']")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    slider = section.find(".float-param-slider")
     slider.val(field.val())
     shaderState.paramValues[paramName] = {
       type: "float",
@@ -152,14 +221,16 @@
 
   floatParamMinChanged = ->
     field = jQuery(this)
-    paramName = field.data("param-name")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
     param = params.find (param) -> param.paramName == paramName
     param.min = field.val()
     params = params
 
   floatParamDefaultChanged = ->
     field = jQuery(this)
-    paramName = field.data("param-name")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
     param = params.find (param) -> param.paramName == paramName
     param.default = field.val()
     params = params
@@ -167,20 +238,32 @@
 
   floatParamMaxChanged = ->
     field = jQuery(this)
-    paramName = field.data("param-name")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
     param = params.find (param) -> param.paramName == paramName
     param.max = field.val()
     params = params
 
   floatParamSliderChanged = ->
     field = jQuery(this)
-    paramName = field.data("param-name")
-    directSetField = jQuery(".float-param-val-direct-set[data-param-name='#{paramName}']")
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    directSetField = section.find(".float-param-val-direct-set")
     directSetField.val(field.val())
     shaderState.paramValues[paramName] = {
       type: "float",
       val: field.val()
     }
+
+  selectDiscoverUser = (uid) ->
+    userShaders = await getUserShaders(uid, true)
+    _firebaseState.discoverShaders ||= {}
+    _firebaseState.discoverShaders[uid] = userShaders
+    firebaseState = _firebaseState
+    discoverUserUid = uid
+
+  unselectDiscoverUser = ->
+    discoverUserUid = null
 
 </script>
 <container id="page">
@@ -197,7 +280,9 @@
   <!-- NAV BUTTONS -->
   <div id="tab-nav">
     <button class="nav-btn selected" on:click={switchTab} data-tab="cameraTab">Camera</button>
-    <button class="nav-btn" on:click={switchTab} data-tab="shadersTab">Shaders</button>
+    <button class="nav-btn" on:click={switchTab} data-tab="templateShadersTab">Template Shaders</button>
+    <button class="nav-btn" on:click={switchTab} data-tab="userShadersTab">My Shaders</button>
+    <button class="nav-btn" on:click={switchTab} data-tab="discoverShadersTab">Discover Shaders</button>
   </div>
   <hr>
 
@@ -212,7 +297,11 @@
       <button on:click={deleteButtonClick} id="delete">Delete</button>
       <br>
       <label for="isPublic">Public</label>
-      <input type="checkbox" id="isPublic" checked="checked" value="Public" />
+      <input type="checkbox" id="isPublic" checked={isShaderPublic} value="Public" />
+      {#if firebaseState.isAdmin}
+        <label for="isTemplate">Template</label>
+        <input type="checkbox" id="isTemplate" value="Template" />
+      {/if}
       <br>
       <a href="#" on:click={clearShaderOnClick}>Clear Active Shader</a>
       <!-- EDITOR -->
@@ -222,67 +311,109 @@
         <button on:click={addParam} class="add-param">Add Parameter</button>
         <ol>
           {#each params as param}
-            <li class="shaderParam">
+            <li
+              class="shaderParam"
+              data-param-name={param.paramName}
+            >
               <input
                 type="text"
                 class="paramName"
-                data-param-name={param.paramName}
                 value={param.paramName}
                 placeholder="param name"
                 on:change={updateParamName}
               />
-              ({param.type.split(".").slice(-1)[0]})
-              <b>Value:
+              <select
+                on:change={paramTypeChange}
+                class="type-select"
+              >
+                <option
+                  value="FOO.BAR.FloatShaderParam"
+                  selected={param.type.split(".").slice(-1)[0] == "FloatShaderParam"}
+                >Float</option>
+                <option
+                  value="FOO.BAR.ColorShaderParam"
+                  selected={param.type.split(".").slice(-1)[0] == "ColorShaderParam"}
+                >Color</option>
+                <option
+                  value="FOO.BAR.TextureShaderParam"
+                  selected={param.type.split(".").slice(-1)[0] == "TextureShaderParam"}
+                >Texture</option>
+              </select>
+              <div
+                class={`shaderOptions inline-block ${param.type.includes("ColorShaderParam") ? "" : "hidden"}`}
+                data-param-type="ColorShaderParam"
+              >
+                <b>Value:
+                  <input
+                    class="color-picker color-param-val-direct-set small-number-input"
+                    type="text"
+                    value={param.default || ""}
+                    on:input={colorParamDirectSet}
+                  />
+                </b>
+                <b>Default:
+                  <input
+                    class="color-picker color-param-default small-number-input"
+                    type="text"
+                    value={param.default || ""}
+                    on:input={colorParamDefaultChanged}
+                  />
+                </b>
+              </div>
+              <div
+                class={`shaderOptions inline-block ${param.type.includes("FloatShaderParam") ? "" : "hidden"}`}
+                data-param-type="FloatShaderParam"
+              >
+                <b>Value:
+                  <input
+                    class="float-param-val-direct-set small-number-input"
+                    type="number"
+                    step="0.01"
+                    value={param.type.includes("FloatShaderParam") ? (param.default || 0.5) : 0.5}
+                    on:change={floatParamDirectSet}
+                  />
+                </b>
+                <b>Default:
+                  <input
+                    class="float-param-default small-number-input"
+                    type="number"
+                    step="0.01"
+                    value={param.type.includes("FloatShaderParam") ? (param.default || 0.5) : 0.5}
+                    on:change={floatParamDefaultChanged}
+                  />
+                </b>
+                <b>Min:
+                  <input
+                    class="float-param-min small-number-input"
+                    type="number"
+                    step="0.01"
+                    value={param.type.includes("FloatShaderParam") ? (param.min || 0.0) : 0.0}
+                    on:change={floatParamMinChanged}
+                  />
+                </b>
+                <b>Max:
+                  <input
+                    class="float-param-max small-number-input"
+                    type="number"
+                    step="0.01"
+                    value={param.type.includes("FloatShaderParam") ? (param.max || 1.0) : 1.0}
+                    on:change={floatParamMaxChanged}
+                  />
+                </b>
                 <input
-                  class="float-param-val-direct-set small-number-input"
-                  data-param-name={param.paramName}
-                  type="number"
+                  class="float-param-slider"
+                  type="range"
                   step="0.01"
+                  min={param.type.includes("FloatShaderParam") ? (param.min || 0.0) : 0.0}
+                  max={param.type.includes("FloatShaderParam") ? (param.max || 1.0) : 1.0}
                   value={param.default || 1.0}
-                  on:change={floatParamDirectSet}
+                  on:input={floatParamSliderChanged}
                 />
-              </b>
-              <b>Default:
-                <input
-                  class="float-param-default small-number-input"
-                  data-param-name={param.paramName}
-                  type="number"
-                  step="0.01"
-                  value={param.default || 1.0}
-                  on:change={floatParamDefaultChanged}
-                />
-              </b>
-              <b>Min:
-                <input
-                  class="float-param-min small-number-input"
-                  data-param-name={param.paramName}
-                  type="number"
-                  step="0.01"
-                  value={param.min || 0.0}
-                  on:change={floatParamMinChanged}
-                />
-              </b>
-              <b>Max:
-                <input
-                  class="float-param-max small-number-input"
-                  data-param-name={param.paramName}
-                  type="number"
-                  step="0.01"
-                  value={param.max || 0.0}
-                  on:change={floatParamMaxChanged}
-                />
-              </b>
-              <input
-                class="float-param-slider"
-                data-param-name={param.paramName}
-                type="range"
-                step="0.01"
-                min={param.min || 0.0}
-                max={param.max || 1.0}
-                value={param.default || 1.0}
-                on:input={floatParamSliderChanged}
-              />
-              <button on:click={deleteParam} class="delete-param" data-param-name={param.paramName}>Delete</button>
+              </div>
+              <button
+                on:click={deleteParam}
+                class="delete-param"
+              >Delete</button>
             </li>
           {/each}
         </ol>
@@ -290,17 +421,63 @@
       <div id="editorWrapper"></div>
     </div>
 
-    <!-- SHADER LIST -->
-    <div class="tab hidden" id="shadersTab">
+    <!-- TEMPLATE SHADER LIST -->
+    <div class="tab hidden" id="templateShadersTab">
+      <ul>
+        {#if Object.keys(firebaseState.templateShaders || {}).length == 0}
+          <p>No template shaders found.</p>
+        {:else}
+          {#each Object.entries(firebaseState.templateShaders || {}).sort(([k,v]) => k) as [name, shaderData]}
+            <li><button on:click={loadShader(name, shaderData)}>{name}</button>
+          {/each}
+        {/if}
+      </ul>
+    </div>
+
+    <!-- MY SHADER LIST -->
+    <div class="tab hidden" id="userShadersTab">
       <ul>
         {#if Object.keys(firebaseState.userShaders || {}).length == 0}
           <p>No saved shaders found.</p>
         {:else}
           {#each Object.entries(firebaseState.userShaders || {}) as [name, shaderData]}
-            <li><button on:click={loadShader(name, shaderData)}>{name}</button>
+            <li><button on:click={loadShader(name, shaderData)}>{name} ({shaderData.isPublic ? "Public": "Private"})</button>
           {/each}
         {/if}
       </ul>
+    </div>
+
+    <!-- DISCOVER SHADER LIST -->
+    <div class="tab hidden" id="discoverShadersTab">
+      {#if discoverUserUid}
+        <button on:click={unselectDiscoverUser}>Back to user list</button>
+        <ul>
+          {#if Object.keys(firebaseState.discoverShaders[discoverUserUid] || {}).length == 0}
+            <p>No saved shaders found.</p>
+          {:else}
+            <br>
+            {#if Object.keys(firebaseState.discoverShaders[discoverUserUid] || {}).length == 0}
+              <p> This user has no public shaders </p>
+            {:else}
+              {#each Object.entries(firebaseState.discoverShaders[discoverUserUid] || {}) as [name, shaderData]}
+                <li><button on:click={loadShader(name, shaderData)}>{name}</button>
+              {/each}
+            {/if}
+          {/if}
+        </ul>
+      {:else}
+        <ul>
+          {#if (firebaseState.userList?.length || 0) == 0}
+            <p> No users have created public shaders. So sad! Why don't you make one?</p>
+          {:else}
+            {#each (firebaseState.userList || []) as userInfo}
+              {#if userInfo.publicShadersCount > 0}
+                <li><button on:click={selectDiscoverUser(userInfo.uid)}>{userInfo.name}</button>
+              {/if}
+            {/each}
+          {/if}
+        </ul>
+      {/if}
     </div>
 
   </div>
@@ -314,6 +491,10 @@
 
   .inline-block {
     display: inline-block;
+  }
+
+  .hidden.inline-block {
+    display: none
   }
 
   .small-number-input {
