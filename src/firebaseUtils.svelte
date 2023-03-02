@@ -48,7 +48,6 @@
     updateState "templateShaders", templateShaders
 
   getUserShaders = (userId, onlyPublic = false) ->
-    return [] unless _firebaseState.user
     dbRef = ref(db)
     userShaders = {}
     publicDataSnapshot = await get(child(dbRef, "userShaders/#{userId}/shaders/public"))
@@ -57,7 +56,7 @@
       for name, data of shaders
         data.isPublic = true
       Object.assign(userShaders, shaders)
-    if _firebaseState.user.uid == userId && !onlyPublic
+    if _firebaseState.user?.uid == userId && !onlyPublic
       privateDataSnapshop = await get(child(dbRef, "userShaders/#{userId}/shaders/private"))
       if privateDataSnapshop.exists()
         shaders = privateDataSnapshop.val()
@@ -118,7 +117,7 @@
     set ref(db, key), shaderObj
     return [shaderObj, null]
 
-  deleteShader = (name) ->
+  deleteShader = (name, isTemplate) ->
     return "Not logged in; cannot delete" unless _firebaseState.user
     if isTemplate
       deleteTemplateShader(name)

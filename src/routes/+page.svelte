@@ -5,11 +5,13 @@
   import p5 from "p5"
   import { onMount } from "svelte"
   import {EditorView, basicSetup} from "codemirror"
+  import {lineNumbers} from "@codemirror/view"
   import {StreamLanguage} from "@codemirror/language"
   import {shader} from "@codemirror/legacy-modes/mode/clike"
   import { browser } from '$app/environment'
   import {
     shaderState, p5Setup, checkShaderError, DefaultShader, buildAndValidateShader,
+    BuiltInShaderContent
   } from "./../../src/shaderUtils.svelte"
   import {
     firebaseApp, db, initLogin, initLogout, _firebaseState, getUserShaders,
@@ -30,16 +32,29 @@
   params = []
   discoverUserUid = null
   isShaderPublic = false
+  defaultTextureUrl = "https://upload.wikimedia.org/wikipedia/commons/9/9a/512x512_Dissolve_Noise_Texture.png"
 
   firebaseState = _firebaseState
   PubSub.subscribe "firebaseStateUpdated", ->
     firebaseState = _firebaseState
 
+  PubSub.subscribe "shaderDrawError", (topic, [imagePath, errMsg, comment]) ->
+    alert(
+      "Error fetching image #{imagePath}\n\n #{errMsg}.\n\n #{comment}"
+    )
+
   onMount =>
     pFive = new p5(p5Setup)
 
+    formatLineNumber = (n) =>
+      n + BuiltInShaderContent.split("\n").length + Math.max(1, params.length)
+
     editorView = new EditorView
-      extensions: [basicSetup, StreamLanguage.define(shader)],
+      extensions: [
+        basicSetup,
+        StreamLanguage.define(shader),
+        lineNumbers({formatNumber: formatLineNumber})
+      ],
       parent: jQuery("#editorWrapper")[0]
 
     editorView.dispatch
@@ -75,7 +90,8 @@
   deleteButtonClick = ->
     return unless confirm "are you sure?"
     name = jQuery("#shader-name").val()
-    err = deleteShader(name)
+    isTemplate = jQuery("#isTemplate")[0]?.checked
+    err = deleteShader(name, isTemplate)
     return alert(err) if err
     if firebaseState.user && firebaseState.user.uid == discoverUserUid
       delete firebaseState.discoverShaders[firebaseState.user.uid][name]
@@ -106,11 +122,6 @@
     tab.removeClass("hidden")
 
   loadShader = (name, shaderData) ->
-    editorView.dispatch
-      changes:
-        from: 0,
-        to: editorView.state.doc.length,
-        insert: shaderData.shaderMainText
     params = JSON.parse(shaderData.paramsJson)
     shaderState.paramValues = {}
     jQuery("#shader-name").val(name)
@@ -118,14 +129,22 @@
     isShaderPublic = shaderData.isPublic
     for key, val of shaderState.paramValues
       delete shaderState.paramValues[key]
+    shaderState.imagesCache = {}
     params.forEach (param) ->
       valueType = if param.type.includes("ColorShaderParam")
         "color"
       else if param.type.includes("FloatShaderParam")
         "float"
+      else if param.type.includes("TextureShaderParam")
+        "texture"
       shaderState.paramValues[param.paramName] =
         type: valueType,
         val: param.default
+    editorView.dispatch
+      changes:
+        from: 0,
+        to: editorView.state.doc.length,
+        insert: shaderData.shaderMainText
 
   clearShader = ->
     loadShader "",
@@ -187,8 +206,31 @@
     else if newType == "ColorShaderParam"
       shaderState.paramValues[paramName] = { type: "color", val: "#ff0000" }
       Object.assign(param, type: "Foo.Bar.ColorShaderParam", default: "#ff0000")
+    else if newType == "TextureShaderParam"
+      shaderState.paramValues[paramName] = { type: "texture", val: defaultTextureUrl }
+      Object.assign(param, type: "Foo.Bar.TextureShaderParam", default: defaultTextureUrl)
 
     params = params
+
+  textureParamDirectSet = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    shaderState.paramValues[paramName] = {
+      type: "texture",
+      val: field.val()
+    }
+
+  textureParamDefaultChanged = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    param = params.find (param) -> param.paramName == paramName
+    param.default = field.val()
+    params = params
+    shaderState.paramValues[paramName] =
+      type: "texture",
+      val: field.val()
 
   colorParamDirectSet = ->
     field = jQuery(this)
@@ -206,7 +248,9 @@
     param = params.find (param) -> param.paramName == paramName
     param.default = field.val()
     params = params
-    shaderState.paramValues[paramName].val = field.val()
+    shaderState.paramValues[paramName] =
+      type: "color",
+      val: field.val()
 
   floatParamDirectSet = ->
     field = jQuery(this)
@@ -234,7 +278,9 @@
     param = params.find (param) -> param.paramName == paramName
     param.default = field.val()
     params = params
-    shaderState.paramValues[paramName].val = field.val()
+    shaderState.paramValues[paramName] =
+      type: "float",
+      val: field.val()
 
   floatParamMaxChanged = ->
     field = jQuery(this)
@@ -339,6 +385,27 @@
                   selected={param.type.split(".").slice(-1)[0] == "TextureShaderParam"}
                 >Texture</option>
               </select>
+              <div
+                class={`shaderOptions inline-block ${param.type.includes("TextureShaderParam") ? "" : "hidden"}`}
+                data-param-type="TextureShaderParam"
+              >
+                <b>Value:
+                  <input
+                    class="texture-param-val-direct-set small-number-input"
+                    type="text"
+                    value={param.default || ""}
+                    on:input={textureParamDirectSet}
+                  />
+                </b>
+                <b>Default:
+                  <input
+                    class="texture-param-default small-number-input"
+                    type="text"
+                    value={param.default || ""}
+                    on:input={textureParamDefaultChanged}
+                  />
+                </b>
+              </div>
               <div
                 class={`shaderOptions inline-block ${param.type.includes("ColorShaderParam") ? "" : "hidden"}`}
                 data-param-type="ColorShaderParam"
@@ -468,7 +535,7 @@
       {:else}
         <ul>
           {#if (firebaseState.userList?.length || 0) == 0}
-            <p> No users have created public shaders. So sad! Why don't you make one?</p>
+            <p> No other users have created public shaders. So sad!</p>
           {:else}
             {#each (firebaseState.userList || []) as userInfo}
               {#if userInfo.publicShadersCount > 0}

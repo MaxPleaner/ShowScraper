@@ -1,18 +1,25 @@
 <script context="module" lang="coffee">
+  import p5 from "p5"
   import defaultVertShader from "./default.vert?raw"
+  import PubSub from 'pubsub-js'
 
   shaderState =
     shaderObj: null
     cam: null
     paramValues: {}
+    imagesCache: {}
 
   DefaultShader = """
-    //////////////////////////////////////////////////////////////
-    //  Fill in the image function below to write your shader!  //
-    //  Built-ins:                                              //
-    //    - iResolution (vec2)                                  //
-    //    - sampleCamera (function, takes uv arg)               //
-    //////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////
+    //  Fill in the image function below to write your shader!       //
+    //  Built-ins:                                                   //
+    //    - Uniforms:                                                //
+    //      - vec2 iResolution                                       //
+    //      - float iTime - seconds since shader load                //
+    //    - Functions:                                               //
+    //      - vec3 sampleCamera(uv)                                  //
+    //      - vec3 samplePrevFrame(uv)                               //
+    ///////////////////////////////////////////////////////////////////
 
     vec3 image(vec2 uv, vec3 color) {
       return color;
@@ -20,6 +27,8 @@
   """
 
   pFive = null
+  usesFeedback = false
+  startTime = Date.now() / 1000.0
 
   p5Setup = (_pFive) =>
     pFive = _pFive
@@ -39,16 +48,35 @@
     pFive.draw = ->
       shaderState.shaderObj.setUniform('tex0', shaderState.cam)
       shaderState.shaderObj.setUniform('iResolution',[710, 400])
+      shaderState.shaderObj.setUniform('iTime', startTime - Date.now() / 1000.0)
 
-      for paramName, paramVal of shaderState.paramValues
+      if usesFeedback
+        shaderState.shaderObj.setUniform('prevFrame', pFive.get())
+
+
+      Object.entries(shaderState.paramValues).forEach ([paramName, paramVal]) =>
         if paramName.length > 0
           if paramVal.type == "color"
-            console.log("SETTING COLOR #{paramName} #{paramVal.val}")
             finalVal = hexToVec3(paramVal.val)
-          else
-            console.log("SETTING FLOAT #{paramName} #{paramVal.val}")
+          else if paramVal.type == "float"
             finalVal = paramVal.val
-          shaderState.shaderObj.setUniform(paramName, finalVal)
+          else if paramVal.type == "texture"
+            finalVal = null
+            record = shaderState.imagesCache[paramVal.val]
+            if record && !record.error
+              shaderState.shaderObj.setUniform(paramName, record.img)
+            else if !record
+              successHandler = (img) => shaderState.imagesCache[paramVal.val] = { img: img }
+              errorHandler = (e) =>
+                PubSub.publish(
+                  "shaderDrawError",
+                  [paramVal.val, e.message, "Possibly a CORS error. Try a different image host such as Imgur."]
+                )
+                shaderState.imagesCache[paramVal.val] = { error: true }
+
+              pFive.loadImage(paramVal.val, successHandler, errorHandler)
+          if finalVal
+            shaderState.shaderObj.setUniform(paramName, finalVal)
 
       # Need to add some geometry to get shaders working;
       # this isn't actually visible
@@ -62,7 +90,29 @@
       parseFloat(parseInt(result[3], 16)) / 255.0
     ] else [0.0, 0.0, 0.0]
 
+  BuiltInShaderContent = """
+      precision mediump float;
+
+      varying vec2 vTexCoord; // grab texcoords from vert shader
+      uniform sampler2D tex0; // our texture coming from p5
+      uniform vec2 iResolution;
+      uniform float iTime;
+      uniform sampler2D prevFrame; // only set if the shader text references it
+
+      vec3 sampleCamera(vec2 uv) {
+        return texture2D(tex0, uv).rgb;
+      }
+
+      vec3 samplePrevFrame(vec2 uv) {
+        uv.x = 1.0 - uv.x;
+        return texture2D(prevFrame, uv).rgb;
+      }
+  """
+
   buildShader = (shaderText, params) ->
+    startTime = Date.now() / 1000.0
+    usesFeedback = shaderText.includes("samplePrevFrame")
+
     paramsString = params.map (param) ->
       paramClass = param.type.split(".").slice(-1)[0]
       uniformType = {
@@ -74,15 +124,7 @@
     .join("\n")
 
     """
-      precision mediump float;
-      varying vec2 vTexCoord; // grab texcoords from vert shader
-      uniform sampler2D tex0; // our texture coming from p5
-      uniform vec2 iResolution;
-
-      vec3 sampleCamera(vec2 uv) {
-        return texture2D(tex0, uv).rgb;
-      }
-
+      #{BuiltInShaderContent}
       #{paramsString}
       #{shaderText}
 
@@ -117,6 +159,7 @@
     checkShaderError,
     shaderState,
     DefaultShader,
-    buildAndValidateShader
+    buildAndValidateShader,
+    BuiltInShaderContent
   }
 </script>
