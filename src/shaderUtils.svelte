@@ -60,6 +60,8 @@
             finalVal = hexToVec3(paramVal.val)
           else if paramVal.type == "float"
             finalVal = paramVal.val
+          else if paramVal.type = "boolean"
+            finalVal = paramVal.val
           else if paramVal.type == "texture"
             finalVal = null
             record = shaderState.imagesCache[paramVal.val]
@@ -75,7 +77,7 @@
                 shaderState.imagesCache[paramVal.val] = { error: true }
 
               pFive.loadImage(paramVal.val, successHandler, errorHandler)
-          if finalVal
+          if finalVal || paramVal.type == "boolean"
             shaderState.shaderObj.setUniform(paramName, finalVal)
 
       # Need to add some geometry to get shaders working;
@@ -118,7 +120,8 @@
       uniformType = {
         "FloatShaderParam": "float",
         "ColorShaderParam": "vec3",
-        "TextureShaderParam": "sampler2D"
+        "TextureShaderParam": "sampler2D",
+        "BooleanShaderParam": "bool"
       }[paramClass]
       "uniform #{uniformType} #{param.paramName};"
     .join("\n")

@@ -149,6 +149,8 @@
         "float"
       else if param.type.includes("TextureShaderParam")
         "texture"
+      else if param.type.includes("BooleanShaderParam")
+        "boolean"
       shaderState.paramValues[param.paramName] =
         type: valueType,
         val: param.default
@@ -221,6 +223,9 @@
     else if newType == "TextureShaderParam"
       shaderState.paramValues[paramName] = { type: "texture", val: defaultTextureUrl }
       Object.assign(param, type: "Foo.Bar.TextureShaderParam", default: defaultTextureUrl)
+    else if newType == "BooleanShaderParam"
+      shaderState.paramValues[paramName] = { type: "boolean", val: defaultTextureUrl }
+      Object.assign(param, type: "Foo.Bar.BooleanShaderParam", default: true)
 
     params = params
 
@@ -243,6 +248,26 @@
     shaderState.paramValues[paramName] =
       type: "texture",
       val: field.val()
+
+  booleanParamDirectSet = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    shaderState.paramValues[paramName] = {
+      type: "boolean",
+      val: field[0].checked
+    }
+
+  booleanParamDefaultChanged = ->
+    field = jQuery(this)
+    section = field.closest(".shaderParam")
+    paramName = section.attr("data-param-name")
+    param = params.find (param) -> param.paramName == paramName
+    param.default = field[0].checked
+    params = params
+    shaderState.paramValues[paramName] =
+      type: "boolean",
+      val: field[0].checked
 
   colorParamDirectSet = ->
     field = jQuery(this)
@@ -396,6 +421,10 @@
                   value="FOO.BAR.TextureShaderParam"
                   selected={param.type.split(".").slice(-1)[0] == "TextureShaderParam"}
                 >Texture</option>
+                <option
+                  value="FOO.BAR.BooleanShaderParam"
+                  selected={param.type.split(".").slice(-1)[0] == "BooleanShaderParam"}
+                >Boolean</option>
               </select>
               <div
                 class={`shaderOptions inline-block ${param.type.includes("TextureShaderParam") ? "" : "hidden"}`}
@@ -415,6 +444,27 @@
                     type="text"
                     value={param.default || ""}
                     on:input={textureParamDefaultChanged}
+                  />
+                </b>
+              </div>
+              <div
+                class={`shaderOptions inline-block ${param.type.includes("BooleanShaderParam") ? "" : "hidden"}`}
+                data-param-type="BooleanShaderParam"
+              >
+                <b>Value:
+                  <input
+                    class="boolean-param-val-direct-set small-number-input"
+                    type="checkbox"
+                    checked={param.default || false}
+                    on:input={booleanParamDirectSet}
+                  />
+                </b>
+                <b>Default:
+                  <input
+                    class="boolean-param-default small-number-input"
+                    type="checkbox"
+                    checked={param.default}
+                    on:input={booleanParamDefaultChanged}
                   />
                 </b>
               </div>
