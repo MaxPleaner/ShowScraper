@@ -86,7 +86,7 @@
     tryUseShader(shaderText, params)
     name = jQuery("#shader-name").val()
     isPublic = jQuery("#isPublic")[0].checked
-    isTemplate = jQuery("#isTemplate")[0].checked
+    isTemplate = jQuery("#isTemplate")[0]?.checked
     [shaderObj, error] = await saveShader(name, shaderText, params, isPublic, isTemplate)
     if error
       alert(error)
