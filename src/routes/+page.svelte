@@ -1,6 +1,6 @@
 <script lang="coffee">
 
-  import * as jQuery from 'jquery';
+  import jQuery from 'jquery';
   import defaultVertShader from "./../../src/default.vert?raw"
   import p5 from "p5"
   import { onMount } from "svelte"
@@ -22,7 +22,7 @@
   import "@melloware/coloris/dist/coloris.css";
   import Coloris from "@melloware/coloris";
 
-  if (browser)
+  if browser
     Coloris.init();
     Coloris({el: ".color-picker", alpha: false});
     window.$ = jQuery
@@ -63,6 +63,7 @@
         to: editorView.state.doc.length
         insert: DefaultShader
 
+    jQuery("#cameraTab").removeClass("hidden")
     getTemplateShaders()
     getUserList()
 
@@ -70,6 +71,17 @@
     tryUseShader editorView.state.doc.toString(), params
 
   saveButtonClick = ->
+    mismatched_defaults = params.some (param) ->
+      { val } = shaderState.paramValues[param.paramName]
+      val != param.val
+    if mismatched_defaults
+      should_fix = confirm("Update defaults to match current values?")
+      if should_fix
+        params.forEach (param) ->
+          { val } = shaderState.paramValues[param.paramName]
+          param.default = val
+    # if params.some (param) ->
+    #   param.val
     shaderText = editorView.state.doc.toString()
     tryUseShader(shaderText, params)
     name = jQuery("#shader-name").val()
@@ -335,7 +347,7 @@
   <div id="tabs">
 
     <!-- CAMERA VIEW -->
-    <div class="tab" id="cameraTab">
+    <div class="tab hidden" id="cameraTab">
       <div id="canvas"></div>
       <input id="shader-name" type="text" placeholder="Shader name" />
       <button on:click={updateButtonClick} id="update">Update Preview</button>
