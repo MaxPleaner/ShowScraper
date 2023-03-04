@@ -38,10 +38,8 @@
   PubSub.subscribe "firebaseStateUpdated", ->
     firebaseState = _firebaseState
 
-  PubSub.subscribe "shaderDrawError", (topic, [imagePath, errMsg, comment]) ->
-    alert(
-      "Error fetching image #{imagePath}\n\n #{errMsg}.\n\n #{comment}"
-    )
+  PubSub.subscribe "shaderDrawError", (topic, msg) ->
+    alert(msg)
 
   onMount =>
     pFive = new p5(p5Setup)
@@ -143,14 +141,15 @@
       delete shaderState.paramValues[key]
     shaderState.imagesCache = {}
     params.forEach (param) ->
-      valueType = if param.type.includes("ColorShaderParam")
-        "color"
+      valueType = null
+      if param.type.includes("ColorShaderParam")
+        valueType = "color"
       else if param.type.includes("FloatShaderParam")
-        "float"
+        valueType = "float"
       else if param.type.includes("TextureShaderParam")
-        "texture"
+        valueType = "texture"
       else if param.type.includes("BooleanShaderParam")
-        "boolean"
+        valueType = "boolean"
       shaderState.paramValues[param.paramName] =
         type: valueType,
         val: param.default

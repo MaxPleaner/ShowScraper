@@ -8,6 +8,7 @@
     cam: null
     paramValues: {}
     imagesCache: {}
+    lastShaderDrawError: ""
 
   DefaultShader = """
     ///////////////////////////////////////////////////////////////////
@@ -53,14 +54,13 @@
       if usesFeedback
         shaderState.shaderObj.setUniform('prevFrame', pFive.get())
 
-
       Object.entries(shaderState.paramValues).forEach ([paramName, paramVal]) =>
         if paramName.length > 0
           if paramVal.type == "color"
             finalVal = hexToVec3(paramVal.val)
           else if paramVal.type == "float"
             finalVal = paramVal.val
-          else if paramVal.type = "boolean"
+          else if paramVal.type == "boolean"
             finalVal = paramVal.val
           else if paramVal.type == "texture"
             finalVal = null
@@ -70,12 +70,13 @@
             else if !record
               successHandler = (img) => shaderState.imagesCache[paramVal.val] = { img: img }
               errorHandler = (e) =>
-                PubSub.publish(
-                  "shaderDrawError",
-                  [paramVal.val, e.message, "Possibly a CORS error. Try a different image host such as Imgur."]
-                )
+                comment = "Possibly a CORS error. Try a different image host such as Imgur."
+                msg = "Error fetching image #{paramVal.val}\n\n #{e.message}.\n\n #{comment}"
+                alreadyShown = shaderState.lastShaderDrawError == msg
+                unless alreadyShown
+                  shaderState.lastShaderDrawError = msg
+                  PubSub.publish("shaderDrawError", msg)
                 shaderState.imagesCache[paramVal.val] = { error: true }
-
               pFive.loadImage(paramVal.val, successHandler, errorHandler)
           if finalVal || paramVal.type == "boolean"
             shaderState.shaderObj.setUniform(paramName, finalVal)
