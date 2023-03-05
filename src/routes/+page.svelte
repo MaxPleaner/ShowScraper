@@ -81,7 +81,6 @@
     # if params.some (param) ->
     #   param.val
     shaderText = editorView.state.doc.toString()
-    tryUseShader(shaderText, params)
     name = jQuery("#shader-name").val()
     isPublic = jQuery("#isPublic")[0].checked
     isTemplate = jQuery("#isTemplate")[0]?.checked
@@ -96,6 +95,7 @@
         firebaseState.templateShaders[name] = shaderObj
       else
         firebaseState.userShaders[name] = shaderObj
+    tryUseShader(shaderText, params)
 
   deleteButtonClick = ->
     return unless confirm "are you sure?"
