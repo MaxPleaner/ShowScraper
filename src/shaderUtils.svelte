@@ -102,6 +102,10 @@
       uniform float iTime;
       uniform sampler2D prevFrame; // only set if the shader text references it
 
+      float round(float val) {
+        return floor(val + 0.5);
+      }
+
       vec3 sampleCamera(vec2 uv) {
         return texture2D(tex0, uv).rgb;
       }
