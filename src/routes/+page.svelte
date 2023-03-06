@@ -496,7 +496,7 @@
                   <input
                     class="float-param-val-direct-set small-number-input"
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     value={param.type.includes("FloatShaderParam") ? (param.default || 0.5) : 0.5}
                     on:change={floatParamDirectSet}
                   />
@@ -505,7 +505,7 @@
                   <input
                     class="float-param-default small-number-input"
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     value={param.type.includes("FloatShaderParam") ? (param.default || 0.5) : 0.5}
                     on:change={floatParamDefaultChanged}
                   />
@@ -514,7 +514,7 @@
                   <input
                     class="float-param-min small-number-input"
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     value={param.type.includes("FloatShaderParam") ? (param.min || 0.0) : 0.0}
                     on:change={floatParamMinChanged}
                   />
@@ -523,7 +523,7 @@
                   <input
                     class="float-param-max small-number-input"
                     type="number"
-                    step="0.01"
+                    step="0.001"
                     value={param.type.includes("FloatShaderParam") ? (param.max || 1.0) : 1.0}
                     on:change={floatParamMaxChanged}
                   />
@@ -531,7 +531,7 @@
                 <input
                   class="float-param-slider"
                   type="range"
-                  step="0.01"
+                  step="0.001"
                   min={param.type.includes("FloatShaderParam") ? (param.min || 0.0) : 0.0}
                   max={param.type.includes("FloatShaderParam") ? (param.max || 1.0) : 1.0}
                   value={param.default || 1.0}
