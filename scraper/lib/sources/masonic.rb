@@ -25,7 +25,8 @@ class Masonic
     private
 
     def get_events
-      $driver.css(".listing__item__link")
+      $driver.css("li[role='group']")
+      # $driver.css(".listing__item__link")
     end
 
     def get_all_pages
@@ -49,7 +50,7 @@ class Masonic
       return unless time
       {
         date: DateTime.parse(time.attribute("datetime")) - 1.day,
-        url: event.attribute("href"),
+        url: event.css("a")[0].attribute("href"),
         img: parse_img(event),
         title: event.css("header h3")[0].text,
         details: "",
