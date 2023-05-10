@@ -1,0 +1,15 @@
+WARNING: TheChapel produced 0 events!
+WARNING: RickshawStop produced 0 events!
+WARNING: ElboRoom produced 0 events!
+WARNING: Starline produced 0 events!
+WARNING: NewParish produced 0 events!
+WARNING: Masonic produced 0 events!
+WARNING: HotelUtah produced 0 events!
+WARNING: GreatAmericanMusicHall produced 0 events!
+WARNING: UCBerkeleyTheater produced 0 events!
+WARNING: Amados produced 0 events!
+WARNING: Fillmore produced 0 events!
+ERROR: ElisMileHighClub failed to scrape. Skipped.
+ERROR: IvyRoom failed to scrape. Skipped.
+ERROR: Paramount failed to scrape. Skipped.
+ERROR: GreatNorthern failed to scrape. Skipped.
