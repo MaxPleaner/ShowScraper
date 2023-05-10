@@ -21,7 +21,7 @@ class HotelUtah
     private
 
     def get_events
-      $driver.css(".list-view-item")
+      $driver.css(".seetickets-list-event-container")
     end
 
     # def get_next_page
@@ -35,8 +35,8 @@ class HotelUtah
       title = parse_title(event)
       return if title.blank?
       {
-        url: event.css(".list-img a")[0].attribute("href"),
-        img: event.css(".list-img img")[0]&.attribute("src") || "",
+        url: event.css("a")[0].attribute("href"),
+        img: event.css(".seetickets-list-view-event-image-container img")[0]&.attribute("src") || "",
         date: parse_date(event),
         title: title,
         details: ""
@@ -48,14 +48,11 @@ class HotelUtah
     end
 
     def parse_title(event)
-      artist1 = event.css(".event-name")[0].text
-      artist2 = event.css(".detail_supporting_talent .name")[0]&.text
-      [artist1, artist2].compact.join(", ")
+      event.css(".event-title")[0].text
     end
 
     def parse_date(event)
-      date_str = event.css(".detail_event_date .name")[0].text
-      date_str = date_str.split("+")[0]
+      date_str = event.css(".event-date")[0].text
       DateTime.parse(date_str)
     end
   end
