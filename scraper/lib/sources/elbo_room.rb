@@ -2,6 +2,9 @@ class ElboRoom
   # No pagination needed here, all events shown at once.
   MAIN_URL = "https://www.elboroomjacklondon.com/full-events-listing"
 
+  # RIP elbo room
+  DISABLED = true
+
   cattr_accessor :events_limit
   self.events_limit = 200
 

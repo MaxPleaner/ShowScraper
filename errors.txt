@@ -1,8 +1,4 @@
-WARNING: TheChapel produced 0 events!
-WARNING: RickshawStop produced 0 events!
-WARNING: ElboRoom produced 0 events!
-WARNING: Starline produced 0 events!
-WARNING: NewParish produced 0 events!
+
 WARNING: Masonic produced 0 events!
 WARNING: HotelUtah produced 0 events!
 WARNING: GreatAmericanMusicHall produced 0 events!

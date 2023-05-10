@@ -5,6 +5,8 @@ class Eagle
   # They only have rock shows every once in a while, anyway.
   MAIN_URL = "https://sf-eagle.com/mec-category/performance/"
 
+  # Unfortunately it's hard to separate the gay bar stuff from the music stuff,
+  # and they don't seem to show their music events on the website anyway.
   DISABLED = true
 
   cattr_accessor :events_limit, :load_time

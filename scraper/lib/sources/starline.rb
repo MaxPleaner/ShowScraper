@@ -6,8 +6,12 @@ class Starline
   self.events_limit = 200
   self.load_time = 3
 
+  # RIP Starline Social Club
+  DISABLED=true
+
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     $driver.get(MAIN_URL)
+    binding.pry
     get_events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
