@@ -1,4 +1,2 @@
-ERROR: ElisMileHighClub failed to scrape. Skipped.
-ERROR: IvyRoom failed to scrape. Skipped.
 ERROR: Paramount failed to scrape. Skipped.
 ERROR: GreatNorthern failed to scrape. Skipped.
