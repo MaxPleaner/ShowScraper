@@ -11,7 +11,6 @@ class GreatNorthern
 
     # the whole fn calendar is in an iframe ... lovely
     sleep self.load_time
-    binding.pry
     $driver.navigate.to $driver.css("iframe")[0].attribute("src")
     sleep self.load_time
 
