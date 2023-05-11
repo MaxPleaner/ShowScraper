@@ -12,8 +12,8 @@ class GreatAmericanMusicHall
   self.events_limit = 200
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
-    nokogiri = Nokogiri.parse(URI.open(MAIN_URL).read)
-    events = nokogiri.css(".calendar-day-event")
+    doc = Nokogiri.parse(URI.open(MAIN_URL).read)
+    events = get_events(doc)
     events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
@@ -23,28 +23,41 @@ class GreatAmericanMusicHall
   class << self
     private
 
-    def get_events
-      $driver.css("#event_tickets")
+    def get_events(doc)
+      doc.css(".seetickets-list-event-container")
     end
 
+    # def get_next_page
+    #   btns = $driver.css(".organizer-profile__show-more button")
+    #   return false unless btns.length > 1
+    #   btns[0].click
+    #   true
+    # end
+
     def parse_event_data(event, &foreach_event_blk)
+      title = parse_title(event)
+      return if title.blank?
       {
+        url: event.css("a")[0].attribute("href").value,
+        img: event.css(".seetickets-list-view-event-image-container img")[0]&.attribute("src")&.value || "",
         date: parse_date(event),
-        img: event.css(".detail_seetickets_image img")[0].attribute("src").value,
-        title: event.css(".event-title")[0].text,
-        url: event.css(".event-title")[0].attribute("href").value,
+        title: title,
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
-      rescue => e
-        ENV["DEBUGGER"] == "true" ? binding.pry : raise
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
+    end
+
+    def parse_title(event)
+      event.css(".event-title")[0].text
     end
 
     def parse_date(event)
-      date_str = event.css(".date")[0].text
-      month, day = date_str.scan(/(\d+)\.(\d+)/)[0]
-      DateTime.parse("#{month}/#{day}")
+      date_str = event.css(".event-date")[0].text
+      DateTime.parse(date_str)
     end
   end
 end
+
