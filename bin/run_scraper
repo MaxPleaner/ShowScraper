@@ -1,5 +1,10 @@
 #!/usr/bin/env ruby
 
+require 'date'
+current_time = DateTime.now
+cdt = current_time.strftime "%d/%m/%Y %H:%M"
+puts "Current Date and Time: "+cdt
+
 require 'optparse'
 require "#{__dir__}/../scraper/scraper.rb"
 
