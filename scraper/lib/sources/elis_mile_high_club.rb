@@ -43,9 +43,9 @@ class ElisMileHighClub
       {
         date: parse_date($driver.css(".event-when")[0].text),
         title: $driver.css(".details .title")[0].text,
-        url: MAIN_URL,
+        url: $driver.css(".links a")[0].attribute("href"),
         img: "",
-        details: $driver.css(".event-description")[0].text
+        details: $driver.css(".event-description")[0]&.text || ""
       }.tap do
         $driver.css(".bubble-closebutton")[1].click
       end.
