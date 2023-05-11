@@ -1,6 +1,6 @@
 class GreatNorthern
   # Single page!!
-  MAIN_URL = "https://www.thegreatnorthernsf.com/shows"
+  MAIN_URL = "https://www.thegreatnorthernsf.com"
 
   cattr_accessor :events_limit, :load_time
   self.events_limit = 200
@@ -11,6 +11,7 @@ class GreatNorthern
 
     # the whole fn calendar is in an iframe ... lovely
     sleep self.load_time
+    binding.pry
     $driver.navigate.to $driver.css("iframe")[0].attribute("src")
     sleep self.load_time
 
