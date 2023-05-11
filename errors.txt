@@ -1,6 +1,3 @@
-WARNING: UCBerkeleyTheater produced 0 events!
-WARNING: Amados produced 0 events!
-WARNING: Fillmore produced 0 events!
 ERROR: ElisMileHighClub failed to scrape. Skipped.
 ERROR: IvyRoom failed to scrape. Skipped.
 ERROR: Paramount failed to scrape. Skipped.
