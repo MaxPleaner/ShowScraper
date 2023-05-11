@@ -1,5 +1,3 @@
-
-WARNING: GreatAmericanMusicHall produced 0 events!
 WARNING: UCBerkeleyTheater produced 0 events!
 WARNING: Amados produced 0 events!
 WARNING: Fillmore produced 0 events!

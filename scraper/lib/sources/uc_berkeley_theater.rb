@@ -18,12 +18,12 @@ class UCBerkeleyTheater
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".eventListings li")
+      $driver.css(".ue-li-container")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css(".date")[0].text),
+        date: DateTime.parse(event.css(".ue-date")[0].text.split("\n").first(2).join(" ")),
         url: event.css("a").find { |link| link.text == "MORE INFO" }.attribute("href"),
         title: event.css("h2,h3").map(&:text).join(", ").gsub("\n", ", "),
         img: event.css("img")[0].attribute("src"),
