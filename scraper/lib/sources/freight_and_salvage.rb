@@ -14,6 +14,7 @@ class FreightAndSalvage
       result = parse_event_data(event, &foreach_event_blk)
       events.push(result) if result
     end.compact
+    events
   end
 
   class << self
@@ -24,6 +25,7 @@ class FreightAndSalvage
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      # binding.pry
       {
         date: DateTime.parse(event.css(".dates")[0].text),
         img: event.css(".wp-post-image")[0].attribute("src"),
