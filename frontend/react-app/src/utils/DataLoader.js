@@ -27,7 +27,12 @@ export default class DataLoader {
     }
     return _.groupBy(results, (event) => {
       let date = moment(event.date, 'YYYY-MM-DD')
-      return date.format('MM-DD-YYYY')
+
+      // Intentionally omitting year here.
+      // Some scraped data does not have accurate year numbers,
+      // which can cause issues around December / January time,
+      // since january events might show up for the PREVIOUS year
+      return date.format('MM-DD')
     })
   }
 
