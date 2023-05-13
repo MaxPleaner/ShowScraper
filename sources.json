@@ -385,5 +385,14 @@
       "mapLink": "",
       "latlng": "",
       "desc": "Another listing of shows. We fetch events from here that aren't supported by the other scrapers."
+    },
+    {
+      "name": "StorkClub",
+      "commonName": "Thee Stork Club",
+      "website": "https://theestorkclub.com/",
+      "region": "East Bay",
+      "mapLink": "",
+      "latlng": "37.813853771369274, -122.26832278465767",
+      "desc": "Chill live music venue also offering comedy & burlesque shows, plus a pool table & arcade games."
     }
 ]
