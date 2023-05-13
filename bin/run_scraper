@@ -8,6 +8,8 @@ puts "Current Date and Time: "+cdt
 require 'optparse'
 require "#{__dir__}/../scraper/scraper.rb"
 
+ENV["HEADLESS"] ||= "true"
+
 opts = {}
 OptionParser.new do |opt|
   opt.on('--headless HEADLESS') { |val| ENV["HEADLESS"] = val }
@@ -25,6 +27,8 @@ OptionParser.new do |opt|
     end
   end
 end.parse!
+
+puts "SOURCES: #{opts[:sources]}"
 
 results, errors = Scraper.run(
   opts[:sources],
