@@ -45,7 +45,8 @@ class TheList
       venue = event.css("b")[0].text
       return if venue_already_has_scraper?(venue)
       artists = (event.css("a").map(&:text) - [venue]).join(", ")
-      title = "#{venue.upcase} - #{artists}"
+      # title = "#{venue.upcase} - #{artists}"
+      title = {venue: venue.upcase, artists: artists}.to_json
       {
         url: "http://www.foopee.com/punk/the-list/",
         img: "",

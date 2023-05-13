@@ -10,7 +10,7 @@ export default class DataLoader {
 
   static async loadEventData(venues) {
     const results = []
-    for (const venue of venues) {
+    for (let venue of venues) {
       const url = `https://storage.googleapis.com/show-scraper-data/${venue.name}.json`
       const events = await $.ajax({
         cache: false,
@@ -18,6 +18,15 @@ export default class DataLoader {
         dataType: "json",
       });
       events.forEach((event) => {
+        // This is a special case where the provided venue name "The List" is not really accurate.
+        // So we do some manipulation here.
+        if (venue.name == "TheList") {
+          const data = JSON.parse(event.title);
+          venue = { ...venue, commonName: `${data.venue} (via The List)` }
+          // venue.commonName = `${data.venue} (via The List)`
+          event.title = data.artists
+          // debugger
+        }
         let newEvent = {
           ...event,
           source: venue
