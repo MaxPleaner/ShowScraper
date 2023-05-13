@@ -122,7 +122,7 @@ class Scraper
     end
 
     def run_scraper(source, events_limit: nil, &foreach_event_blk)
-      source.run({ events_limit: events_limit }.compact, &foreach_event_blk)
+      source.run(**{ events_limit: events_limit }.compact, &foreach_event_blk)
     end
 
   end
