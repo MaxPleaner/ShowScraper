@@ -27,6 +27,11 @@ export default class Nav extends React.Component {
                     <div className={`mybox ${(this.props.route === "TextAndImagesView") ? "selected" : ""}`}>Text + Images</div>
                   </Link>
                 </Column>
+                <Column className="is-narrow">
+                  <Link to='/MapView'>
+                    <div className={`mybox ${(this.props.route === "MapView") ? "selected" : ""}`}>Map View</div>
+                  </Link>
+                </Column>
     {/*            <Column className="is-narrow">
                   <Box className={this.props.route === "Test" ? "selected" : ""}>Map View</Box>
                 </Column>*/}

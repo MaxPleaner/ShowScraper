@@ -22,24 +22,52 @@ export default class EventListViewManager extends React.Component {
   constructor(props) {
     super(props)
     const currentDay = moment(new Date());
+    const currentVenue = "TheList"
     const allEvents = props.events || [];
+    const mode = props.mode || DEFAULT_MODE;
+    const mapView = props.mapView
     this.state = {
-      mode: DEFAULT_MODE,
+      mapView: mapView,
+      mode: mode,
       allEvents: allEvents,
-      events: this.computeEventsList(allEvents, currentDay, DEFAULT_MODE),
+      events: this.computeEventsList(allEvents, currentDay, mode, mapView, currentVenue),
       currentDay: currentDay
     };
   }
 
   componentDidUpdate(oldProps) {
     if (this.props.events != oldProps.events) {
-      this.setState({...this.state, allEvents: this.props.events, events: this.computeEventsList(this.props.events, this.state.currentDay, this.state.mode)})
+      this.setState({
+        ...this.state,
+        allEvents: this.props.events,
+        events: this.computeEventsList(
+          this.props.events,
+          this.state.currentDay,
+          this.state.mode,
+          this.state.mapView,
+          this.state.currentVenue
+        )
+      })
     }
   }
 
-  computeEventsList (allEvents, currentDay, mode) {
+  computeEventsList (allEvents, currentDay, mode, mapView, currentVenue) {
     if (mode == 'day') {
-      return _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT));
+      if (mapView) {
+        if (currentVenue) {
+          return {}
+        } else {
+          const allDayEvents = _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT))
+          Object.entries(allDayEvents).forEach(([date, events]) => {
+            allDayEvents[date] = events.filter((event) => {
+              return event.source.name == currentVenue
+            })
+          })
+          return allDayEvents
+        }
+      } else {
+        return _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT));
+      }
     } else if (mode == 'week') {
       const days = [...Array(7).keys()].map((i) => {
         return currentDay.clone().add(i, 'days').format(FILE_DATE_FORMAT);
@@ -49,7 +77,17 @@ export default class EventListViewManager extends React.Component {
   }
 
   changeMode (newMode) {
-    this.setState({...this.state, mode: newMode, events: this.computeEventsList(this.state.allEvents, this.state.currentDay, newMode)})
+    this.setState({
+      ...this.state,
+      mode: newMode,
+      events: this.computeEventsList(
+        this.state.allEvents,
+        this.state.currentDay,
+        newMode,
+        this.state.mapView,
+        this.state.currentVenue
+      )
+    })
   }
 
   currentDateEntry() {
@@ -91,7 +129,17 @@ export default class EventListViewManager extends React.Component {
     } else if (this.state.mode == 'week') {
       newDay = this.state.currentDay.clone().add(7, 'days');
     }
-    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode)})
+    this.setState({
+      ...this.state,
+      currentDay: newDay,
+      events: this.computeEventsList(
+        this.state.allEvents,
+        newDay,
+        this.state.mode,
+        this.state.mapView,
+        this.state.currentVenue
+      )
+    })
   }
 
   goToPrevDate() {
@@ -101,7 +149,17 @@ export default class EventListViewManager extends React.Component {
     } else if (this.state.mode == 'week') {
       newDay = this.state.currentDay.clone().add(-7, 'days');
     }
-    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode)})
+    this.setState({
+      ...this.state,
+      currentDay: newDay,
+      events: this.computeEventsList(
+        this.state.allEvents,
+        newDay,
+        this.state.mode,
+        this.state.mapView,
+        this.state.currentVenue
+      )
+    })
   }
 
   render() {

@@ -7,8 +7,6 @@ import moment from 'moment';
 export default class ListView extends React.Component {
   render() {
     const events = Object.entries(this.props.events).map(([date, date_events], idx) => {
-      const x = moment
-      debugger
       return (
         <div key={idx} className='Day-group'>
           <div className='daygroup-title'>{moment(date, "MM-DD").format("M/DD (dddd)")}</div>
