@@ -9,6 +9,7 @@ import './vendor/handdrawn.css';
 
 import Nav from './components/Nav';
 import EventListViewManager from './components/EventListViewManager';
+import AboutView from './components/AboutView';
 import VenuesList from './components/VenuesList';
 import DataLoader from "./utils/DataLoader"
 
@@ -35,6 +36,7 @@ class App extends React.Component {
     if (this.props.route == "TextAndImagesView") { currentView = <EventListViewManager events={this.state.events} />; }
     if (this.props.route == "TextView") { currentView = <EventListViewManager events={this.state.events} textOnly={true} />; }
     if (this.props.route == "VenuesListView") { currentView = <VenuesList venues={this.state.venues} />; }
+    if (this.props.route == "About") { currentView = <AboutView />; }
 
     return (
         <div className="App-body">

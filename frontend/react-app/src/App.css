@@ -13,6 +13,10 @@
   /*margin: 10px;*/
 }
 
+.About a, .About a:visited {
+  color: lightgreen
+}
+
 .clearfix::after {
   content: "";
   clear: both;
