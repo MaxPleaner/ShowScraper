@@ -26,8 +26,9 @@ class StorkClub
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      puts "DATE: #{event.css(".dtstart")[0].text}"
       {
-        date: DateTime.parse(event.css(".dtstart")[0].text),
+        date: DateTime.parse(event.css(".dtstart")[0].text.split(" ")[1].gsub(".", "/")),
         img: event.css(".detail_seetickets_image img")[0].attribute("src"),
         title: event.css(".event-title")[0].text,
         url: event.css(".detail_seetickets_image a")[0].attribute("href"),
