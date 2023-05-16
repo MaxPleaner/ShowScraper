@@ -1,7 +1,5 @@
 import React from 'react';
 import moment from 'moment';
-import { Columns, Box } from 'react-bulma-components';
-const { Column } = Columns;
 import _ from 'underscore'
 
 export default class VenuesList extends React.Component {
@@ -19,25 +17,18 @@ export default class VenuesList extends React.Component {
   buildVenuesList(venues) {
     return venues.map((venue, idx) => {
       return (
-        <Column key={idx} className='is-half'>
-          <div className='venue'>
-{/*            <Columns>
-              <Column className='is-one-third venue-name'>*/}
-              <div className='venue-name'>{venue.commonName}</div>
-              {/*</Column>*/}
-              {/*<Column className='is-one-third venue-website'>*/}
-              <a className='venue-link' href={venue.website}>Website</a>
-              {/*</Column>*/}
-              {/*<Column className='is-one-third venue-view-events'>*/}
-              {/*<a className='venue-view-events'>View events</a>*/}
-              <div className='clearfix'></div>
-              {/*</Column>*/}
-              {/*<Column className='is-full venue-description'>*/}
-              <div className='venue-description'>{venue.desc}</div>
-              {/*</Column>*/}
-            {/*</Columns>*/}
-          </div>
-        </Column>
+        <div key={idx} className='venue-container '>
+              <div className='description-container'>
+              <div className='venue-name'> 
+                <i className='location-icon'></i> 
+                {venue.commonName}
+                <div></div>
+              </div>
+              
+                <div className='venue-description'>{venue.desc}</div>
+              </div>
+                <a className='venue-link' href={venue.website}> ↗  &nbsp; Website</a>
+        </div>
       )
     })
   }
@@ -47,24 +38,27 @@ export default class VenuesList extends React.Component {
     const eastBayVenues = this.state.venues.filter((venue) => venue.region == "East Bay")
     const otherVenues = this.state.venues.filter((venue) => venue.region == "Other")
     return (
-      <div className='mybox mt-3'>
+      <div className=' VenuesListContainer'>
         {
           this.state.venues.length == 0 ? (
-            <div className='hd-border mybox'>... Loading ... </div>
+            <div className='loading '>... Loading ... </div>
           ) : (
             <div>
-              <div className='venue-region-title'>San Francisco</div>
-              <Columns className='VenuesList is-multiline'>
+              <div className='venue-region-title'>
+                <span className='venue-region-title-text'>San Francisco</span>  </div>
+              <div className='VenuesList '>
                   {this.buildVenuesList(sfVenues)}
-              </Columns>
-              <div className='venue-region-title'>EastBay</div>
-              <Columns className='VenuesList is-multiline'>
+              </div>
+              <div className='venue-region-title'>
+                <span className='venue-region-title-text'>EastBay</span> </div>
+              <div className='VenuesList '>
                   {this.buildVenuesList(eastBayVenues)}
-              </Columns>
-              <div className='venue-region-title'>Other</div>
-              <Columns className='VenuesList is-multiline'>
+              </div>
+              <div className='venue-region-title'>
+                <span className='venue-region-title-text'>Other</span> </div>
+              <div className='VenuesList '>
                   {this.buildVenuesList(otherVenues)}
-              </Columns>
+              </div>
             </div>
           )
         }

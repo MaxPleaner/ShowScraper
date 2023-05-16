@@ -1,63 +1,71 @@
-import React from 'react';
-import { Columns, Box } from 'react-bulma-components';
-const { Column } = Columns;
+import React, {useState} from 'react';
 import MissingImage from '../MissingImage.png'
 
 export default class EventListItem extends React.Component {
   constructor(props) {
     super(props)
-  }
+    this.state = {
+        display: 'none'
+      }
+
+      this.mouseEnter = this.mouseEnter.bind(this);
+      this.mouseLeave = this.mouseLeave.bind(this);
+    }
+
+    mouseEnter() {  this.setState({display: 'block'}) }
+    mouseLeave() {  this.setState({display: 'none'})  }
+
   render() {
+  
+  
     let imgSrc = this.props.event.img;
     if (imgSrc == "") {
       imgSrc = MissingImage;
     }
     const maxTitleLength = 80
     let title = this.props.event.title;
+
     if (title.length > maxTitleLength) {
       title = title.slice(0,maxTitleLength) + "..."
     }
+
     if (this.props.textOnly) {
       return (
-        <Column className='is-full textViewEntry'>
-          <Columns>
-            <Column className='is-one-fifth'>
-              <span className='textViewVenue'>{this.props.event.source.commonName}</span>
-            </Column>
-            <Column>
+        <div className='textViewEntry'>
+            <h1 className='textViewVenue'><i className='location-icon'></i> {this.props.event.source.commonName}</h1>
+            <div>
               <a className='textViewLink' href={this.props.event.url}>
-                <span className='textViewTitle'>{title}</span>
+                <span className='textViewTitle'> {title}</span>
               </a>
-            </Column>
-          </Columns>
-        </Column>
+            </div>
+        </div>
       )
     } else {
       return (
-        <Column className='is-full-tablet is-half-desktop'>
-         <a className='event-link' href={this.props.event.url}>
-          <Columns className='Event-box'>
-            <Column className='is-one-third'>
-                 {/*<div className='img-background'>*/}
-                   <img
-                     className='Event-img'
-                     src={imgSrc}
-                     onError={this.onImageError}
-                    />
-                 {/*</div>*/}
-            </Column>
-            <Column className='is-two-thirds'>
-              <div className='event-venue'>
-                {this.props.event.source.commonName}
-               </div>
-               <br />
-               <div className='event-title'>
-                 {title}
-               </div>
-            </Column>
-          </Columns>
+    
+         
+         <a className='event-link ' href={this.props.event.url} onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}>
+          
+            <div className='Event-box'>
+                    <div className='img-container'>
+                        <img
+                            className='Event-img'
+                            src={imgSrc}
+                            onError={this.onImageError}
+                            />
+                        <div className='event-description' style={{display: this.state.display}} >
+                            <small>venue:</small>
+                            <span className='event-venue'>   {this.props.event.source.commonName} </span>
+                            <br />
+                            <br />
+                            <small>event:</small>
+                            <br />
+                            <h1 className='event-title'>  {title} </h1>
+                        </div>
+                    </div>
+                
+            </div>
          </a>
-        </Column>
       )
     }
   }
