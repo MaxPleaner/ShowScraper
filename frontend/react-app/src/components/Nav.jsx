@@ -9,7 +9,6 @@ export default class Nav extends React.Component {
   
   render() {
     return (
-        
         <nav className='flex-row' >
             <h1>Bay Area Shows</h1>
                 
@@ -29,6 +28,10 @@ export default class Nav extends React.Component {
                 
                     <Link to='/VenuesListView'>
                         <div className={`nav-item ${this.props.route === "VenuesListView" ? "selected" : ""}`}>Venues</div>
+                    </Link>
+                    
+                    <Link to='/About'>
+                        <div className={`nav-item ${this.props.route === "About" ? "selected" : ""}`}>About / Contact</div>
                     </Link>
 
                 </div>

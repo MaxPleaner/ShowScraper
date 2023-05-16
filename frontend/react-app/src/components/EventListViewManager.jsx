@@ -8,7 +8,11 @@ import _ from 'underscore'
 const DEFAULT_MODE = 'week'
 
 // The format of the dates in the JSON files
-const FILE_DATE_FORMAT = 'MM-DD-YYYY';
+// const FILE_DATE_FORMAT = 'MM-DD-YYYY';
+
+// Note: intentionally ommitting year here, see comment in DataLoader.js
+const FILE_DATE_FORMAT = 'MM-DD';
+
 // Format for a single day
 const SINGLE_DAY_FORMAT = 'M/DD (dddd)'
 // Format when a date is shown in a range
@@ -103,7 +107,6 @@ export default class EventListViewManager extends React.Component {
   render() {
      return (
       <div className='ListViewManager'> 
-
                 <h2>Dates:</h2>
                 <br />
                <div className = 'eventDates'>

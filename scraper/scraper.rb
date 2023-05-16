@@ -104,7 +104,7 @@ class Scraper
       GCS.upload_text_as_file(text: json, dest: "#{source}.json")
 
       # Also write the file locally
-      # File.open("debug/#{source}.json", "w") { |f| f.write json }
+      File.open("debug/#{source}.json", "w") { |f| f.write json }
     end
 
     def init_driver
@@ -122,7 +122,7 @@ class Scraper
     end
 
     def run_scraper(source, events_limit: nil, &foreach_event_blk)
-      source.run({ events_limit: events_limit }.compact, &foreach_event_blk)
+      source.run(**{ events_limit: events_limit }.compact, &foreach_event_blk)
     end
 
   end

@@ -26,7 +26,7 @@ class Yoshis
       got_next_page = get_next_page unless i == months_limit - 1
       break unless got_next_page
     end
-    events
+    events.compact
   end
 
   class << self
