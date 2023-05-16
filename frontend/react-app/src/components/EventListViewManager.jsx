@@ -124,7 +124,7 @@ export default class EventListViewManager extends React.Component {
                </div>
         {
           (this.state.allEvents.length == 0) ? (
-            <div className='loading'>Loading...</div>
+            <div className='loading'>Loading months and months of show listings. Give it just a few seconds ...</div>
           ) : (
             <EventListView textOnly={this.props.textOnly} events={this.state.events}/>
           )

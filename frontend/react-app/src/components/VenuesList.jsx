@@ -41,7 +41,7 @@ export default class VenuesList extends React.Component {
       <div className=' VenuesListContainer'>
         {
           this.state.venues.length == 0 ? (
-            <div className='loading '>... Loading ... </div>
+            <div className='loading '>Give it just a few seconds, loading .. </div>
           ) : (
             <div>
               <div className='venue-region-title'>

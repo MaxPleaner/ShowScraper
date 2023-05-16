@@ -3,7 +3,7 @@
     min-height: 100vh;
     color: white;
     /* background-color: rgb(209, 209, 209); */
-    background-color: white;
+    background-color: black;
 }
 
 .About a, .About a:visited {
@@ -40,6 +40,10 @@
 }
 
 .loading{
+    text-align: center;
+    margin-top: 10px;
+    color: black;
+    font-weight: bold;
     background-color: lightgrey;
 }
 
@@ -489,7 +493,6 @@ a .box:hover {
     .venue-container{
         width: 45%;
     }
- 
 }
 @media only screen and (max-width: 860px){
     nav{
@@ -497,7 +500,7 @@ a .box:hover {
         padding-bottom: 10px;
     }
 
-    .ListViewManager, .VenuesListContainer{
+    .ListViewManager, .VenuesListContainer {
         padding-top: 50px;
     }
 
@@ -523,14 +526,11 @@ a .box:hover {
         flex-direction: column !important;
         grid-gap: 10px;
     }
-    .ListViewManager{
-        padding-top: 100px;
-    }
  
 }
 @media only screen and (max-width: 510px){
  
-    .ListViewManager, .VenuesListContainer{
+    .ListViewManager, .VenuesListContainer, .About{
         padding-top: 200px;
     }
     .venue-region-title{
@@ -542,5 +542,10 @@ a .box:hover {
         flex-direction: column !important;
     }
  
+}
+
+.About {
+    padding: 0 30px;
+/*    margin-top: 90px;*/
 }
 
