@@ -102,41 +102,26 @@ export default class EventListViewManager extends React.Component {
 
   render() {
      return (
-      <div className='ListViewManager'>
+      <div className='ListViewManager'> 
 
-{/*          <Column className='is-one-quarter'>
-            <Box className='mt-3'>
-              <Columns>
-                <Column>
-                  <a onClick={this.changeMode.bind(this, "day")}>
-                    <Box className={this.state.mode == "day" ? "selected" : ""}>Day</Box>
-                  </a>
-                </Column>
-                <Column>
-                  <a onClick={this.changeMode.bind(this, "week")}>
-                    <Box className={this.state.mode == "week" ? "selected" : ""}>Week</Box>
-                  </a>
-                </Column>
-              </Columns>
-            </Box>
-          </Column>*/}
-
-               <div class = 'eventDates'>
+                <h2>Dates:</h2>
+                <br />
+               <div className = 'eventDates'>
 
                   <a onClick={this.goToPrevDate.bind(this)}>
-                    <div className='date-range-select hd-border mybox'>{this.prevDateEntry()}</div>
+                    <div className='date-range-select  nav-item'>{this.prevDateEntry()}</div>
                   </a>
 
-                  <div className='date-range-select-static hd-border mybox selected'>{this.currentDateEntry()}</div>
+                  <div className='date-range-select-static  nav-item selected'>{this.currentDateEntry()}</div>
 
 
                   <a onClick={this.goToNextDate.bind(this)}>
-                    <div className='date-range-select hd-border mybox'>{this.nextDateEntry()}</div>
+                    <div className='date-range-select  nav-item'>{this.nextDateEntry()}</div>
                   </a>
                </div>
         {
           (this.state.allEvents.length == 0) ? (
-            <div className='hd-border mybox'>Loading...</div>
+            <div className='loading'>Loading...</div>
           ) : (
             <EventListView textOnly={this.props.textOnly} events={this.state.events}/>
           )
