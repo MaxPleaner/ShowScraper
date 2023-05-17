@@ -378,6 +378,7 @@ nav h2 {
     /* max-height: 100%; */
     border-radius: 20px;
     background-color: rgba(54, 54, 54, 0.848);
+    cursor: pointer;
 }
 
 .event-link {
@@ -408,7 +409,6 @@ nav h2 {
 
 .pseudo-link {
 /*    color: green;*/
-    cursor: pointer;
 }
 
 .box.selected {
