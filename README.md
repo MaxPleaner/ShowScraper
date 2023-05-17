@@ -142,5 +142,5 @@ For now it suffices to go backend-less and just host the results on GCS.
 - [ ] Map View
 - [ ] Add event descriptions to List View
 - [ ] Add Venue Events List view (accessible from Venue List View)
-- [ ] Find a way to handle events that don't have an explicit year in their date
-- [ ] Add Submit Event / About pages
+- [x] Find a way to handle events that don't have an explicit year in their date
+- [x] Add Submit Event / About pages
