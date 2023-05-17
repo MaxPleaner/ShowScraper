@@ -52,8 +52,9 @@ export default class EventListItem extends React.Component {
 
   render() {
     let imgSrc = this.props.event.img;
-    if (imgSrc == "") {
-      imgSrc = MissingImage;
+    if (imgSrc == "" || imgSrc == null) {
+      // Use the per-venue default image.
+      imgSrc = this.props.event.source.img;
     }
     const maxTitleLength = 80
     let title = this.props.event.title;
