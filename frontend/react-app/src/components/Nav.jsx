@@ -15,15 +15,14 @@ export default class Nav extends React.Component {
 
 
             <div className='flex-row' >
-                <h3>Display:</h3>
 
                 <div>
                     <Link to='/TextView'>
-                        <div className={`nav-item ${this.props.route === "TextView" ? "selected" : ""}`}>Text</div>
+                        <div className={`nav-item ${this.props.route === "TextView" ? "selected" : ""}`}>Text View</div>
                     </Link>
 
                     <Link to='/TextAndImagesView'>
-                        <div className={`nav-item ${(this.props.route === "TextAndImagesView") ? "selected" : ""}`}>Text & Images</div>
+                        <div className={`nav-item ${(this.props.route === "TextAndImagesView") ? "selected" : ""}`}>Flyers View</div>
                     </Link>
                 
                     <Link to='/VenuesListView'>

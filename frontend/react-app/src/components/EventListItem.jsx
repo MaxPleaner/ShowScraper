@@ -5,19 +5,52 @@ export default class EventListItem extends React.Component {
   constructor(props) {
     super(props)
     this.state = {
-        display: 'none'
-      }
+      display: 'none',
+      // canFollowLink: false
+    }
 
       this.mouseEnter = this.mouseEnter.bind(this);
       this.mouseLeave = this.mouseLeave.bind(this);
+      this.touchStart = this.touchStart.bind(this)
+      this.click = this.click.bind(this)
     }
 
-    mouseEnter() {  this.setState({display: 'block'}) }
-    mouseLeave() {  this.setState({display: 'none'})  }
+    // Some complexity in all this due to mouseover handling
+    // on mobile vs web.
+
+    // Affects web only
+    mouseEnter() {
+      this.setState({display: 'block'})
+    }
+
+    // Affects web only
+    mouseLeave() {
+      this.setState({display: 'none'})
+    }
+
+    // Affects mobile only
+    touchStart(path) {
+    //   // debugger
+    //   if (this.state.display == 'block') {
+    //     console.log("can follow link")
+    //     window.open(path, "_blank")
+    //   } else {
+    //     console.log("cannot follow link")
+    //     this.setState({display: 'block'})
+    //     // this.setState({canFollowLink: true})
+    //   }
+    }
+
+    // Affects web only
+    click(path, e) {
+      // debugger
+      if (this.state.display == 'block') {
+        window.open(path, "_blank")
+      }
+      // console.log("processed click")
+    }
 
   render() {
-  
-  
     let imgSrc = this.props.event.img;
     if (imgSrc == "") {
       imgSrc = MissingImage;
@@ -32,7 +65,7 @@ export default class EventListItem extends React.Component {
     if (this.props.textOnly) {
       return (
         <div className='textViewEntry'>
-            <h1 className='textViewVenue'><i className='location-icon'></i> {this.props.event.source.commonName}</h1>
+            <h1 className='textViewVenue'>{this.props.event.source.commonName}</h1>
             <div>
               <a className='textViewLink' href={this.props.event.url}>
                 <span className='textViewTitle'> {title}</span>
@@ -42,30 +75,34 @@ export default class EventListItem extends React.Component {
       )
     } else {
       return (
-    
-         
-         <a className='event-link ' href={this.props.event.url} onMouseEnter={this.mouseEnter} onMouseLeave={this.mouseLeave}>
-          
+         <span
+           className='event-link'
+           href={this.props.event.url}
+           onMouseEnter={this.mouseEnter}
+           onMouseLeave={this.mouseLeave}
+           onTouchStart={() => { this.touchStart(this.props.event.url) }}
+          >
             <div className='Event-box'>
-                    <div className='img-container'>
-                        <img
-                            className='Event-img'
-                            src={imgSrc}
-                            onError={this.onImageError}
-                            />
-                        <div className='event-description' style={{display: this.state.display}} >
-                            <small>venue:</small>
-                            <span className='event-venue'>   {this.props.event.source.commonName} </span>
-                            <br />
-                            <br />
-                            <small>event:</small>
-                            <br />
-                            <h1 className='event-title'>  {title} </h1>
-                        </div>
-                    </div>
-                
+              <div className='img-container'>
+                  <img
+                      className='Event-img'
+                      src={imgSrc}
+                      onError={this.onImageError}
+                      />
+                  <div
+                    onPointerDown={(e) => {this.click(this.props.event.url, e)}}
+                    className='event-description pseudo-link'
+                    style={{display: this.state.display}}
+                  >
+                      <span className='event-venue'> {this.props.event.source.commonName} </span>
+                      {/*<br />*/}
+                      <h1 className='event-title'>
+                        <span> {title} </span>
+                      </h1>
+                  </div>
+              </div>
             </div>
-         </a>
+         </span>
       )
     }
   }

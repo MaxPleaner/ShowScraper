@@ -59,7 +59,7 @@ nav {
 
     justify-content: space-between !important;
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
-    position: fixed;
+/*    position: fixed;*/
     top: 0;
     z-index: 1;
 }
@@ -108,13 +108,15 @@ nav h2 {
     font-size: 1.2em;
     color: white;
     margin: 0 10px;
-    border-radius: 30px;
-    /* background-color: #0C7B93 !important; */
+/*    border-radius: 30px;*/
+
+     background-color: #0C7B93 !important; 
 }
 
 .nav-item.selected {
-    background-color: #0C7B93 !important;
-    border-radius: 30px;
+    background-color: #0C7B93;
+    outline: 1px solid white;
+/*    border-radius: 30px;*/
 }
 
 
@@ -132,7 +134,7 @@ nav h2 {
 .ListViewManager h2{
     color: black;
     text-align: center;
-    padding-top: 100px;
+/*    padding-top: 100px;*/
 }
 
 .ListViewManager .date-range-select:hover {
@@ -163,7 +165,7 @@ nav h2 {
     justify-content: space-around;
 }
 .VenuesListContainer{
-    margin-top: 100px;
+/*    margin-top: 100px;*/
     padding: 5%;
     padding-top: 0;
 }
@@ -286,20 +288,17 @@ nav h2 {
 
 .venue-region-title-text{
     font-size: 40px;
-    background-color: white;
+    background-color: black;
+/*    outline: 1px solid white;*/
+    color: white;
     padding: 0 10px;
 }
-
-
-
-
-
 
 
 .Day-group {
     /*margin-right: 20px;*/
     /*outline: 1px solid black;*/
-    padding: 5%;
+    padding: 2%;
 }
 
 .daygroup-title {
@@ -316,14 +315,14 @@ nav h2 {
 
 .daygroup-title-text {
     font-size: 40px;
-    background-color: white;
+    background-color: black;
+    color: white;
     padding: 0 10px;
 }
 
 .masonry-with-columns {
-    columns: 3 400px;
+    columns: 6 250px;
     column-gap: 1rem;
-
 }
 
 .masonry-with-columns .masonry-item {
@@ -339,13 +338,9 @@ nav h2 {
     font-size: 2rem;
 }
 
-
-
-
-
-
 .Event-box {
     display: flex;
+    max-width: 250px;
     flex-direction: column;
     /* outline: 2px solid rgb(170, 170, 170); */
     border-radius: 10px;
@@ -356,18 +351,19 @@ nav h2 {
     margin-bottom: 1rem;
 }
 
-
-
 .img-container {
-    width: 100%;
+/*    width: 100%;*/
     /* background-color: #27496D ; */
 }
 
 .Event-img {
     display: block;
     /* width: auto; */
-    width: 100%;
-    /* height: 250px; */
+/*    width: 100%;*/
+/*    width: 50%;*/
+/*    max-width: 200px;*/
+/*    max-height: 2pp;*/
+/*     height: 250px; */
     /* height: 50%; */
     border-radius: 20px;
 }
@@ -386,8 +382,11 @@ nav h2 {
 
 .event-link {
     color: black !important;
-    width: 30%;
-    margin: 0 auto;
+    display: inline-block;
+/*    width: 30%;*/
+/*    display: block;*/
+/*    margin: 0 auto;*/
+    max-width: 250px !important;
 }
 
 .event-venue {
@@ -396,15 +395,20 @@ nav h2 {
     color: white;
     width: 100%;
     text-align: center;
-    font-size: xx-large;
+/*    font-size: xx-large;*/
     padding: 4px;
 }
 
 .event-title {
     display: inline-block;
     font-weight: bold;
-    font-size: 1.3em;
+    font-size: 1.0em;
     padding: 5px;
+}
+
+.pseudo-link {
+/*    color: green;*/
+    cursor: pointer;
 }
 
 .box.selected {
@@ -486,30 +490,47 @@ a .box:hover {
 }
 
 
-
+.About {
+    padding: 30px;
+/*    padding-top: 120px;*/
+}
+/*@media only screen and (min-width: 1370) {
+}*/
 
 
 @media only screen and (max-width: 1370px){
     .venue-container{
         width: 45%;
     }
-}
-@media only screen and (max-width: 860px){
     nav{
         flex-direction: column !important;
         padding-bottom: 10px;
     }
+/*    .About {
+        padding: 0 30px;
+        padding-top: 180px;
+    }*/
 
-    .ListViewManager, .VenuesListContainer {
+}
+@media only screen and (max-width: 860px){
+
+/*    .ListViewManager, .VenuesListContainer {
         padding-top: 50px;
-    }
+    }*/
 
     nav div {
         flex-direction: column !important;
     }
-    nav div div {
+/*    nav div div {
         text-align: center;
         flex-direction: row !important;
+    }*/
+    nav div div {
+        flex-direction: column !important;
+    }
+
+    .nav-item {
+        margin: 5px;
     }
 
     .venue-container{
@@ -519,6 +540,11 @@ a .box:hover {
     .venue-region-title{
         height: 70px;
     }
+
+/*    .About {
+        padding: 0 30px;
+        padding-top: 380px;
+    }*/
  
 }
 @media only screen and (max-width: 560px){
@@ -526,13 +552,24 @@ a .box:hover {
         flex-direction: column !important;
         grid-gap: 10px;
     }
+
+    .masonry-with-columns {
+        columns: 1 100%;
+    }
+
+    .Event-box {
+        width: 60vw;
+        margin-left: 15vw;
+    }
+
+
  
 }
 @media only screen and (max-width: 510px){
  
-    .ListViewManager, .VenuesListContainer, .About{
+/*    .ListViewManager, .VenuesListContainer {
         padding-top: 200px;
-    }
+    }*/
     .venue-region-title{
         height: 55px;
     }
@@ -541,11 +578,9 @@ a .box:hover {
         
         flex-direction: column !important;
     }
+/*    .About {
+        padding: 0 30px;
+        padding-top: 380px;
+    }*/
  
 }
-
-.About {
-    padding: 0 30px;
-/*    margin-top: 90px;*/
-}
-
