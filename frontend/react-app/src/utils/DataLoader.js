@@ -22,8 +22,7 @@ export default class DataLoader {
         // So we do some manipulation here.
         if (venue.name == "TheList" || venue.name == "ManuallyAdded") {
           const data = JSON.parse(event.title);
-          venue = { ...venue, commonName: `${data.venue} (via The List)` }
-          // venue.commonName = `${data.venue} (via The List)`
+          venue = { ...venue, commonName: `${data.venue} (via ${venue.commonName})` }
           event.title = data.artists
           // debugger
         }
