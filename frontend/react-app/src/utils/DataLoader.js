@@ -20,7 +20,7 @@ export default class DataLoader {
       events.forEach((event) => {
         // This is a special case where the provided venue name "The List" is not really accurate.
         // So we do some manipulation here.
-        if (venue.name == "TheList") {
+        if (venue.name == "TheList" || venue.name == "ManuallyAdded") {
           const data = JSON.parse(event.title);
           venue = { ...venue, commonName: `${data.venue} (via The List)` }
           // venue.commonName = `${data.venue} (via The List)`

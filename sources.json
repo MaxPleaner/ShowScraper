@@ -438,5 +438,15 @@
       "latlng": "",
       "desc": "Another listing of shows. We fetch events from here that aren't supported by the other scrapers.",
       "img": "https://pbs.twimg.com/media/D7TjIXEU0AA2rGu?format=jpg&name=large"
+    },
+    {
+      "name": "ManuallyAdded",
+      "commonName": "Manually Added",
+      "website": "http://dissonant.info",
+      "region": "Other",
+      "mapLink": "",
+      "latlng": "",
+      "desc": "Stuff I add manually",
+      "img": "https://cdna.artstation.com/p/assets/images/images/045/033/028/large/max-pleaner-lotus.jpg?1641769519"
     }
 ]
