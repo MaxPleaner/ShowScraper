@@ -2,6 +2,13 @@ class Selenium::WebDriver::Element
 	def css(selector)
 		find_elements(:css, selector)
 	end
+
+		# Hidden text is not returned by `.text` by default.
+		# (e.g. if the element is not visible)
+		# This patch fixes that.
+		def text
+			$driver.execute_script("return arguments[0].textContent;", self)
+		end
 end
 
 class SeleniumPatches

@@ -1,6 +1,6 @@
 class Cornerstone
   # No pagination needed here, all events shown at once.
-  MAIN_URL = "https://cornerstoneberkeley.com/music-venue/"
+  MAIN_URL = "https://cornerstoneberkeley.com"
 
   cattr_accessor :events_limit
   self.events_limit = 200
@@ -17,15 +17,15 @@ class Cornerstone
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".list-view-item")
+      $driver.css(".collection-item")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       {
         date: parse_date(event),
-        title: event.css(".event-name")[0].text,
-        url: event.css(".event-name a")[0].attribute("href"),
-        img: event.css(".attachment-post-thumbnail")[0]&.attribute("src") || "",
+        title: event.css(".main-title-hover")[0].text,
+        url: event.css("a")[0].attribute("href"),
+        img: parse_img(event),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
@@ -35,9 +35,12 @@ class Cornerstone
     end
 
     def parse_date(event)
-      # todo: no year
-      date_string = event.css(".dates")[0].text
-      DateTime.parse(date_string)
+      DateTime.parse event.css(".date").first(2).map(&:text).join(" ")
+    end
+
+    def parse_img(event)
+      style = event.css(".bg-image-show")[0].attribute("style")
+      style.split("background-image: url(\"")[1].split("\");")[0]
     end
   end
 end
