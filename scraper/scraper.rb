@@ -73,6 +73,8 @@ class Scraper
         end
       end
 
+      # persist_error_list
+
       [results, errors]
     end
 

@@ -15,7 +15,8 @@ class GoldenBull
         events.push(parse_event_data(event, &foreach_event_blk))
       end
       break if events.count >= events_limit
-      get_next_page unless i == months_limit - 1
+      got_next_page = get_next_page unless i == months_limit - 1
+      break if !got_next_page
     end
     events
   end
@@ -25,40 +26,25 @@ class GoldenBull
 
     def get_events
       sleep load_time
-      $driver.css(".Main-content .background-image-link")
+      $driver.css(".eventlist-event")
     end
 
     def get_next_page
-      $driver.css("[aria-label='Go to next month']")[0].click
+      $driver.css("[aria-label='Go to next month']")[0]&.click
     end
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        url: event.attribute("href"),
-        img: event.css("img")[0].attribute("src"),
-      }.tap do |data|
-        $driver.new_tab(data[:url]) do
-          data[:date] = parse_date($driver.css("time.event-date")[0].text)
-          data[:title] = $driver.css(".eventitem-title")[0].text
-          data[:details] = $driver.css(".sqs-block-content")[0].text
-        end
-      end.
+        url: event.css(".eventlist-title-link")[0].attribute("href"),
+        img: event.css(".eventlist-column-thumbnail img")[0].attribute("src"),
+        title: event.css(".eventlist-title-link")[0].text,
+        date: DateTime.parse(event.css(".event-date")[0].text),
+        details: "",
+      }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
-    end
-
-    def parse_date(date_string)
-      begin
-        tries = 0
-        # TODO: also parse time, the data is available.
-        DateTime.parse(date_string)
-      rescue
-        sleep 3
-        retry if (tries += 1) < 3
-        raise
-      end
     end
   end
 end
