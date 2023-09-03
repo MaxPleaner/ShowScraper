@@ -12,7 +12,8 @@ class ElRio
     get_all_pages
     get_events.map do |event|
       next if events.count >= events_limit
-      events.push(parse_event_data(event, &foreach_event_blk))
+      data = parse_event_data(event, &foreach_event_blk)
+      events.push(data) if data
       break if events.count >= events_limit
     end
     events
@@ -37,9 +38,9 @@ class ElRio
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css(".d-when")[0].text),
+        date: (DateTime.parse(event.css(".d-when")[0].text.strip) rescue return),
         img: event.css(".agendaItem__image__img")[0].attribute("src"),
-        title: event.css(".d-title")[0].text,
+        title: event.css(".d-title")[0].text.strip,
         url: event.css(".d-title a")[0].attribute("href"),
         details: ""
       }.
