@@ -61,7 +61,7 @@ class Yoshis
       {
         url: event.css(".eimage a")[0].attribute("href"),
         img: event.css(".eimage img")[0].attribute("src"),
-        date: parse_date(event),
+        date: (parse_date(event) rescue return),
         title: parse_title(event),
         details: ""
       }.

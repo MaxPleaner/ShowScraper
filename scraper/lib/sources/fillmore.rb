@@ -25,7 +25,7 @@ class Fillmore
     private
 
     def get_events
-      $driver.css(".chakra-linkbox").reject do |box|
+      $driver.css("li[role='group']").reject do |box|
         box.text.empty?
       end
     end
@@ -45,7 +45,7 @@ class Fillmore
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        date: DateTime.parse(event.css("time")[0].attribute("datetime")) - 1.day,
+        date: ((DateTime.parse(event.css("time")[0].attribute("datetime"))) rescue return),
         url: event.css("a")[0].attribute("href"),
         img: parse_img(event),
         title: event.css("header h3")[0].text,

@@ -7,7 +7,7 @@ class Selenium::WebDriver::Element
 		# (e.g. if the element is not visible)
 		# This patch fixes that.
 		def text
-			$driver.execute_script("return arguments[0].textContent;", self)
+			$driver.execute_script("return arguments[0].textContent;", self)&.strip.tr("\t\n", "")
 		end
 end
 

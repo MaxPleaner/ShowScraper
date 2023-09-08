@@ -1,5 +1,8 @@
 class NewParish
 
+  # annoying 506 "switching protocols" error, cant deal with it
+  DISABLED = true
+
   # This one is scraped with Nokigiri, because it doesn't seem to like headless
   # scrapers.
 
