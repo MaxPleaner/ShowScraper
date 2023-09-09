@@ -28,6 +28,7 @@ class BottomOfTheHill
       link = parse_details_link(event)
       title = event.css(".band").map(&:text).join(", ")
       return if title.blank?
+      # binding.pry
       {
         date: parse_date(event.css(".date").map(&:text).reject(&:blank?).first),
         img: parse_img(event) || "",
