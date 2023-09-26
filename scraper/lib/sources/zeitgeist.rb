@@ -22,7 +22,7 @@ class Zeitgeist
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        img: event.css("img")[0].attribute("src"),
+        img: event.css("img")&.first&.attribute("src"),
         title: event.css("[data-hook='title']")[0].text,
         date: parse_date(event.css("[data-hook='date']")[0].text),
         url: event.css("[data-hook='ev-rsvp-button']")[0].attribute("href"),
