@@ -29,9 +29,10 @@ class StorkClub
       puts "DATE: #{event.css(".dtstart")[0].text}"
       {
         date: DateTime.parse(event.css(".dtstart")[0].text.split(" ")[1].gsub(".", "/")),
-        img: event.css(".detail_seetickets_image img")[0].attribute("src"),
+        img: event.css(".detail_seetickets_image img")&.first&.attribute("src"),
         title: event.css(".event-title")[0].text,
-        url: event.css(".detail_seetickets_image a")[0].attribute("href"),
+        # url: event.css(".detail_seetickets_image a")[0].attribute("href"),
+        url: event.css("#event_tickets")[0].attribute("href"),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
