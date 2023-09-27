@@ -448,5 +448,15 @@
       "latlng": "",
       "desc": "Stuff I add manually",
       "img": "https://cdna.artstation.com/p/assets/images/images/045/033/028/large/max-pleaner-lotus.jpg?1641769519"
+    },
+    {
+      "name": "BandcampOakland",
+      "commonName": "Bandcamp Oakland",
+      "website": "https://linktr.ee/bandcampoakland",
+      "region": "East Bay",
+      "mapLink": "",
+      "latlng": "37.81318002254458, -122.25785099074434",
+      "desc": "Bandcamp Headquarters in Oakland",
+      "img": "https://oaklandnorth.net/wp-content/uploads/2019/02/Bandcamp-e1549611176222-1024x768.jpg"
     }
 ]
