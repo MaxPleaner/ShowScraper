@@ -427,23 +427,35 @@ a .box:hover {
 /* EVENT LIST ITEM -- TEXT ONLY */
 .textViewEntry {
     outline: 1px solid black;
-    background-color: #ebebeb;  
+    /* background-color: #ebebeb;   */
     border-radius: 10px;
     overflow: hidden;
     /* width: 30%; */
     margin: 0 auto;
-    margin-bottom: 1rem;
+    padding-left: 3px;
+    padding-bottom: 10px;
+    margin-bottom: 0.3rem;
+    /* outline: 1px solid white; */
+    border-bottom: 1px solid white;
+}
 
+.region-title {
+    color: red;
+    font-size: 2em;
+    margin-left: 10px;
 }
 
 .textViewEntry:hover {
+    outline: 1px solid white;
     box-shadow: 10px 5px 5px grey;
 }
 
 .textViewEntry .textViewVenue {
     font-weight: bold;
     font-size: 1.2em;
-    background-color: #27496D;
+    /* color: black; */
+    color: white;
+    /* background-color: #27496D; */
     text-align: center;
     padding: 4px;
     padding-top: 8px;
@@ -451,13 +463,16 @@ a .box:hover {
 
 .textViewEntry .textViewTitle {
     padding: 10px;
-    display: block;
+    /* display: block; */
 }
 
 .textViewEntry .textViewLink, .textViewEntry .textViewLink:visited {
-    color: #27496D;
+    /* color: #27496D; */
+    color: lightblue;
     font-size: 1.2em;
-    font-family: Impact;
+    width: 100%;
+    display: block;
+    /* font-family: Impact; */
     letter-spacing: 1px;
 }
 

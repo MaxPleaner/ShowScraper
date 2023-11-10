@@ -6,17 +6,17 @@ export default class EventListItem extends React.Component {
     super(props)
     this.state = {
       display: 'none',
-      // canFollowLink: false
     }
 
       this.mouseEnter = this.mouseEnter.bind(this);
       this.mouseLeave = this.mouseLeave.bind(this);
-      this.touchStart = this.touchStart.bind(this)
       this.click = this.click.bind(this)
     }
 
-    // Some complexity in all this due to mouseover handling
-    // on mobile vs web.
+    /////////////////////////////////////////////////////////// 
+    // Some complexity in all this due to mouseover handling //
+    // on mobile vs web.                                     //
+    ///////////////////////////////////////////////////////////
 
     // Affects web only
     mouseEnter() {
@@ -28,26 +28,11 @@ export default class EventListItem extends React.Component {
       this.setState({display: 'none'})
     }
 
-    // Affects mobile only
-    touchStart(path) {
-    //   // debugger
-    //   if (this.state.display == 'block') {
-    //     console.log("can follow link")
-    //     window.open(path, "_blank")
-    //   } else {
-    //     console.log("cannot follow link")
-    //     this.setState({display: 'block'})
-    //     // this.setState({canFollowLink: true})
-    //   }
-    }
-
     // Affects web only
     click(path, e) {
-      // debugger
       if (this.state.display == 'block') {
         window.open(path, "_blank")
       }
-      // console.log("processed click")
     }
 
   render() {
@@ -66,12 +51,13 @@ export default class EventListItem extends React.Component {
     if (this.props.textOnly) {
       return (
         <div className='textViewEntry'>
-            <h1 className='textViewVenue'>{this.props.event.source.commonName}</h1>
-            <div>
+            {/* <h1 className='textViewVenue'>{this.props.event.source.commonName}</h1> */}
+            {/* <div> */}
               <a className='textViewLink' href={this.props.event.url}>
+                <b className='textViewVenue'>{this.props.event.source.commonName}</b>
                 <span className='textViewTitle'> {title}</span>
               </a>
-            </div>
+            {/* </div> */}
         </div>
       )
     } else {
