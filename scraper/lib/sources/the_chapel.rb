@@ -26,6 +26,7 @@ class TheChapel
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      date = parse_date(event) rescue return
       {
         date: parse_date(event),
         img: event.css(".seetickets-calendar-event-picture img")[0].attribute("src"),

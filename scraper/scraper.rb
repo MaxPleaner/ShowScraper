@@ -12,7 +12,9 @@ unless ENV["NO_DB"] == "true"
   require "#{__dir__}/../db/db.rb"
 end
 
-unless ENV["NO_GCS"] == "true"
+if ENV["NO_GCS"] == "true"
+  GCS = nil
+else
   require "#{__dir__}/lib/gcs.rb"
 end
 
@@ -94,7 +96,7 @@ class Scraper
     end
 
     def persist_sources_list
-      GCS.upload_file(source: SOURCE_LIST_JSON, dest: "sources.json")
+      GCS&.upload_file(source: SOURCE_LIST_JSON, dest: "sources.json")
     end
 
     def persist_event_list(source, event_list)
@@ -103,7 +105,7 @@ class Scraper
       json = event_list.uniq.to_json
 
       # upload to GCS
-      GCS.upload_text_as_file(text: json, dest: "#{source}.json")
+      GCS&.upload_text_as_file(text: json, dest: "#{source}.json")
 
       # Also write the file locally
       File.open("debug/#{source}.json", "w") { |f| f.write json }
