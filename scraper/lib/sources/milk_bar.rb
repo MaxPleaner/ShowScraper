@@ -9,7 +9,7 @@ class MilkBar
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    5.times { get_next_page }
+    # 5.times { get_next_page }
     get_events.each do |event|
       next if events.count >= events_limit
       result = parse_event_data(event, &foreach_event_blk)
@@ -28,18 +28,19 @@ class MilkBar
     def get_next_page
       btns = $driver.css(".organizer-profile__show-more button")
       return false unless btns.length > 1
-      btns[0].click
+      btns[0]&.click if btns[0].displayed?
       sleep 1
       true
     end
 
     def parse_event_data(event, &foreach_event_blk)
       title = event.css(".eds-event-card__formatted-name--is-clamped")[0].text
+      date = parse_date(event) rescue return
       return if title.blank?
       {
         url: event.css(".eds-event-card-content__action-link")[0].attribute("href"),
         img: event.css(".eds-event-card-content__image")[0]&.attribute("data-src") || "",
-        date: parse_date(event),
+        date: date,
         title: title,
         details: ""
       }.

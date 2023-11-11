@@ -28,7 +28,7 @@ class TheChapel
     def parse_event_data(event, &foreach_event_blk)
       date = parse_date(event) rescue return
       {
-        date: parse_date(event),
+        date: date,
         img: event.css(".seetickets-calendar-event-picture img")[0].attribute("src"),
         title: event.css(".title")[0].text,
         url: event.css(".seetickets-calendar-event-picture")[0].attribute("href"),
