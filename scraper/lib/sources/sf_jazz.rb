@@ -31,10 +31,11 @@ class SfJazz
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      date = parse_date(event) rescue return
       {
         url: event.css("a.event-image")[0].attribute("href"),
         img: event.css(".event-image img")[0].attribute("src"),
-        date: parse_date(event),
+        date: date,
         title: event.css(".event-info-title")[0].text.gsub("\n", " "),
         details: ""
       }.
