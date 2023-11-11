@@ -9,31 +9,37 @@ export default class DataLoader {
   }
 
   static async loadEventData(venues) {
-    const results = []
-    for (let venue of venues) {
-      const url = `https://storage.googleapis.com/show-scraper-data/${venue.name}.json`
-      const events = await $.ajax({
+    const fetchEventsPromises = venues.map(venue => {
+      const url = `https://storage.googleapis.com/show-scraper-data/${venue.name}.json`;
+      return $.ajax({
         cache: false,
         url: url,
         dataType: "json",
-      });
-      let modifiedVenue = null;
-      events.forEach((event) => {
-        // This is a special case where the provided venue name "The List" is not really accurate.
-        // So we do some manipulation here.
-        if (venue.name == "TheList" || venue.name == "ManuallyAdded") {
+      }).then(events => ({ venue, events })); // Pair each venue with its events
+    });
+  
+    const results = [];
+  
+    const pairedData = await Promise.all(fetchEventsPromises);
+  
+    pairedData.forEach(({ venue, events }) => {
+      events.forEach(event => {
+        let modifiedVenue = null;
+        if (venue.name === "TheList" || venue.name === "ManuallyAdded") {
           const data = JSON.parse(event.title);
-          const commonName = venue.commonName
-          modifiedVenue = { ...venue, commonName: `${data.venue} (via ${commonName})` }
-          event.title = data.artists
+          const commonName = venue.commonName;
+          modifiedVenue = { ...venue, commonName: `${data.venue} (via ${commonName})` };
+          event.title = data.artists;
         }
+  
         let newEvent = {
           ...event,
           source: modifiedVenue || venue
-        }
-        results.push(newEvent)
-      })
-    }
+        };
+        results.push(newEvent);
+      });
+    });
+
     return _.groupBy(results, (event) => {
       let date = moment(event.date, 'YYYY-MM-DD')
 
