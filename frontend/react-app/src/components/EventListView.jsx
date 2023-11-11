@@ -85,7 +85,7 @@ export default class ListView extends React.Component {
                 })
                 return (
                   <div className="Region" key={region}>
-                    <p className="region-title">{region}</p>
+                    { this.props.textOnly ? <p className="region-title">{region}</p> : ""}
                     { regionEvents }
                   </div>
                 )
