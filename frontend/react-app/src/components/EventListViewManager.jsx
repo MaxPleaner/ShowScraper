@@ -26,30 +26,46 @@ export default class EventListViewManager extends React.Component {
     this.state = {
       mode: DEFAULT_MODE,
       allEvents: allEvents,
-      events: this.computeEventsList(allEvents, currentDay, DEFAULT_MODE),
-      currentDay: currentDay
+      events: this.computeEventsList(allEvents, currentDay, DEFAULT_MODE, ""),
+      currentDay: currentDay,
+      search: ""
     };
   }
 
   componentDidUpdate(oldProps) {
     if (this.props.events != oldProps.events) {
-      this.setState({...this.state, allEvents: this.props.events, events: this.computeEventsList(this.props.events, this.state.currentDay, this.state.mode)})
+      this.setState({...this.state, allEvents: this.props.events, events: this.computeEventsList(this.props.events, this.state.currentDay, this.state.mode, this.state.search)})
     }
   }
 
-  computeEventsList (allEvents, currentDay, mode) {
+  computeEventsList (allEvents, currentDay, mode, search) {
+    let results;
     if (mode == 'day') {
-      return _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT));
+      results = _.pick(allEvents, currentDay.format(FILE_DATE_FORMAT));
     } else if (mode == 'week') {
       const days = [...Array(7).keys()].map((i) => {
         return currentDay.clone().add(i, 'days').format(FILE_DATE_FORMAT);
       });
-      return _.pick(allEvents, days);
+      results = _.pick(allEvents, days);
     }
+    if (search && search != "") {
+      Object.entries(results).forEach(([date, events]) => {
+        results[date] = events.filter((event) => {
+          return event.source.commonName.toLowerCase().includes(search.toLowerCase())
+        })
+      })
+      // delete the keys of results which have empty values
+      Object.entries(results).forEach(([date, events]) => {
+        if (events.length == 0) {
+          delete results[date]
+        }
+      })
+    }
+    return results
   }
 
   changeMode (newMode) {
-    this.setState({...this.state, mode: newMode, events: this.computeEventsList(this.state.allEvents, this.state.currentDay, newMode)})
+    this.setState({...this.state, mode: newMode, events: this.computeEventsList(this.state.allEvents, this.state.currentDay, newMode, this.state.search)})
   }
 
   currentDateEntry() {
@@ -91,7 +107,7 @@ export default class EventListViewManager extends React.Component {
     } else if (this.state.mode == 'week') {
       newDay = this.state.currentDay.clone().add(7, 'days');
     }
-    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode)})
+    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode, this.state.search)})
   }
 
   goToPrevDate() {
@@ -101,14 +117,21 @@ export default class EventListViewManager extends React.Component {
     } else if (this.state.mode == 'week') {
       newDay = this.state.currentDay.clone().add(-7, 'days');
     }
-    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode)})
+    this.setState({...this.state, currentDay: newDay, events: this.computeEventsList(this.state.allEvents, newDay, this.state.mode, this.state.search)})
+  }
+
+  searchInput = (event) => {
+    const search = event.currentTarget.value
+    this.setState({...this.state, search: search, events: this.computeEventsList(this.state.allEvents, this.state.currentDay, this.state.mode, search)})
   }
 
   render() {
      return (
       <div className='ListViewManager'> 
-                <h2>Dates:</h2>
-                <br />
+               <div className="search">
+                <input type="text" placeholder="Search Venues" onChange={this.searchInput}/>
+               </div>
+               <br />
                <div className = 'eventDates'>
 
                   <a onClick={this.goToPrevDate.bind(this)}>

@@ -423,6 +423,25 @@ a .box:hover {
     background-color: lightblue;
 }
 
+.white {
+    color: white !important;
+}
+
+.search {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    width: 100%;
+}
+
+.search input[type='text'] {
+    height: 30px;
+    font-size: 1.1em;
+}
 
 /* EVENT LIST ITEM -- TEXT ONLY */
 .textViewEntry {
