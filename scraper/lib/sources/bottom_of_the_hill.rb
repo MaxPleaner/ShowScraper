@@ -27,10 +27,11 @@ class BottomOfTheHill
     def parse_event_data(event, &foreach_event_blk)
       link = parse_details_link(event)
       title = event.css(".band").map(&:text).join(", ")
+      date = parse_date(event.css(".date").map(&:text).reject(&:blank?).first) rescue return
       return if title.blank?
       # binding.pry
       {
-        date: parse_date(event.css(".date").map(&:text).reject(&:blank?).first),
+        date: date,
         img: parse_img(event) || "",
         title: title,
         url: link,

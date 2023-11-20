@@ -21,11 +21,12 @@ class GreyArea
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      date = DateTime.parse(event.css(".date")[0].text) rescue return
       {
         img: parse_img(event),
         title: event.css(".item-title")[0].text,
         url: event.attribute("href"),
-        date: DateTime.parse(event.css(".date")[0].text),
+        date: date,
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
