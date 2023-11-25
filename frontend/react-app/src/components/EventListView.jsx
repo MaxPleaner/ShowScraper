@@ -3,6 +3,7 @@ import { Columns, Box } from 'react-bulma-components';
 const { Column } = Columns;
 import EventListItem from './EventListItem'
 import moment from 'moment';
+import _ from 'underscore'
 
 const REGIONS = {
   EAST_BAY: 'East Bay',
@@ -31,7 +32,7 @@ const REGION_SORTING = [
 
 export default class ListView extends React.Component {
   groupByRegion(events) {
-    return Object.groupBy(events, (event) => {
+    return _.groupBy(events, (event) => {
       let region = event.source.region
       if (region == REGIONS.OTHER) {
         // Events from The List are not tagged with a region, so we try and deduce the region
