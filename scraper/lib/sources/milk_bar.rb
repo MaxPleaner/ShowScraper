@@ -15,7 +15,7 @@ class MilkBar
       result = parse_event_data(event, &foreach_event_blk)
       events.push(result) if result.present?
     end
-    events
+    events.uniq { |e| [e[:date], e[:title]] }
   end
 
   class << self
