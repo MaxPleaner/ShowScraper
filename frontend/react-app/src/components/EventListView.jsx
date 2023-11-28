@@ -38,12 +38,12 @@ export default class ListView extends React.Component {
         // Events from The List are not tagged with a region, so we try and deduce the region
         // based on the event name (which often includes a city).
         const regionFallbacks = [
-          [REGIONS.EAST_BAY, ['oakland', 'port costa', 'richmond', 'berkeley', 'alameda', 'vallejo', 'emeryville', 'oakley', 'walnut creek', 'antioch', 'concord', 'lafayette']],
+          [REGIONS.EAST_BAY, ['crockett', 'oakland', 'port costa', 'richmond', 'berkeley', 'alameda', 'vallejo', 'emeryville', 'oakley', 'walnut creek', 'antioch', 'concord', 'lafayette']],
           [REGIONS.PACIFICA, ['pacifica']],
           [REGIONS.SANTA_CRUZ, ['santa cruz', 'santa curz', 'monterey', 'big sur', 'felton']],
           [REGIONS.SAN_FRANCISCO, ['san francisco', 'sf', 's.f.', 'thrillhouse']],
           [REGIONS.SACRAMENTO, ['sacramento', 'brooks']],
-          [REGIONS.SOUTH_BAY, ['menlo park', 'redwood city', 'saratoga', 'memlo park', 'palo alto', 'san jose']],
+          [REGIONS.SOUTH_BAY, ['fremont', 'freemont', 'menlo park', 'redwood city', 'saratoga', 'memlo park', 'palo alto', 'san jose']],
           [REGIONS.NORTH_BAY, ['novato', 'sebastopol', 'mill valley', 'piedmont', 'santa rosa', 'fairfax', 'marin', 'petaluma', 'sonoma', 'napa', 'healdsburg']],
         ]
         regionFallbacks.forEach(([fallbackRegion, regionStrings]) => {
