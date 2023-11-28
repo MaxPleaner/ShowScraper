@@ -26,7 +26,6 @@ class StorkClub
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      puts "DATE: #{event.css(".dtstart")[0].text}"
       {
         date: DateTime.parse(event.css(".dtstart")[0].text.split(" ")[1].gsub(".", "/")),
         img: event.css(".detail_seetickets_image img")&.first&.attribute("src"),

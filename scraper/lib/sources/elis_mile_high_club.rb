@@ -1,11 +1,9 @@
 class ElisMileHighClub
 
-  # The calendar is shown at elismilehigh.com, but its through an iframe,
-  # so we can rather just access the Google calendar directly
-  MAIN_URL = "https://calendar.google.com/calendar/embed?src=5b4fnnnhfa7v3svqg76kj3914g%40group.calendar.google.com&ctz=America/Los_Angeles"
+  MAIN_URL = "https://www.elismilehighclub.com/"
 
   cattr_accessor :months_limit, :events_limit, :load_time
-  self.months_limit = 3
+  # self.months_limit = 3
   self.events_limit = 200
   self.load_time = 2
 
@@ -13,50 +11,39 @@ class ElisMileHighClub
     events = []
     $driver.get(MAIN_URL)
     sleep load_time
-    months_limit.times do |i|
-      new_events = get_events
-      new_events.each do |event|
-        next if events.count >= events_limit
-        events.push(parse_event_data(event, &foreach_event_blk))
-      end
-      break if events.count >= events_limit
-      get_next_page unless i == months_limit - 1
+    new_events = get_events
+    new_events.each do |event|
+      next if events.count >= events_limit
+      events.push(parse_event_data(event, &foreach_event_blk))
     end
-    events
+    events.compact
   end
 
   class << self
     private
 
     def get_events
-      $driver.css(".rb-ni")
-    end
-
-    def get_next_page
-      $driver.css("#navForward1")[0].click
-      sleep load_time
+      $driver.css("[data-hook='events-card']")
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      event.click # shows a popup with event details
-
+      date = parse_date(event) rescue return
       {
-        date: parse_date($driver.css(".event-when")[0].text),
-        title: $driver.css(".details .title")[0].text,
-        url: $driver.css(".links a")[0].attribute("href"),
-        img: "",
-        details: $driver.css(".event-description")[0]&.text || ""
-      }.tap do
-        $driver.css(".bubble-closebutton")[1].click
-      end.
+        date: date,
+        title: event.css("[data-hook='title']")[0].text,
+        url: event.css("[data-hook='ev-rsvp-button']")[0].attribute("href"),
+        img: event.css("[data-hook='image'] img")[1].attribute("src"),
+        details: ""
+      }.
+        tap { |data| }.
         tap { |data| Utils.print_event_preview(self, data) }.
         tap { |data| foreach_event_blk&.call(data) }
     rescue => e
       ENV["DEBUGGER"] == "true" ? binding.pry : raise
     end
 
-    def parse_date(date_string)
-      DateTime.parse(date_string)
+    def parse_date(event)
+      DateTime.parse event.css("[data-hook='short-date']")[0].text
     end
   end
 end
