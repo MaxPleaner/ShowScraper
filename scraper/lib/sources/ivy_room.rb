@@ -28,7 +28,7 @@ class IvyRoom
       {
         url: event.attribute("href"),
         img: parse_img(event),
-        date: DateTime.parse(event.css(".vp-event-row-datetime")[0].text),
+        date: DateTime.parse(event.css(".vp-month-n-day")[0].text),
         title: [".vp-event-name", ".vp-support"].map { |c| event.css(c)[0].text }.compact.join(", "),
         details: ""
       }.
