@@ -21,16 +21,15 @@ class IvyRoom
 
     def get_events
       sleep load_time
-      $driver.css(".event-card")
+      $driver.css(".vp-event-link")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       {
-        # links are done here through modals, not standalone links
-        url: $driver.current_url,
+        url: event.attribute("href"),
         img: parse_img(event),
-        date: DateTime.parse(event.css(".time-info")[0].text),
-        title: [".event-name", ".support"].map { |c| event.css(c)[0].text }.compact.join(", "),
+        date: DateTime.parse(event.css(".vp-event-row-datetime")[0].text),
+        title: [".vp-event-name", ".vp-support"].map { |c| event.css(c)[0].text }.compact.join(", "),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
@@ -40,7 +39,7 @@ class IvyRoom
     end
 
     def parse_img(event)
-      style = event.css(".main-img")[0].attribute("style")
+      style = event.css(".vp-main-img")[0].attribute("style")
       style.split("background-image: url(\"")[1].split("\");")[0]
     end
 

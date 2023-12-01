@@ -32,7 +32,7 @@ class ElisMileHighClub
         date: date,
         title: event.css("[data-hook='title']")[0].text,
         url: event.css("[data-hook='ev-rsvp-button']")[0].attribute("href"),
-        img: event.css("[data-hook='image'] img")[1].attribute("src"),
+        img: event.css("[data-hook='image'] img")[1]&.attribute("src") || "",
         details: ""
       }.
         tap { |data| }.
