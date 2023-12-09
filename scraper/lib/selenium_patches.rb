@@ -3,12 +3,14 @@ class Selenium::WebDriver::Element
 		find_elements(:css, selector)
 	end
 
-		# Hidden text is not returned by `.text` by default.
-		# (e.g. if the element is not visible)
-		# This patch fixes that.
-		def text
-			$driver.execute_script("return arguments[0].textContent;", self)&.strip.tr("\t\n", " ")
-		end
+	# Hidden text is not returned by `.text` by default.
+	# (e.g. if the element is not visible)
+	# This patch fixes that.
+	def text(strip: false)
+		txt = $driver.execute_script("return arguments[0].textContent;", self)
+		return txt unless strip
+		txt&.strip.tr("\t\n", " ")
+	end
 end
 
 class SeleniumPatches
