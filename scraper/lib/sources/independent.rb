@@ -41,12 +41,16 @@ class Independent
     def parse_title(event)
       name1 = event.css(".tw-name")[0].text
       name2 = event.css(".tw-artist")[0]&.text
-      [name1, name2].compact.join(", ")
+      [name1, name2].compact.map do |str|
+        str.tr("\n", " ").strip
+      end.join(", ")
     end
 
     def parse_date(event)
       # TODO: no year
-      month, day = event.css(".tw-event-date")[0].text.split(".")
+      month, day = event.css(".tw-event-date")[0].text.split(".").map do |str|
+        str.tr("\n ", "")
+      end
       DateTime.parse("#{month}/#{day}")
     end
   end
