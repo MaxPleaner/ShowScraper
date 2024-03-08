@@ -10,14 +10,14 @@ class Amados
     $driver.execute_script("window.scrollBy(0, 500)")
     sleep 3
 
-    5.times.flat_map do
+    # 5.times.flat_map do
       events = get_events.each.with_index.map do |event, index|
         next if index >= events_limit
         parse_event_data(event, &foreach_event_blk)
       end.compact
-      get_next_page
-      events
-    end
+      # get_next_page
+      # events
+    # end
   end
 
   class << self
@@ -29,7 +29,7 @@ class Amados
 
     def get_next_page
       btns = $driver.css("[role='button']")
-      btn = btns.find { |btn| btn.text == "More Events" }
+      btn = btns.find { |btn| btn.text.include?("More") }
       btn.click
     end
 
