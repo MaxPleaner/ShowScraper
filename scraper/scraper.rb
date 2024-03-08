@@ -120,7 +120,13 @@ class Scraper
           "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
         )
       end
-      driver = Selenium::WebDriver.for :chrome, options: options
+      if File.exist?("/proc/device-tree/model") && `cat /proc/device-tree/model`.include?("Raspberry Pi")
+        driver_path = "/usr/lib/chromium-browser/chromedriver"
+        service = Selenium::WebDriver::Chrome::Service.new(path: driver_path)
+        driver = Selenium::WebDriver.for :chrome, options: options, service: service
+      else
+        driver = Selenium::WebDriver.for :chrome, options: options, service: service
+      end
       SeleniumPatches.patch_driver(driver)
       driver
     end

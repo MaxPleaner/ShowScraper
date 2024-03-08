@@ -20,6 +20,10 @@ and styled with [Bulma CSS framework](https://bulma.io/).
 
 ## Setup - Scraper
 
+_prereq_
+
+If you are on raspberry pi, do `sudo apt-get install chromium-chromedriver` first.
+
 1. Run `bundle install` in the root of the repo. I'm using Ruby 2.6 at time of writing.
 
 1. You're gonna need to add Chromedriver to your `PATH`.
