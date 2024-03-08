@@ -27,12 +27,19 @@ class Warfield
     end
 
     def get_next_page
-      ["#onetrust-group-container", "#onetrust-policy-text"].each do |shit|
+      sleep 2
+      [
+	"#onetrust-group-container",
+	"#onetrust-policy-text",
+	"#onetrust-group-text",
+	"#onetrust-policy-container",
+      ].each do |shit|
         $driver.execute_script <<-JS
           var blockingShit = document.querySelector('#{shit}');
           if (blockingShit) { blockingShit.remove() };
         JS
       end
+#      binding.pry
       $driver.css("#loadMoreEvents")[0].click
     end
 
