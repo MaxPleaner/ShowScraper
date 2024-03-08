@@ -1,4 +1,5 @@
 require 'nokogiri'
+require 'open-uri'
 
 class GreatAmericanMusicHall
   # Awesome calendar which shows multiple months at once!
@@ -60,4 +61,3 @@ class GreatAmericanMusicHall
     end
   end
 end
-
