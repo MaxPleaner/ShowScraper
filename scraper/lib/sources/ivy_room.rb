@@ -9,7 +9,6 @@ class IvyRoom
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
     $driver.get(MAIN_URL)
-    listing = get_events
     sleep 10
     get_events.each do |event|
       next if events.count >= events_limit
