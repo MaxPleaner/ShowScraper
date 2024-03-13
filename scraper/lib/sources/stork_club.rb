@@ -1,6 +1,6 @@
 class StorkClub
   # Awesome calendar which shows multiple months at once!
-  MAIN_URL = "https://theestorkclub.com/calendar/"
+  MAIN_URL = "https://theestorkclub.com"
 
   cattr_accessor :events_limit, :load_time
   self.events_limit = 200
@@ -22,16 +22,17 @@ class StorkClub
       max_width, max_height = $driver.execute_script("return [window.screen.availWidth, window.screen.availHeight];")
       $driver.manage.window.resize_to(2000, max_height)
 
-      $driver.css(".calendar-day-event")
+      $driver.css(".seetickets-list-event-container")
     end
 
     def parse_event_data(event, &foreach_event_blk)
+      binding.pry
       {
-        date: DateTime.parse(event.css(".dtstart")[0].text.split(" ")[1].gsub(".", "/")),
-        img: event.css(".detail_seetickets_image img")&.first&.attribute("src"),
-        title: event.css(".event-title")[0].text,
+        date: DateTime.parse(event.css(".date")[0].text),
+        img: event.css(".seetickets-list-view-event-image")&.first&.attribute("src"),
+        title: event.css(".title")[0].text,
         # url: event.css(".detail_seetickets_image a")[0].attribute("href"),
-        url: event.css("#event_tickets")[0].attribute("href"),
+        url: event.css(".title a")[0].attribute("href"),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
