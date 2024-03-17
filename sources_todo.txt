@@ -1,12 +1,5 @@
-SLOW SCRAPERS
-- DNA
-- GOLDEN BULL
-- KNOCKOUT
-- IVY ROOM
-- WINTERS
-
 OTHER ISSUES
-- paramount error
+- paramount error (it only works when you run it alone, without also running the other scrapers)
 
 /*
 TODO Venues:
@@ -21,7 +14,6 @@ CANNOT SCRAPE (NO PUBLIC CALENDAR)
 - Bender's
 - Stay Gold Deli
 - First Church of the Buzzard
-- Thee Stork Club (not open yet)
 - Red Hat (Concord)
 - The Bistro (Hayward)
 - Ashkenaz (Closed)
