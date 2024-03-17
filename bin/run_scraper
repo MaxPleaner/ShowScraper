@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/rubies/ruby-3.3.0/bin/ruby
 
 require 'date'
 current_time = DateTime.now
