@@ -20,24 +20,18 @@ and styled with [Bulma CSS framework](https://bulma.io/).
 
 ## Setup - Scraper
 
-_prereq_
+1. Run `bundle install` in the root of the repo using a stable Ruby version
 
-If you are on raspberry pi, do `sudo apt-get install chromium-chromedriver` first.
+1. You're gonna need to install Chromedriver.
+     - **On Raspberry Pi**:  you can do this with `sudo apt-get install chromium-chromedriver` and this will happen automatically (the scraper will check your system architecture and use the right 
+       chromedriver path)
+     - **on OSX and Windows** you can find all versions at [https://chromedriver.chromium.org/](https://chromedriver.chromium.org/) and then add it to your PATH.
+       For example, add this to your `~/.bash_profile`:
+         ```
+         export PATH=$PATH:/path/to/folder/containing/chromedriver/
+         ```
 
-1. Run `bundle install` in the root of the repo. I'm using Ruby 2.6 at time of writing.
-
-1. You're gonna need to add Chromedriver to your `PATH`.
-   OSX and Windows versions of v100 are included in this repo
-   (that's the latest version that works with Selenium at time of writing)
-   but you can find all versions [here](https://chromedriver.chromium.org/).
-
-   For example, add this to your `~/.bash_profile`:
-
-   ```
-   export PATH=$PATH:<REPO LOCATION>/scraper/Chromedriver/v100/OSX/
-   ```
-
-1. Run `cp .env.example .env` in the root of the repo.
+1. Run `cp .env.example .env` in the root of the repo. The `.env` file sets environment variables which can be used to customize the application's behavior. This file can be edited directly.
 
 1. Make a new "project" on google cloud. Create a GCS bucket in the project. Add the credentials to `.env`:
   
@@ -56,7 +50,7 @@ If you are on raspberry pi, do `sudo apt-get install chromium-chromedriver` firs
 
 ## Setup - Frontend
 
-1. Make sure you're using Node 14 or newer
+1. Make sure you're using a stable Node version
 2. `cd frontend/react-app`
 3. run `yarn install` to get dependencies
 4. `yarn start` and then open `localhost:3000`
@@ -71,6 +65,7 @@ bin/run_frontend
 
 This runs `nvm use 14; cd frontend/react_app && yarn install & yarn start`
 
+Note you will probably have to change this `nvm use 14` if you are using a different Node version.
 
 ## Running Scraper
 
@@ -78,7 +73,7 @@ There is a command line tool at `bin/run_scraper`.
 By default it will run all scrapers (each will fetch a maximum of 200 events) 
 and then upload the results to GCS.
 
-**Options**
+**Options** (note that most of these can also be set from `.env`)
 
 ```
 # Limits each scraper to N results
@@ -96,12 +91,16 @@ and then upload the results to GCS.
 
 # Limit the scrape to a set of venues. Comma-separated list.
 --sources=GreyArea,Cornerstone
+
+# Run headlessly, or not
+--headless=true
+--headless=false
 ```
 
-For example, using all options at once:
+For example, combining options:
 
 ```
-bin/run-scraper --limit=5 --skip-persist --rescue=false --no-scrape sources=ElboRoom,Knockout
+bin/run-scraper --headless=true --limit=5 --skip-persist --rescue=false sources=ElboRoom,Knockout
 ```
 
 There are some other configuration options done through ENV, see `.env.example`
@@ -144,7 +143,8 @@ For now it suffices to go backend-less and just host the results on GCS.
 ## Development - TODOS
 
 - [ ] Map View
-- [ ] Add event descriptions to List View
+- [ ] Add more meta-scrapers (e.g. scrape other scrapers/aggregators), especially for electronic shows which aren't really captured by the current venue list or "The List"
+- [ ] Add more venues (have specifically received requests for South Bay, but probably there are new SF / East Bay venues as well). 
 - [ ] Add Venue Events List view (accessible from Venue List View)
 - [x] Find a way to handle events that don't have an explicit year in their date
 - [x] Add Submit Event / About pages
