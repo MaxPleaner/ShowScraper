@@ -37,7 +37,7 @@ class UCBerkeleyTheater
     end
 
     def parse_date(event)
-      DateTime.parse(event.css(".ue-date")[0].text.split("\n").first(2).join(" "))
+      DateTime.parse(event.css(".ue-date")[0].text.strip.split("\n").first(2).join(" "))
     end
   end
 end
