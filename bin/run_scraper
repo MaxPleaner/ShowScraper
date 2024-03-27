@@ -67,7 +67,7 @@ unless ENV["LOG_PATH"].blank?
     warnings.each do |source|
       f.puts "#{Time.now.strftime("%m/%d/%Y")}: WARNING: #{source} produced no events"
     end
-    error.each do |source|
+    errors.each do |source|
       f.puts "#{Time.now.strftime("%m/%d/%Y")}: ERROR: #{source} failed to scrape"
     end
   end
