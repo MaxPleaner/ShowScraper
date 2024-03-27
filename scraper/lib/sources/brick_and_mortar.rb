@@ -25,7 +25,7 @@ class BrickAndMortar
       {
         date: parse_date(event),
         img: event.css(".tw-image img")[0].attribute("src"),
-        title: event.css(".tw-name")[0].text,
+        title: event.css(".tw-name")[0].text.strip,
         url: event.css(".tw-image a")[0].attribute("href"),
         details: ""
       }.
