@@ -3,3 +3,5 @@ credentials/*.json
 .DS_Store
 debug/*
 debug/
+log.txt
+log_full.txt

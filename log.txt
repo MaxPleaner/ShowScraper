@@ -13741,3 +13741,5 @@ ERROR: Paramount failed to scrape. Skipped.
 03/26/2024: scraped 0    events from ManuallyAdded
 03/26/2024: scraped 4    events from BandcampOakland
 03/26/2024: ERROR: {:source=>"Paramount", :error=>#<Selenium::WebDriver::Error::ElementNotInteractableError:"element not interactable\n  (Session info: chrome-headless-shell=122.0.6261.89)">} failed to scrape
+03/27/2024: scraped 24   events from UCBerkeleyTheater
+03/27/2024: scraped 48   events from BrickAndMortar
