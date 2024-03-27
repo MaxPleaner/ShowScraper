@@ -38,7 +38,7 @@ class Bimbos
     def parse_title(event)
       name1 = event.css(".tw-name")[0].text
       name2 = event.css(".tw-artist")[0]&.text
-      [name1, name2].compact.join(", ")
+      [name1, name2].compact.map(&:strip).join(", ")
     end
 
     def parse_date(event)
