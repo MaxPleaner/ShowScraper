@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/rubies/ruby-3.3.0/bin/ruby
 
 require 'date'
 current_time = DateTime.now
@@ -40,6 +40,7 @@ puts "done\n"
 
 warnings = []
 
+=begin
 Dir.glob("./debug/*.json").each do |file|
   name = File.basename(file).gsub(".json", "")
   next if opts[:sources] && !opts[:sources].include?(name)
@@ -50,6 +51,7 @@ Dir.glob("./debug/*.json").each do |file|
 
   puts "#{name} - #{num_events}"
 end
+=end
 
 warnings.each do |source|
   puts "WARNING: #{source} produced 0 events!"
@@ -57,6 +59,18 @@ end
 
 errors.each do |error|
   puts "ERROR: #{error[:source]} failed to scrape. Skipped."
+end
+
+# Write the event count to a condensed log file
+unless ENV["LOG_PATH"].blank?
+  File.open(ENV["LOG_PATH"], "a") do |f|
+    warnings.each do |source|
+      f.puts "#{Time.now.strftime("%m/%d/%Y")}: WARNING: #{source} produced no events"
+    end
+    error.each do |source|
+      f.puts "#{Time.now.strftime("%m/%d/%Y")}: ERROR: #{source} failed to scrape"
+    end
+  end
 end
 
 

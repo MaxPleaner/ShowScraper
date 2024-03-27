@@ -26,7 +26,6 @@ class StorkClub
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      binding.pry
       {
         date: DateTime.parse(event.css(".date")[0].text),
         img: event.css(".seetickets-list-view-event-image")&.first&.attribute("src"),

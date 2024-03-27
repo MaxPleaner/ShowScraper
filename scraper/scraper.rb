@@ -107,8 +107,12 @@ class Scraper
       # upload to GCS
       GCS&.upload_text_as_file(text: json, dest: "#{source}.json")
 
-      # Also write the file locally
-      File.open("debug/#{source}.json", "w") { |f| f.write json }
+      # Write the event count to a condensed log file
+      unless ENV["LOG_PATH"].blank?
+        File.open(ENV["LOG_PATH"], "a") do |f|
+          f.puts "#{Time.now.strftime("%m/%d/%Y")}: scraped #{event_list.uniq.count.to_s.ljust(4)} events from #{source}"
+        end
+      end
     end
 
     def init_driver
