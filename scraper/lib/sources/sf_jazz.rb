@@ -36,7 +36,7 @@ class SfJazz
         url: event.css("a.event-image")[0].attribute("href"),
         img: event.css(".event-image img")[0].attribute("src"),
         date: date,
-        title: event.css(".event-info-title")[0].text.strip.gsub("\n", " ").gsub(/\s{2,}/, "").tap do |title|
+        title: event.css(".event-info-title")[0].text.strip.gsub("\n", " ").gsub(/\s{2,}/, " ").tap do |title|
         end,
         details: ""
       }.
