@@ -32,6 +32,10 @@ export default class Nav extends React.Component {
                     <Link to='/About'>
                         <div className={`nav-item ${this.props.route === "About" ? "selected" : ""}`}>About / Contact</div>
                     </Link>
+                    
+                    <Link to='https://utils.dissonant.info/show_scraper_log'>
+                        <div>Scraper Log</div>
+                    </Link>
 
                 </div>
 
