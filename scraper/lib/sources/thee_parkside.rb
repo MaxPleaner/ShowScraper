@@ -7,6 +7,8 @@ class TheeParkside
   self.load_time = 2
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
+    $driver.navigate.to(MAIN_URL)
+    sleep load_time
     get_events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
@@ -17,19 +19,18 @@ class TheeParkside
     private
 
     def get_events
-      $driver.navigate.to(MAIN_URL)
-      sleep load_time
-      $driver.css(".hmt-event-item")
+      $driver.css(".vp-event-link")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       img = get_high_res_image(event)
       return unless img # their "bar closed" events have no image
       {
-        date: parse_date(event.css(".hmt-event-start-span")[0].text),
-        url: MAIN_URL,
-        title: event.css(".hmt-event-title")[0].text,
-        details: event.css(".hmt-event-subtitle")[0]&.text || "",
+        date: parse_date(event.css(".vp-event-row-datetime")[0].text),
+        url: event.attribute("href"),
+        title: event.css(".vp-event-name")[0].text,
+        details: "",
+        # details: event.css(".hmt-event-subtitle")[0]&.text || "",
         img: img,
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
@@ -39,15 +40,20 @@ class TheeParkside
     end
 
     def get_high_res_image(event)
-      event.css(".hmt-flyer")[0].click
-      graphic_container = $driver.css(".graphic-container")[0]
-      return unless graphic_container
+      img = event.css(".vp-main-img")[0]
+      # event.css(".vp-main-img")[0].click
+      # graphic_container = $driver.css(".graphic-container")[0]
+      # return unless graphic_container
 
-      link = graphic_container.
+      # link = graphic_container.
+      #   attribute("style").
+      #   scan(/url\(\"(.+)\"\)/)[0][0]
+
+      link = img.
         attribute("style").
         scan(/url\(\"(.+)\"\)/)[0][0]
 
-      link.tap { $driver.css(".close_btn")[0].click }
+      # link.tap { $driver.css(".close_btn")[0].click }
     end
 
     def parse_date(date_string)
