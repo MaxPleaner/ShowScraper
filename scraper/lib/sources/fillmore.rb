@@ -11,10 +11,6 @@ class Fillmore
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     $driver.navigate.to(MAIN_URL)
-
-    # We just spam the auto loader until everything's there.
-    get_all_pages
-
     get_events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
@@ -25,7 +21,8 @@ class Fillmore
     private
 
     def get_events
-      $driver.css("li[role='group']").reject do |box|
+      sleep 1
+      $driver.css("div[role='group']").reject do |box|
         box.text.empty?
       end
     end
@@ -48,7 +45,7 @@ class Fillmore
         date: ((DateTime.parse(event.css("time")[0].attribute("datetime"))) rescue return),
         url: event.css("a")[0].attribute("href"),
         img: parse_img(event),
-        title: event.css("header h3")[0].text,
+        title: event.css(".chakra-heading")[0].text,
         details: "",
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
