@@ -17,8 +17,18 @@ export default class VenuesList extends React.Component {
   buildVenuesList(venues) {
     return venues.map((venue, idx) => {
       return (
-        <div key={idx} className='venue-container '>
-              <div className='description-container'>
+        <li key={idx} className='venue-container '>
+          <a className="venue-link" href={venue.website}>
+            <div className='venue-name'>
+              <span className='venue-name'>
+                {venue.commonName}
+              </span>
+              <span className='venue-description'>
+                {venue.desc}
+               </span>
+            </div>
+          </a>
+              {/* <div className='description-container'>
               <div className='venue-name'> 
                 <i className='location-icon'></i> 
                 {venue.commonName}
@@ -27,8 +37,8 @@ export default class VenuesList extends React.Component {
               
                 <div className='venue-description'>{venue.desc}</div>
               </div>
-                <a className='venue-link' href={venue.website}> ↗  &nbsp; Website</a>
-        </div>
+                <a className='venue-link' href={venue.website}> ↗  &nbsp; Website</a> */}
+        </li>
       )
     })
   }
@@ -46,19 +56,19 @@ export default class VenuesList extends React.Component {
             <div>
               <div className='venue-region-title'>
                 <span className='venue-region-title-text'>San Francisco</span>  </div>
-              <div className='VenuesList '>
+              <ul className='VenuesList '>
                   {this.buildVenuesList(sfVenues)}
-              </div>
+              </ul>
               <div className='venue-region-title'>
                 <span className='venue-region-title-text'>EastBay</span> </div>
-              <div className='VenuesList '>
+              <ul className='VenuesList '>
                   {this.buildVenuesList(eastBayVenues)}
-              </div>
+              </ul>
               <div className='venue-region-title'>
                 <span className='venue-region-title-text'>Other</span> </div>
-              <div className='VenuesList '>
+              <ul className='VenuesList '>
                   {this.buildVenuesList(otherVenues)}
-              </div>
+              </ul>
             </div>
           )
         }

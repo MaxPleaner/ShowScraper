@@ -9,14 +9,11 @@ export default class Nav extends React.Component {
   
   render() {
     return (
-        <nav className='flex-row' >
-            <h1>Bay Area Shows</h1>
-                
-
-
-            <div className='flex-row' >
-
-                <div>
+        <div class='nav-container'>
+        {/* <nav className='flex-row' > */}
+            <p id='bay-area-shows-text'>Bay Area Shows</p>
+            {/* <div className='flex-row' > */}
+                <div class='nav-items'>
                     <Link to='/TextView'>
                         <div className={`nav-item ${this.props.route === "TextView" ? "selected" : ""}`}>Text View</div>
                     </Link>
@@ -39,9 +36,10 @@ export default class Nav extends React.Component {
 
                 </div>
 
-            </div>
+            {/* </div> */}
  
-      </nav>
+            {/* //   </nav> */}
+        </div>
     )
   }
 }
