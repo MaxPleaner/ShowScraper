@@ -11,6 +11,10 @@ class Selenium::WebDriver::Element
 		return txt unless strip
 		txt&.strip.tr("\t\n", " ")
 	end
+
+	def parent
+		find_element(xpath: "..")
+	end
 end
 
 class SeleniumPatches

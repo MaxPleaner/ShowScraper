@@ -1,6 +1,6 @@
 class Regency
   # No pagination needed here, all events shown at once.
-  MAIN_URL = "https://www.theregencyballroom.com/events/all"
+  MAIN_URL = "https://www.theregencyballroom.com/shows/"
 
   cattr_accessor :events_limit
   self.events_limit = 200
@@ -21,17 +21,18 @@ class Regency
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".entry")
+      sleep 2
+      $driver.css(".c-axs-event-card__wrapper").reject { |node| node['class'].include?('mobile') }
     end
 
     def parse_event_data(event, &foreach_event_blk)
-      date = event.css(".date")[0].text
+      date = event.css(".date")[0]&.text || return
       return if date.blank?
       {
         date: DateTime.parse(date),
-        url: event.css(".carousel_item_title_small a")[0].attribute("href"),
-        img: event.css(".thumb img")[0].attribute("src"),
-        title: event.css(".carousel_item_title_small a")[0].text,
+        url: (event.css(".c-axs-event-card__header")[0] || event.css(".c-axs-event-card__image a")[0]).attribute("href"),
+        img: (event.css(".mediaImage")[0] || event.css(".u-img-respond")[0]).attribute("src"),
+        title: event.css(".c-axs-event-card__title")[0].text,
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.

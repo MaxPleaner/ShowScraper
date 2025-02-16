@@ -6,16 +6,21 @@ class Knockout
   self.events_limit = 200
 
 	def self.run(events_limit: self.events_limit, &foreach_event_blk)
-		index = 1
+		index = 0
 		events = []
 		loop do
-			new_events = get_events(index)
-			new_events.each do |event|
-        next if events.count >= events_limit
-				events.push(parse_event_data(event, &foreach_event_blk))
+			added = []
+			days = get_days(index)
+			days.each do |day_container|
+				new_events = day_container.css(".item-link")
+				added.concat(new_events)
+				new_events.each do |event|
+	        		next if events.count >= events_limit
+					events.push(parse_event_data(day_container, event, &foreach_event_blk))
+				end
 			end
 			break if events.count >= events_limit
-			break if new_events.empty? || index > pages_limit
+			break if added.empty? || index > pages_limit
 			index += 1
 		end
 		events
@@ -23,35 +28,40 @@ class Knockout
 
 	class << self
 		private
-		def get_events(page_idx)
-			$driver.navigate.to("https://theknockoutsf.com/events/list/?tribe_paged=#{page_idx}")
-			$driver.css(".type-tribe_events")
+		def get_days(page_idx)
+			$driver.navigate.to("https://theknockoutsf.com/calendar2")
+			page_idx.times do
+				sleep 1
+				$driver.css("a[aria-label='Go to next month']")[0].click
+				sleep 1
+			end
+			$driver.css("td[role='gridcell']")
 		end
 
-		def parse_event_data(event, &foreach_event_blk)
+		# "event" here is actually a day which can contain multiple events
+		def parse_event_data(day_container, event, &foreach_event_blk)
+			month, year = $driver.css("div[aria-role='heading']")[0].text.split(" ")
+			day = day_container.css(".marker-daynum")[0].text
+
+			# There are two kinds of events
+			title = event.css(".item-title")[0]&.text
+			url = event.attribute("href")
+			img = nil
+			$driver.new_tab(url) do
+				img = $driver.css("link[rel='icon']")[0].attribute("href")
+			end
+
 			{
-				date: parse_date(event.css(".tribe-event-date-start")[0].text),
-				url: event.css(".tribe-common-anchor-thin")[0]&.attribute("href") || "",
-				title: event.css(".tribe-common-anchor-thin")[0].text,
+				date: DateTime.parse("#{month} #{day}, #{year}"),
+				url: url,
+				title: title,
+				img: img,
 				details: "",
-			}.tap do |data|
-				data[:img] = event.css(".tribe-events-calendar-list__event-featured-image")[0]&.attribute("src")
-				# data[:img] = fetch_full_res_image(data)
-			end.
+			}.
 				tap { |data| Utils.print_event_preview(self, data) }.
 				tap { |data| foreach_event_blk&.call(data) }
 		rescue => e
 			ENV["DEBUGGER"] == "true" ? binding.pry : raise
-		end
-
-		def fetch_full_res_image(event)
-			$driver.new_tab(event[:url]) do
-				$driver.css(".tribe-events-event-image img")[0].attribute("src")
-			end
-		end
-
-		def parse_date(date_string)
-			DateTime.parse(date_string)
 		end
 	end
 end
