@@ -39,19 +39,11 @@ results, errors = Scraper.run(
 puts "done\n"
 
 warnings = []
-
-=begin
-Dir.glob("./debug/*.json").each do |file|
-  name = File.basename(file).gsub(".json", "")
-  next if opts[:sources] && !opts[:sources].include?(name)
-  num_events = JSON.parse(File.read(file)).length
-  if num_events == 0
-    warnings.push(name)
+results.each do |source, events|
+  if events.count == 0
+    warnings << source
   end
-
-  puts "#{name} - #{num_events}"
 end
-=end
 
 warnings.each do |source|
   puts "WARNING: #{source} produced 0 events!"
