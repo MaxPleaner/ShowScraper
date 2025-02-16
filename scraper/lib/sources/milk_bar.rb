@@ -1,6 +1,6 @@
 class MilkBar
   # Eventbrite, "load more" site
-  MAIN_URL = "https://www.eventbrite.com/o/the-milk-bar-presents-6806338175"
+  MAIN_URL = "https://www.eventbrite.com/o/oreillys-pub-sf-presents-6806338175"
 
   cattr_accessor :months_limit, :events_limit
   self.months_limit = 3
