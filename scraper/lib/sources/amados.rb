@@ -2,6 +2,9 @@ class Amados
   # No pagination needed here, all events shown at once.
   MAIN_URL = "http://www.amadossf.com"
 
+  # https://missionlocal.org/2023/11/amados-valencia-st-bar-and-venue-closes/
+  DISABLED = true
+
   cattr_accessor :events_limit
   self.events_limit = 200
 
