@@ -11,6 +11,7 @@ class Fillmore
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     $driver.navigate.to(MAIN_URL)
+    get_all_pages
     get_events.map.with_index do |event, index|
       next if index >= events_limit
       parse_event_data(event, &foreach_event_blk)
@@ -21,23 +22,23 @@ class Fillmore
     private
 
     def get_events
-      sleep 1
       $driver.css("div[role='group']").reject do |box|
         box.text.empty?
       end
     end
 
     def get_all_pages
+      sleep 2
       # ewww gross iframe
       $driver.execute_script 'document.querySelectorAll("iframe").forEach((iframe) => iframe.remove())'
 
       # And google ads ... livenation, everyone
       $driver.execute_script 'document.querySelectorAll("#adhesion-ad").forEach((iframe) => iframe.remove())'
 
-      while load_more = $driver.css(".show-more")[0]
-        load_more.click
-        sleep 1
-      end
+      # while load_more = $driver.css(".show-more")[0]
+      #   load_more.click
+      #   sleep 1
+      # end
     end
 
     def parse_event_data(event, &foreach_event_blk)

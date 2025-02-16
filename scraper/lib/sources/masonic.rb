@@ -13,7 +13,8 @@ class Masonic
     $driver.navigate.to(MAIN_URL)
 
     # We just spam the auto loader until everything's there.
-    get_all_pages
+    # get_all_pages
+    sleep 2
 
     get_events.map.with_index do |event, index|
       next if index >= events_limit
@@ -25,7 +26,7 @@ class Masonic
     private
 
     def get_events
-      $driver.css("li[role='group']")
+      $driver.css("div[role='group']")
       # $driver.css(".listing__item__link")
     end
 
@@ -49,10 +50,10 @@ class Masonic
       time = event.css("time")[0]
       return unless time
       {
-        date: DateTime.parse(time.attribute("datetime")) - 1.day,
+        date: DateTime.parse(time.attribute("datetime")),
         url: event.css("a")[0].attribute("href"),
         img: parse_img(event),
-        title: event.css("header h3")[0].text,
+        title: event.css(".chakra-heading")[0].text,
         details: "",
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
