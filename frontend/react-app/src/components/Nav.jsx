@@ -11,8 +11,9 @@ export default class Nav extends React.Component {
     return (
         <div class='nav-container'>
         {/* <nav className='flex-row' > */}
-            <p id='bay-area-shows-text'>Bay Area Shows</p>
             {/* <div className='flex-row' > */}
+                <p id='bay-area-shows-text'>Bay Area Shows</p>
+                <br />
                 <div class='nav-items'>
                     <Link to='/TextView'>
                         <div className={`nav-item ${this.props.route === "TextView" ? "selected" : ""}`}>Text View</div>
@@ -33,6 +34,7 @@ export default class Nav extends React.Component {
                     <a href='https://utils.dissonant.info/show_scraper_log'>
                         <div className='nav-item'>Scraper Log</div>
                     </a>
+
 
                 </div>
 
