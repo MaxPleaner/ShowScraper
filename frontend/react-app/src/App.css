@@ -6,6 +6,14 @@
     background-color: black;
 }
 
+#bay-area-shows-text {
+    font-size: 1.3em;
+    /* margin-right: 10px; */
+    margin-left: 20px;
+    text-decoration: underline;
+    display: inline-block;
+}
+
 .About a, .About a:visited {
   color: lightgreen
 }
@@ -49,23 +57,21 @@
 
 /* ======  NAV  ====== */
 
-nav {
-    padding: 0px 5%;
+.nav-container {
+    padding: 0px 0%;
     margin-bottom: 15px;
     border-bottom: 1px solid rgb(170, 170, 170);
     color: white;
     width: 100%;
-    background-color: #11273d !important;
+    /* background-color: #11273d !important; */
+    background-color: black !important;
 
     justify-content: space-between !important;
-    font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+    /* font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif; */
 /*    position: fixed;*/
     top: 0;
     z-index: 1;
 }
-
-
-
 
 nav h1 {
     display: block;
@@ -102,15 +108,22 @@ nav h2 {
     background-color: #27496D !important;
 }
 
-.nav-item {
-    display: block;
-    padding: 10px 30px;
-    font-size: 1.2em;
-    color: white;
-    margin: 0 10px;
+.nav-items {
+    margin: 5px 0px;
+    display: inline-block;
+    margin-left: 20px;
+}
+.nav-item, .nav-item-no-click {
+    display: inline-block;
+    padding: 2px 5px;
+    font-size: 1.1em;
+    color: lightgreen;
+    margin: 0 5px;
+    outline: 1px solid white;
+    background-color: black;
 /*    border-radius: 30px;*/
 
-     background-color: #0C7B93 !important; 
+     /* background-color: #0C7B93 !important; 
 }
 
 .nav-item.selected {
@@ -173,22 +186,20 @@ nav h2 {
 .eventDates {
     display: flex;
     justify-content: center;
+    padding-bottom: 10px;
 }
 
 .venue-container{
     width: 30%;
     margin-bottom: 1rem;
     outline: 2px solid rgb(170, 170, 170);
-    background-color: #ebebeb; 
+    background-color: black; 
     /* width: 30%; */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     border-radius: 10px;
-}
- 
-.venue-container:hover {
-    box-shadow: 10px 5px 5px grey;
+    padding: 10px;
 }
 
 .venue-name {
@@ -197,14 +208,15 @@ nav h2 {
     font-weight: bold;
     font-size: 1.1em;
     width: 100%;
-    background-color: #27496D;
+    /* background-color: #27496D; */
+    background-color: black;
 
-    text-align: center;
+    /* text-align: center; */
     padding: 4px;
     padding-top: 8px;
 
-    display: flex;
-    justify-content: space-between;
+    /* display: flex; */
+    /* justify-content: space-between; */
 
     border-top-left-radius: 10px;
     border-top-right-radius: 10px;
@@ -225,13 +237,13 @@ nav h2 {
     margin-top: 10px;
     /* font-style: italic; */
     /*min-height: 150px;*/
-    color: #27496D;
-    font-size: 1.2em;
-    font-family: Impact;
+    color: white;
+    font-size: 0.8em;
+    /* font-family: Impact; */
     padding: 10px;
 }
 
-.venue-link {
+.___venue-link {
     display: block;
     text-align: center;
     padding: 10px 30px;
@@ -245,9 +257,13 @@ nav h2 {
     margin-bottom: 10px;
 }
 
+.venue-link, .venue-link:visited {
+    color: lightgreen;
+}
+
 .venue-link:hover {
-    background-color: #27496D !important;
-    color: white;
+    /* background-color: #27496D !important; */
+    color: lightblue;
 }
 
 .venue-view-events {
@@ -298,12 +314,13 @@ nav h2 {
 .Day-group {
     /*margin-right: 20px;*/
     /*outline: 1px solid black;*/
-    padding: 2%;
+    /* padding: 2%; */
+    padding: 10px;
 }
 
 .daygroup-title {
-    margin-bottom: 50px;
-    font-size: 2em;
+    /* margin-bottom: 15px; */
+    font-size: 1em;
     text-align: center;
     color: black;
 
@@ -314,7 +331,7 @@ nav h2 {
 }
 
 .daygroup-title-text {
-    font-size: 40px;
+    font-size: 20px;
     background-color: black;
     color: white;
     padding: 0 10px;
@@ -455,23 +472,26 @@ a .box:hover {
     padding-bottom: 10px;
     margin-bottom: 0.3rem;
     /* outline: 1px solid white; */
-    border-bottom: 1px solid white;
+    border-bottom: 1px solid grey;
+}
+
+.Region {
+    margin-bottom: 15px;
 }
 
 .region-title {
-    color: red;
-    font-size: 2em;
+    color: lightgreen;
+    font-size: 1.5em;
     margin-left: 10px;
 }
 
 .textViewEntry:hover {
     outline: 1px solid white;
-    box-shadow: 10px 5px 5px grey;
 }
 
 .textViewEntry .textViewVenue {
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 1.0em;
     /* color: black; */
     color: white;
     /* background-color: #27496D; */
@@ -488,7 +508,7 @@ a .box:hover {
 .textViewEntry .textViewLink, .textViewEntry .textViewLink:visited {
     /* color: #27496D; */
     color: lightblue;
-    font-size: 1.2em;
+    font-size: 1.0em;
     width: 100%;
     display: block;
     /* font-family: Impact; */
@@ -583,8 +603,8 @@ a .box:hover {
 }
 @media only screen and (max-width: 560px){
     .eventDates{
-        flex-direction: column !important;
-        grid-gap: 10px;
+        /* flex-direction: column !important;
+        grid-gap: 10px; */
     }
 
     .masonry-with-columns {
@@ -617,4 +637,9 @@ a .box:hover {
         padding-top: 380px;
     }*/
  
+}
+
+.other-links {
+    display: inline-block;
+    margin-left: 20px;
 }

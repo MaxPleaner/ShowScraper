@@ -128,6 +128,15 @@ export default class EventListViewManager extends React.Component {
   render() {
      return (
       <div className='ListViewManager'> 
+
+          <div className='other-links'>
+            <span>Other Event Lists: </span>
+            <a href='https://indybay.org/calendar'>Indybay </a> /
+            <a href='https://sf.funcheap.com/events/'> FunCheap</a> /
+            <a href='https://19hz.info/eventlisting_BayArea.php'> 19hz</a> /
+            <a href='https://www.meetup.com/find/?source=EVENTS&eventType=inPerson&sortField=DATETIME&location=us--ca--San%20Francisco&distance=twentyFiveMiles'> Meetup</a>
+        </div>
+
                <div className="search">
                 <input type="text" placeholder="Search Venues" onChange={this.searchInput}/>
                </div>
