@@ -38,17 +38,15 @@ class Knockout
 			$driver.css("td[role='gridcell']")
 		end
 
-		# "event" here is actually a day which can contain multiple events
 		def parse_event_data(day_container, event, &foreach_event_blk)
 			month, year = $driver.css("div[aria-role='heading']")[0].text.split(" ")
 			day = day_container.css(".marker-daynum")[0].text
 
-			# There are two kinds of events
 			title = event.css(".item-title")[0]&.text
 			url = event.attribute("href")
 			img = nil
 			$driver.new_tab(url) do
-				img = $driver.css("link[rel='icon']")[0].attribute("href")
+				img = $driver.css("meta[property='og:image']")[0].attribute("content")
 			end
 
 			{

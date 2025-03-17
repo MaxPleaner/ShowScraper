@@ -60,6 +60,9 @@ class Scraper
       sources.each do |source|
         next if source.const_defined?(:DISABLED) && source::DISABLED
         event_list = run_scraper(source, events_limit: events_limit) do |event_data|
+          unless %i[url img date title].all? { |key| event_data[key].present? }
+            raise "#{source.name} had missing data keys"
+          end
           if persist_mode == :sql
             persist_sql(source, event_data)
           end
@@ -68,8 +71,15 @@ class Scraper
         results[source.name] = event_list
       rescue => e
         if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
-          puts e, e.backtrace
-          errors.push({ source: source.name, error: e })
+          if source == Paramount && !$retried_paramount
+            $retried_paramount = true
+            puts "RETRYING PARAMOUNT"
+            sleep 5
+            retry
+          else
+            puts e, e.backtrace
+            errors.push({ source: source.name, error: e })
+          end
         else
           raise
         end
@@ -135,8 +145,11 @@ class Scraper
       driver
     end
 
+    require 'timeout'
     def run_scraper(source, events_limit: nil, &foreach_event_blk)
-      source.run(**{ events_limit: events_limit }.compact, &foreach_event_blk)
+      Timeout.timeout(60 * 3) do
+        source.run(**{ events_limit: events_limit }.compact, &foreach_event_blk)
+      end
     end
 
   end

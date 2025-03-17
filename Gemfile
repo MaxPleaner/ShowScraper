@@ -6,6 +6,7 @@ gem 'pry-nav'
 gem 'activesupport'
 gem 'dotenv'
 gem 'nokogiri'
+gem 'rss'
 
 # Testing
 gem 'rspec'

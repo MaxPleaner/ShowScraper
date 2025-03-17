@@ -115,6 +115,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.11.0)
     rspec-support (3.11.0)
+    rss (0.3.1)
+      rexml
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
     selenium-webdriver (4.2.1)
@@ -161,6 +163,7 @@ DEPENDENCIES
   pry-nav
   rake
   rspec
+  rss
   selenium-webdriver
   sinatra-activerecord
 

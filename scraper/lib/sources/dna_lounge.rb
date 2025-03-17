@@ -1,4 +1,56 @@
+# NOTE:
+# I originally wrote the scraper to use DNA Lounge's calendar view, but the redirect stopped working.
+# So I've updated it to use the RSS feed instead, which is more bot-friendly.
+
+require 'open-uri'
+require 'rss'
+require 'nokogiri'
+
 class DnaLounge
+  MAIN_URL = "https://www.dnalounge.com/calendar/dnalounge.rss"
+
+  cattr_accessor :events_limit
+  self.events_limit = 200
+
+  def self.run(events_limit: self.events_limit, &foreach_event_blk)
+    events = []
+    get_events.each do |event|
+      next if events.count >= events_limit
+      result = parse_event_data(event, &foreach_event_blk)
+      next unless result
+      events.push(result)
+    end
+    events
+  end
+
+  class << self
+    private
+
+    def get_events
+      rss_content = URI.open(MAIN_URL).read
+      rss = RSS::Parser.parse(rss_content, false)
+      rss.items
+    end
+
+    def parse_event_data(event, &foreach_event_blk)
+      doc = Nokogiri::HTML(event.content_encoded)
+      {
+        url: doc.at("a.url")["href"],
+        img: doc.at('div.event_flyer a[href] img')&.to_h&.fetch("src") || "https://cdn.dnalounge.com/logo2025.gif",
+        date: DateTime.parse(doc.at('abbr.dtstart')['title']),
+        title: doc.at('abbr.summary')&.to_h&.fetch("title") || doc.at('div.summary a').text.strip,
+        details: ""
+      }.
+        tap { |data| Utils.print_event_preview(self, data) }.
+        tap { |data| foreach_event_blk&.call(data) }
+    rescue => e
+      ENV["DEBUGGER"] == "true" ? binding.pry : raise
+    end
+  end
+end
+
+
+class DnaLounge_OLD
   MAIN_URL = "https://www.dnalounge.com/calendar/latest.html" # this performs an internal redirect
 
   cattr_accessor :months_limit, :events_limit
