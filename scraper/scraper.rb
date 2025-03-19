@@ -60,7 +60,7 @@ class Scraper
       sources.each do |source|
         next if source.const_defined?(:DISABLED) && source::DISABLED
         event_list = run_scraper(source, events_limit: events_limit) do |event_data|
-          unless %i[url img date title].all? { |key| event_data[key].present? }
+          unless %i[url date title].all? { |key| event_data[key].present? }
             raise "#{source.name} had missing data keys"
           end
           if persist_mode == :sql

@@ -44,7 +44,7 @@ class MilkBar
       return if title.blank?
       {
         url: event.css(".event-card-link")[0].attribute("href"),
-        img: event.css(".event-card-image")[0]&.attribute("src") || "",
+        img: event.css(".event-card-image")[0]&.attribute("src") || "https://img.evbuc.com/https%3A%2F%2Fcdn.evbuc.com%2Fimages%2F508879929%2F78654724783%2F1%2Foriginal.20230505-225547?h=230&w=460&auto=format%2Ccompress&q=75&sharp=10&rect=0%2C152%2C1242%2C621&s=39c1c2c43fbea1958ab34d2b46660fcc",
         date: date,
         title: title,
         details: ""
@@ -76,24 +76,24 @@ class MilkBar
         "Sunday" => 0, "Monday" => 1, "Tuesday" => 2, "Wednesday" => 3,
         "Thursday" => 4, "Friday" => 5, "Saturday" => 6
       }
-      
+
       # Get the current DateTime
       now = DateTime.now
-      
+
       # Extract the target weekday's number and the specified time (hours and minutes)
       weekday_name = weekday_map.keys.find { |k| str.downcase.include?(k.downcase) }
       target_weekday = weekday_map[weekday_name]
-      
+
       # Calculate the difference in days to the next occurrence of the target weekday
       days_difference = (target_weekday - now.wday) % 7
       days_difference = 7 if days_difference == 0 # If today is the target day, set to next week
-      
+
       # Calculate the next occurrence of the target weekday and time
       next_occurrence = now + days_difference
       next_occurrence = DateTime.new(next_occurrence.year, next_occurrence.month, next_occurrence.day)
-      
+
       next_occurrence
     end
-    
+
   end
 end

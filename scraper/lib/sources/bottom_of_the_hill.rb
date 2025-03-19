@@ -29,10 +29,9 @@ class BottomOfTheHill
       title = event.css(".band").map(&:text).join(", ")
       date = parse_date(event.css(".date").map(&:text).reject(&:blank?).join("")) rescue return
       return if title.blank?
-      # binding.pry
       {
         date: date,
-        img: parse_img(event) || "",
+        img: parse_img(event) || "https://upload.wikimedia.org/wikipedia/commons/2/2a/Bottom_of_the_hill.jpg",
         title: title,
         url: link,
         details: "",

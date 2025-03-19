@@ -46,7 +46,8 @@ class MakeOutRoom
           date: parse_date(event),
           title: title,
           url: MAIN_URL,
-          img: "",
+          # Only default image is used here
+          img: "https://images.squarespace-cdn.com/content/v1/59e75c55a803bbc973dfc016/1569943309185-4VXIYB8S1KBVLGU61HRP/5B0A7065.jpg?format=1500w",
           details: _event.text.split("~")[1..-1].join("~")
         }.
           tap { |data| Utils.print_event_preview(self, data) }.

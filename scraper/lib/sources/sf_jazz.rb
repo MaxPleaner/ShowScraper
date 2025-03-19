@@ -33,8 +33,8 @@ class SfJazz
     def parse_event_data(event, &foreach_event_blk)
       date = parse_date(event) rescue return
       {
-        url: event.css("a.event-image")[0].attribute("href"),
-        img: event.css(".event-image img")[0].attribute("src"),
+        url: event.css("a.event-image")[0].attribute("href") || "https://www.sfjazz.org/calendar/",
+        img: event.css(".event-image img")[0].attribute("src") || "https://ybgfestival.org/wp-content/uploads/2014/03/sfjazz-logo-21-300x300-300x300.jpg",
         date: date,
         title: event.css(".event-info-title")[0].text.strip.gsub("\n", " ").gsub(/\s{2,}/, " ").tap do |title|
         end,
