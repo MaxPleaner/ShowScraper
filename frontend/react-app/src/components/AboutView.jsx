@@ -9,7 +9,7 @@ export default class AboutView extends React.Component {
   }
 
   render() {
-    const dp_link = <a href='https://dissonant.info'>dissonant.info</a>
+    const dp_link = <a href='https://maxpleaner.com'>maxpleaner.com</a>
     const gh_link = <a href='https://github.com/maxpleaner/showscraper'>github.com/maxpleaner/showscraper</a>
     const list_link = <a href='http://www.foopee.com/punk/the-list/'>The List</a>
     return (
