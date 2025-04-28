@@ -20,7 +20,7 @@ class Independent
     private
 
     def get_events
-      $driver.css(".tw-section")
+      $driver.css(".tw-event-item")
     end
 
     def parse_event_data(event, &foreach_event_blk)

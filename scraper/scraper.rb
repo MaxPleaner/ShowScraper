@@ -70,7 +70,7 @@ class Scraper
         persist_event_list(source, event_list) if persist_mode == :static
         results[source.name] = event_list
       rescue => e
-        if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
+#        if ENV["RESCUE_SCRAPING_ERRORS"] == "true"
           if source == Paramount && !$retried_paramount
             $retried_paramount = true
             puts "RETRYING PARAMOUNT"
@@ -80,9 +80,9 @@ class Scraper
             puts e, e.backtrace
             errors.push({ source: source.name, error: e })
           end
-        else
-          raise
-        end
+ #       else
+ #         raise
+ #       end
       end
 
       # persist_error_list
@@ -127,20 +127,22 @@ class Scraper
 
     def init_driver
       options = Selenium::WebDriver::Chrome::Options.new
-      unless ENV["HEADLESS"] == "false"
-        options.add_argument('--headless')
-        options.add_argument('--window-size=1920,1080')
-        options.add_argument(
-          "user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/87.0.4280.88 Safari/537.36"
-        )
-      end
+      options.add_argument('--headless') unless ENV["HEADLESS"] == "false"
+      options.add_argument('--window-size=1920,1080')
+      options.add_argument('--disable-blink-features=AutomationControlled')
+      options.add_argument('--no-sandbox')
+      options.add_argument('--disable-dev-shm-usage')
+      options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36')
+
       if File.exist?("/proc/device-tree/model") && `cat /proc/device-tree/model`.include?("Raspberry Pi")
-        driver_path = "/usr/lib/chromium-browser/chromedriver"
+        driver_path = "/usr/bin/chromedriver"
         service = Selenium::WebDriver::Chrome::Service.new(path: driver_path)
-        driver = Selenium::WebDriver.for :chrome, options: options, service: service
       else
-        driver = Selenium::WebDriver.for :chrome, options: options, service: service
+        service = Selenium::WebDriver::Chrome::Service.chrome
       end
+
+      driver = Selenium::WebDriver.for :chrome, options: options, service: service
+
       SeleniumPatches.patch_driver(driver)
       driver
     end

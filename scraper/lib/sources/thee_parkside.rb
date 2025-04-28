@@ -26,7 +26,7 @@ class TheeParkside
       img = get_high_res_image(event)
       return unless img # their "bar closed" events have no image
       {
-        date: parse_date(event.css(".vp-event-row-datetime")[0].text),
+        date: parse_date(event.css(".vp-month-n-day")[0].text),
         url: event.attribute("href"),
         title: event.css(".vp-event-name")[0].text,
         details: "",
