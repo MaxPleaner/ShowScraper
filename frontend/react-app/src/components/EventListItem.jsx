@@ -1,5 +1,6 @@
 import React, {useState} from 'react';
 import MissingImage from '../MissingImage.png'
+import moment from 'moment';
 
 export default class EventListItem extends React.Component {
   constructor(props) {
@@ -8,32 +9,47 @@ export default class EventListItem extends React.Component {
       display: 'none',
     }
 
-      this.mouseEnter = this.mouseEnter.bind(this);
-      this.mouseLeave = this.mouseLeave.bind(this);
-      this.click = this.click.bind(this)
-    }
+    this.mouseEnter = this.mouseEnter.bind(this);
+    this.mouseLeave = this.mouseLeave.bind(this);
+    this.click = this.click.bind(this)
+  }
 
-    /////////////////////////////////////////////////////////// 
-    // Some complexity in all this due to mouseover handling //
-    // on mobile vs web.                                     //
-    ///////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////// 
+  // Some complexity in all this due to mouseover handling //
+  // on mobile vs web.                                     //
+  ///////////////////////////////////////////////////////////
 
-    // Affects web only
-    mouseEnter() {
-      this.setState({display: 'block'})
-    }
+  // Affects web only
+  mouseEnter() {
+    this.setState({display: 'block'})
+  }
 
-    // Affects web only
-    mouseLeave() {
-      this.setState({display: 'none'})
-    }
+  // Affects web only
+  mouseLeave() {
+    this.setState({display: 'none'})
+  }
 
-    // Affects web only
-    click(path, e) {
-      if (this.state.display == 'block') {
-        window.open(path, "_blank")
-      }
+  // Affects web only
+  click(path, e) {
+    if (this.state.display == 'block') {
+      window.open(path, "_blank")
     }
+  }
+
+  generateCalendarLinks(event) {
+    const date = moment(event.date, 'YYYY-MM-DD').format('YYYYMMDD');
+    const title = encodeURIComponent(`${event.title} at ${event.source.commonName}`);
+    const location = encodeURIComponent(event.source.commonName);
+    const description = encodeURIComponent(`Event URL: ${event.url}`);
+
+    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&dates=${date}/${date}&text=${title}&location=${location}&details=${description}`;
+    const icalUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:${date}%0ADTEND:${date}%0ASUMMARY:${title}%0ALOCATION:${location}%0ADESCRIPTION:${description}%0AEND:VEVENT%0AEND:VCALENDAR`;
+
+    return {
+      google: googleCalendarUrl,
+      ical: icalUrl
+    };
+  }
 
   render() {
     let imgSrc = this.props.event.img;
@@ -49,15 +65,23 @@ export default class EventListItem extends React.Component {
     }
 
     if (this.props.textOnly) {
+      const calendarLinks = this.generateCalendarLinks(this.props.event);
       return (
         <div className='textViewEntry'>
-            {/* <h1 className='textViewVenue'>{this.props.event.source.commonName}</h1> */}
-            {/* <div> */}
-              <a className='textViewLink' href={this.props.event.url}>
+            <div className='textViewLink'>
+              <div className='calendar-buttons'>
+                <a href={calendarLinks.google} target="_blank" rel="noopener noreferrer" className='calendar-button' title="Add to Google Calendar">
+                  <i className="fab fa-google"></i>
+                </a>
+                <a href={calendarLinks.ical} download={`${title}.ics`} className='calendar-button' title="Download iCal">
+                  <i className="fas fa-calendar-alt"></i>
+                </a>
+              </div>
+              <a href={this.props.event.url}>
                 <b className='textViewVenue'>{this.props.event.source.commonName}</b>
                 <span className='textViewTitle'> {title}</span>
               </a>
-            {/* </div> */}
+            </div>
         </div>
       )
     } else {
@@ -82,7 +106,6 @@ export default class EventListItem extends React.Component {
                     style={{display: this.state.display}}
                   >
                       <span className='event-venue'> {this.props.event.source.commonName} </span>
-                      {/*<br />*/}
                       <h1 className='event-title'>
                         <span> {title} </span>
                       </h1>
