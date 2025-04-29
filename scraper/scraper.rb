@@ -126,13 +126,41 @@ class Scraper
     end
 
     def init_driver
-      options = Selenium::WebDriver::Chrome::Options.new
+      # init_driver_chrome
+      init_driver_firefox
+    end
+
+    def init_driver_firefox
+      options = Selenium::WebDriver::Firefox::Options.new
       options.add_argument('--headless') unless ENV["HEADLESS"] == "false"
+      options.add_argument('--width=1920')
+      options.add_argument('--height=1080')
+
+      service = Selenium::WebDriver::Service.firefox(path: '/usr/local/bin/geckodriver')
+      driver = Selenium::WebDriver.for :firefox, options: options, service: service
+
+      SeleniumPatches.patch_driver(driver) # if compatible
+      driver.manage.timeouts.page_load = 15
+      driver.manage.timeouts.script_timeout = 10
+
+      driver
+    end
+
+
+    def init_driver_chrome
+      options = Selenium::WebDriver::Chrome::Options.new
+      options.add_argument('--headless=new') unless ENV["HEADLESS"] == "false"
       options.add_argument('--window-size=1920,1080')
       options.add_argument('--disable-blink-features=AutomationControlled')
       options.add_argument('--no-sandbox')
       options.add_argument('--disable-dev-shm-usage')
-      options.add_argument('user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36')
+      options.add_argument('--disable-extensions')
+      options.add_argument('--disable-background-networking')
+      options.add_argument('--disable-sync')
+      options.add_argument('--metrics-recording-only')
+      options.add_argument('--mute-audio')
+      options.add_argument('--ignore-certificate-errors')
+      options.add_argument('--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/135.0.0.0 Safari/537.36')
 
       if File.exist?("/proc/device-tree/model") && `cat /proc/device-tree/model`.include?("Raspberry Pi")
         driver_path = "/usr/bin/chromedriver"
@@ -143,7 +171,21 @@ class Scraper
 
       driver = Selenium::WebDriver.for :chrome, options: options, service: service
 
+      # Patches
       SeleniumPatches.patch_driver(driver)
+
+      # Hard timeouts
+      driver.manage.timeouts.page_load = 15
+      driver.manage.timeouts.script_timeout = 10
+
+      # Anti-bot fingerprint patch
+      driver.execute_cdp('Page.addScriptToEvaluateOnNewDocument', source: <<~JS)
+        Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+        window.navigator.chrome = { runtime: {} };
+        Object.defineProperty(navigator, 'plugins', { get: () => [1,2,3,4,5] });
+        Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'] });
+      JS
+
       driver
     end
 
