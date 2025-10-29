@@ -1,14 +1,15 @@
 class Paramount
-  # "load more" / infinite scroll
   MAIN_URL = "https://www.paramountoakland.org/events"
 
-  cattr_accessor :months_limit, :events_limit
+  cattr_accessor :months_limit, :events_limit, :load_time
   self.events_limit = 200
+  self.load_time = 2
 
   def self.run(events_limit: self.events_limit, &foreach_event_blk)
     events = []
 
     $driver.get(MAIN_URL)
+    sleep self.load_time
     $driver.css("[aria-label='Toggle to List View']")[0].click
 
     loop do
