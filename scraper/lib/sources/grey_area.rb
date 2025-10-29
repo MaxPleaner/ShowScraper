@@ -1,5 +1,4 @@
 class GreyArea
-  # No pagination needed here, all events shown at once.
   MAIN_URL = "https://grayarea.org/events/"
 
   cattr_accessor :events_limit
@@ -36,9 +35,9 @@ class GreyArea
     end
 
     def parse_img(event)
-      style = $driver.css(".image")[0]&.attribute("style")
+      style = event.css(".image")[0]&.attribute("style")
       return "" unless style
-      style.scan(/url\(\"(.+)\"\)/)[0][0]
+      style.scan(/url\(([^)]+)\)/)[0][0]
     end
   end
 end

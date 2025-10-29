@@ -1,5 +1,4 @@
 class UCBerkeleyTheater
-  # No pagination needed here, all events shown at once.
   MAIN_URL = "https://theuctheatre.org/events"
 
   cattr_accessor :events_limit, :load_time
@@ -18,16 +17,16 @@ class UCBerkeleyTheater
 
     def get_events
       $driver.navigate.to(MAIN_URL)
-      $driver.css(".ue-li-container")
+      $driver.css(".shows-collection-item")
     end
 
     def parse_event_data(event, &foreach_event_blk)
       date = parse_date(event) rescue return
       {
         date: date,
-        url: event.css("a").find { |link| link.text.upcase == "MORE INFO" }.attribute("href"),
-        title: event.css("h2,h3").map(&:text).join(", ").gsub("\n", ", "),
-        img: event.css("img")[0].attribute("src"),
+        url: event.css("a[href^='/shows/']")[0].attribute("href"),
+        title: parse_title(event),
+        img: parse_image(event),
         details: ""
       }.
         tap { |data| Utils.print_event_preview(self, data) }.
@@ -37,7 +36,24 @@ class UCBerkeleyTheater
     end
 
     def parse_date(event)
-      DateTime.parse(event.css(".ue-date")[0].text.strip.split("\n").first(2).join(" "))
+      date_div = event.css(".date-div")[0]
+      month = date_div.css(".heading-2")[0].text.strip
+      day = date_div.css(".heading-3")[0].text.strip
+      DateTime.parse("#{month} #{day}")
+    end
+
+    def parse_title(event)
+      main_title = event.css(".name-listing")[0].text.strip
+      support = event.css(".support-listing")[0]&.text&.strip
+      support ? "#{main_title}, #{support}" : main_title
+    end
+
+    def parse_image(event)
+      img_div = event.css(".shows-image")[0]
+      style = img_div.attribute("style")
+      style.match(/url\("([^"]+)"\)/)[1]
+    rescue
+      nil
     end
   end
 end
