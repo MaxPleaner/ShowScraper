@@ -104,6 +104,7 @@ class TheList
         "Great Northern",
         "New Parish",
         "Stork Club",
+        "Wyldflowr",
       ].map do |known_venue|
         known_venue.downcase.gsub(/[^0-9a-z ]/i, '')
       end
