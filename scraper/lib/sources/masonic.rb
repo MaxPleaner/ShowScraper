@@ -49,9 +49,11 @@ class Masonic
     def parse_event_data(event, &foreach_event_blk)
       time = event.css("time")[0]
       return unless time
+      link = event.css("a")[0]
+      return unless link
       {
         date: DateTime.parse(time.attribute("datetime")),
-        url: event.css("a")[0].attribute("href"),
+        url: link.attribute("href"),
         img: parse_img(event),
         title: event.css(".chakra-heading")[0].text,
         details: "",

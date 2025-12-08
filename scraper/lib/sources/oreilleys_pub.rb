@@ -1,4 +1,4 @@
-class MilkBar
+class OReilleysPub
   # Eventbrite, "load more" site
   MAIN_URL = "https://www.eventbrite.com/o/oreillys-pub-sf-presents-6806338175"
 

@@ -136,7 +136,7 @@ class Scraper
       options.add_argument('--width=1920')
       options.add_argument('--height=1080')
 
-      service = Selenium::WebDriver::Service.firefox(path: '/usr/local/bin/geckodriver')
+      service = Selenium::WebDriver::Service.firefox(path: ENV.fetch("GECKODRIVER_PATH"))
       driver = Selenium::WebDriver.for :firefox, options: options, service: service
 
       SeleniumPatches.patch_driver(driver) # if compatible
