@@ -1,8 +1,10 @@
 import os
+import re
 import asyncio
 import json
 import ipaddress
 import socket
+import hashlib
 from urllib.parse import urlparse
 from typing import AsyncGenerator, Optional, List
 from datetime import datetime
@@ -14,7 +16,127 @@ from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from langchain_core.tools import Tool
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_community.document_loaders import WebBaseLoader
+import urllib.request
+import urllib.error
 import agentops
+
+CACHE_DIR = Path(__file__).resolve().parent / "logs" / "cache"
+
+
+def _normalize_cache_field(value: str) -> str:
+    return re.sub(r"\s+", " ", (value or "").strip().lower())
+
+
+def build_cache_key(event_data: dict, mode: str) -> str:
+    base = "|".join([
+        _normalize_cache_field(event_data.get("date", "")),
+        _normalize_cache_field(event_data.get("venue", "")),
+        _normalize_cache_field(event_data.get("title", "")),
+        mode.lower().strip(),
+    ])
+    return hashlib.sha256(base.encode("utf-8")).hexdigest()
+
+
+def _cache_path(cache_key: str) -> Path:
+    path = (CACHE_DIR / f"{cache_key}.json").resolve()
+    # Ensure the resolved path stays within the cache directory to avoid traversal
+    resolved_cache = CACHE_DIR.resolve()
+    if resolved_cache not in path.parents and path != resolved_cache:
+        raise ValueError("Invalid cache path")
+    return path
+
+
+def _extract_trace_id(trace_obj) -> Optional[str]:
+    try:
+        span = getattr(trace_obj, "span", None)
+        if span and hasattr(span, "get_span_context"):
+            ctx = span.get_span_context()
+            trace_id = getattr(ctx, "trace_id", None)
+            if trace_id:
+                return str(trace_id)
+    except Exception:
+        pass
+    return None
+
+
+def log_trace_cost(trace_obj):
+    """Best-effort: fetch trace cost via AgentOps Public API and print it."""
+    api_key = os.getenv("AGENTOPS_API_KEY")
+    trace_id = _extract_trace_id(trace_obj)
+    if not api_key or not trace_id:
+        return
+
+    def _post_json(url: str, payload: dict) -> dict:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST",
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+
+    def _get_json(url: str, token: str) -> dict:
+        req = urllib.request.Request(
+            url,
+            headers={"Authorization": f"Bearer {token}"},
+            method="GET",
+        )
+        with urllib.request.urlopen(req, timeout=5) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+
+    try:
+        token_resp = _post_json(
+            "https://api.agentops.ai/public/v1/auth/access_token",
+            {"api_key": api_key},
+        )
+        access_token = token_resp.get("access_token")
+        if not access_token:
+            return
+
+        metrics = _get_json(
+            f"https://api.agentops.ai/public/v1/traces/{trace_id}/metrics",
+            access_token,
+        )
+        total_cost = (
+            metrics.get("cost", {}).get("total")
+            if isinstance(metrics, dict)
+            else None
+        )
+        if total_cost is not None:
+            print(f"[agentops] trace {trace_id} cost=${total_cost}")
+    except Exception:
+        # Silent failure to avoid impacting request flow
+        return
+
+
+def load_cache(cache_key: str) -> Optional[dict]:
+    try:
+        path = _cache_path(cache_key)
+        if not path.exists():
+            return None
+        data = json.loads(path.read_text())
+        if data.get("key") != cache_key:
+            return None
+        return data
+    except Exception:
+        return None
+
+
+def save_cache(cache_key: str, payload: dict):
+    try:
+        path = _cache_path(cache_key)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        payload_with_meta = {
+            **payload,
+            "key": cache_key,
+            "cached_at": datetime.utcnow().isoformat() + "Z",
+        }
+        tmp_path = path.with_suffix(".tmp")
+        tmp_path.write_text(json.dumps(payload_with_meta, indent=2))
+        tmp_path.replace(path)
+    except Exception:
+        pass
 
 def _is_safe_url(url: str) -> tuple[bool, str]:
     """
@@ -308,8 +430,15 @@ async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]
     Quick mode: single streaming LLM call, no tools, 2-3 sentence summary.
     Events: {"event": "quick", "data": "...streaming text..."}
     """
+    cache_key = build_cache_key(event_data, "quick")
+    cached = load_cache(cache_key)
+    if cached and "quickSummary" in cached:
+        print(f"[cache] quick hit for key={cache_key}")
+        yield {"event": "quick", "data": cached["quickSummary"]}
+        return
+    trace_obj = None
     if os.getenv("AGENTOPS_API_KEY"):
-        agentops.start_trace(tags=["concert-quick", event_data.get('title', 'unknown')[:50]])
+        trace_obj = agentops.start_trace(tags=["concert-quick", event_data.get('title', 'unknown')[:50]])
 
     try:
         llm = ChatOpenAI(
@@ -323,8 +452,11 @@ async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]
         quick_prompt = build_quick_prompt(event_data)
         chain = ChatPromptTemplate.from_messages([("user", quick_prompt)]) | llm | StrOutputParser()
 
+        quick_buffer = ""
         async for chunk in chain.astream({}):
+            quick_buffer += chunk
             yield {"event": "quick", "data": chunk}
+        save_cache(cache_key, {"quickSummary": quick_buffer})
 
         if os.getenv("AGENTOPS_API_KEY"):
             agentops.end_trace(end_state="Success")
@@ -340,8 +472,22 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
     - Phase 1: Extract artist list (from title, URL, or web search)
     - Phase 2: Get artist details (genres, bio, links)
     """
+    cache_key = build_cache_key(event_data, "detailed")
+    cached = load_cache(cache_key)
+    if cached and "aiContent" in cached and "artists" in cached:
+        print(f"[cache] detailed hit for key={cache_key}")
+        # Serve cached content using the same event shape expected by the client
+        yield {"event": "status", "data": "extracting_artists"}
+        yield {"event": "artist_list", "data": json.dumps(cached["artists"])}
+        yield {"event": "status", "data": "researching_artists"}
+        for artist_name, artist_content in zip(cached["artists"], cached.get("artistSections", [])):
+            yield {"event": "artist_result", "data": json.dumps({"artist": artist_name, "content": artist_content})}
+        yield {"event": "complete", "data": "all_artists_researched"}
+        return
+
+    trace_obj = None
     if os.getenv("AGENTOPS_API_KEY"):
-        agentops.start_trace(tags=[f"concert-detailed", event_data.get('title', 'unknown')[:50]])
+        trace_obj = agentops.start_trace(tags=[f"concert-detailed", event_data.get('title', 'unknown')[:50]])
 
     try:
         ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
@@ -400,6 +546,9 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
 
         # Phase 2: Get artist details (parallel mode - streaming as they complete)
         yield {"event": "status", "data": "researching_artists"}
+
+        artist_sections: list[str] = []
+        artist_results_map: dict[str, str] = {}
 
         # Create parallel tasks for each artist (with 2-phase research + verification)
         async def research_and_verify_artist(artist: str) -> tuple[str, str]:
@@ -463,12 +612,22 @@ Return the cleaned up artist section:"""
                 artist_name, artist_content = await coro
                 # JSON-serialize the dict for SSE
                 yield {"event": "artist_result", "data": json.dumps({"artist": artist_name, "content": artist_content})}
+                artist_results_map[artist_name] = artist_content
             except Exception as e:
                 # Shouldn't reach here due to error handling in research_and_verify_artist, but just in case
                 yield {"event": "error", "data": f"Unexpected error: {str(e)}"}
 
         # All artists completed
         yield {"event": "complete", "data": "all_artists_researched"}
+
+        # Persist cache in artist order
+        ordered_sections = [artist_results_map.get(name, "") for name in artists]
+        full_content = "\n\n".join(ordered_sections)
+        save_cache(cache_key, {
+            "artists": artists,
+            "artistSections": ordered_sections,
+            "aiContent": full_content,
+        })
 
         # Log result
         try:
