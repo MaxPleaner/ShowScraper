@@ -524,7 +524,7 @@ a .box:hover {
 .textViewEntry {
     outline: 2px solid #1a4a5c;
     border-radius: 4px;
-    overflow: hidden;
+    overflow: visible;
     margin: 0 auto;
     padding-left: 3px;
     padding-right: 3px;
@@ -593,6 +593,7 @@ a .box:hover {
   gap: 2px;
   margin: 0;
   padding: 0;
+  overflow: visible;
 }
 
 .textViewEntry .calendar-button {
@@ -611,6 +612,7 @@ a .box:hover {
   border: 1px solid #4ade80;
   font-weight: 700;
   cursor: pointer;
+  position: relative;
 }
 
 .textViewEntry .calendar-button:hover {
@@ -622,6 +624,389 @@ a .box:hover {
 
 .textViewEntry .calendar-button i {
   font-size: 1em;
+}
+
+.textViewEntry .calendar-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  transform: translate(0, 4px);
+  background: rgba(13, 17, 23, 0.95);
+  color: #e0e0e0;
+  border: 1px solid #4ade80;
+  border-radius: 4px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 0.75em;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 50;
+}
+
+.textViewEntry .calendar-button:hover::after {
+  opacity: 1;
+  transform: translate(0, 2px);
+}
+
+/* AI Button Styling */
+.textViewEntry .calendar-button.ai-button {
+  background-color: #7c3aed;
+  border-color: #a78bfa;
+}
+
+.textViewEntry .calendar-button.ai-button:hover {
+  background-color: #8b5cf6;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
+}
+
+/* AI Modal Styles */
+.ai-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.ai-modal-content {
+  background-color: #0d1117;
+  border: 2px solid #4ade80;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 900px;
+  max-height: 85vh;
+  width: 90%;
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.3);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(50px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.ai-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 2px solid #1a4a5c;
+  background-color: #0C7B93;
+}
+
+.ai-modal-header h2 {
+  margin: 0;
+  color: #4ade80;
+  font-size: 1.5em;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+}
+
+.ai-modal-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.ai-toggle-raw {
+  background-color: #1a4a5c;
+  color: #4ade80;
+  border: 1px solid #4ade80;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+
+.ai-refetch {
+  background-color: #0b8a7f;
+  color: #ffffff;
+  border: 1px solid #4ade80;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 700;
+}
+
+.ai-refetch:hover {
+  background-color: #4ade80;
+  color: #0d1117;
+}
+
+.ai-toggle-raw:hover {
+  background-color: #4ade80;
+  color: #0d1117;
+}
+
+.ai-modal-close {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 2em;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.ai-modal-close:hover {
+  color: #4ade80;
+  transform: rotate(90deg);
+}
+
+.ai-content pre {
+  background-color: #1a1a1a;
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto;
+  font-family: 'Courier New', monospace;
+  font-size: 0.9em;
+  line-height: 1.4;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  color: white
+}
+
+.ai-modal-body {
+  padding: 14px;
+  overflow-y: auto;
+  color: #e0e0e0;
+  line-height: 1.35;
+}
+
+.ai-loading {
+  text-align: center;
+  padding: 10px;
+  font-size: 1.2em;
+  color: #4ade80;
+}
+
+.ai-loading i {
+  margin-right: 10px;
+}
+
+.ai-error {
+  padding: 20px;
+  background-color: #3f1f1f;
+  border: 1px solid #ff6b6b;
+  border-radius: 4px;
+  color: #ff6b6b;
+}
+
+.ai-error i {
+  margin-right: 10px;
+}
+
+.ai-status {
+  margin-bottom: 6px;
+  font-weight: 800;
+  font-size: 0.95em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.ai-drafting { color: #4ade80; }
+.ai-proofreading { color: #93c5fd; }
+
+@keyframes pulse {
+  0% { opacity: 0.6; transform: translateY(0px); }
+  50% { opacity: 1; transform: translateY(-1px); }
+  100% { opacity: 0.6; transform: translateY(0px); }
+}
+
+.ai-content {
+  white-space: pre-wrap;
+}
+
+/* AI Disclaimer */
+.ai-disclaimer {
+  padding: 12px;
+  background-color: #3f2a1f;
+  border: 1px solid #ff9800;
+  border-radius: 6px;
+  margin-bottom: 15px;
+  color: #ffb74d;
+  font-size: 0.9em;
+  line-height: 1.4;
+}
+
+.ai-disclaimer strong {
+  color: #ffa726;
+  font-weight: 700;
+}
+
+/* Quick Summary Section */
+.ai-quick-summary {
+  padding: 5px;
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.ai-quick-summary h3 {
+  color: #4ade80;
+  font-size: 1.2em;
+  margin: 0 0 12px 0;
+  font-weight: 700;
+}
+
+.ai-quick-summary p {
+  color: #e0e0e0;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 13px;
+}
+
+.ai-get-details-btn {
+  background: linear-gradient(135deg, #0C7B93 0%, #0a6078 100%);
+  color: white;
+  border: 1px solid #4ade80;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ai-get-details-btn:hover {
+  background: linear-gradient(135deg, #0a6078 0%, #08516a 100%);
+  border-color: #22c55e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+}
+
+.ai-get-details-btn i {
+  font-size: 1.1em;
+}
+
+/* GitHub Markdown overrides */
+.ai-content .markdown-body,
+.ai-content .markdown-body * {
+  all: revert;
+}
+
+.ai-content .markdown-body {
+  background: transparent;
+  color: #e0e0e0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  line-height: 1.25;
+  margin: 0;
+  padding: 0;
+}
+
+.ai-content .markdown-body h1,
+.ai-content .markdown-body h2,
+.ai-content .markdown-body h3,
+.ai-content .markdown-body h4,
+.ai-content .markdown-body h5,
+.ai-content .markdown-body h6 {
+  color: #4ade80;
+  font-weight: 800;
+  margin: 4px 0 2px 0;
+}
+
+.ai-content .markdown-body h1 { font-size: 1.32em; padding-bottom: 1px; border-bottom: 1px solid #0C7B93; }
+.ai-content .markdown-body h2 { font-size: 1.18em; padding-bottom: 1px; border-bottom: 1px solid #0C7B93; }
+.ai-content .markdown-body h3 { font-size: 1.05em; }
+
+.ai-content .markdown-body p {
+  margin: 0 0 4px 0;
+}
+
+.ai-content .markdown-body ul,
+.ai-content .markdown-body ol {
+  margin: 0;
+  padding-left: 0.9em;
+  list-style-position: inside;
+  display: grid;
+  gap: 0;
+}
+
+.ai-content .markdown-body li {
+  margin: 0;
+  padding: 0;
+  line-height: 1.08;
+}
+
+.ai-content .markdown-body a {
+  color: #4ade80;
+  text-decoration: none;
+}
+
+.ai-content .markdown-body a:hover {
+  color: #ffffff;
+  text-decoration: underline;
+}
+
+.ai-content .markdown-body strong {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.ai-content .markdown-body code {
+  background-color: #1a1a1a;
+  color: #4ade80;
+  padding: 0.12em 0.28em;
+  border-radius: 3px;
+}
+
+.ai-content .markdown-body pre {
+  background-color: #1a1a1a;
+  margin: 4px 0;
+  padding: 6px;
+  overflow: auto;
+  border-radius: 4px;
+}
+
+.ai-content .markdown-body blockquote {
+  border-left: 3px solid #4ade80;
+  color: #b0b0b0;
+  margin: 4px 0;
+  padding: 0 0.8em;
+}
+
+.ai-content .markdown-body hr {
+  border: none;
+  height: 1px;
+  background: #0C7B93;
+  margin: 6px 0;
 }
 
 .location-icon {

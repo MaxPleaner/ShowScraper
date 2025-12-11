@@ -5,11 +5,13 @@
   "private": true,
   "dependencies": {
     "bulma": "^0.9.3",
+    "github-markdown-css": "^5.8.1",
     "jquery": "^3.6.0",
     "moment": "^2.29.3",
     "react": "^18.1.0",
     "react-bulma-components": "^4.1.0",
     "react-dom": "^18.1.0",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "5.0.1",
     "underscore": "^1.13.3"
