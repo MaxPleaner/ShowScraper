@@ -83,3 +83,8 @@ When `AGENTOPS_API_KEY` is set, all concert research sessions are tracked in Age
 1. Create new file in `tasks/` directory
 2. Implement handler function that yields SSE data
 3. Add route in `main.py`
+
+
+## Security
+
+Security scanner runs on Github.
