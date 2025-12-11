@@ -135,6 +135,7 @@ export default class EventListViewManager extends React.Component {
             <span className='ai-icon-example'>🤖</span>
             <span> icon to attempt to get info about the bands</span>
           </div>
+          <br />
 
           <div className='other-links'>
             <span>Other Event Lists: </span>
