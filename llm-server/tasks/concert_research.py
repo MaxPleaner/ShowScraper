@@ -472,7 +472,9 @@ Return the cleaned up artist section:"""
 
         # Log result
         try:
-            log_path = Path(__file__).parent / "logs" / f"detailed_{ts}_{os.getpid()}.md"
+            # Write task logs to the shared llm-server/logs directory (not tasks/logs)
+            log_dir = Path(__file__).resolve().parent.parent / "logs"
+            log_path = log_dir / f"detailed_{ts}_{os.getpid()}.md"
             log_path.parent.mkdir(parents=True, exist_ok=True)
             log_path.write_text(f"# Artists Found\n{artist_list_text}\n\n# Streaming mode - individual results sent as events")
         except Exception:

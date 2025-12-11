@@ -8,4 +8,4 @@ log_full.txt
 venv/
 __pycache__/
 *.pyc
-llm_server/logs/
+llm-server/logs/

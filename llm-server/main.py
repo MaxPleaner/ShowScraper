@@ -113,7 +113,8 @@ async def concert_research(
             "mode": mode,
             "query": event_data
         }
-        log_path = Path(__file__).parent / "logs" / f"req_{ts}_{os.getpid()}.json"
+        log_dir = Path(__file__).resolve().parent / "logs"
+        log_path = log_dir / f"req_{ts}_{os.getpid()}.json"
         log_path.parent.mkdir(parents=True, exist_ok=True)
         log_path.write_text(json.dumps(req_log, indent=2))
     except Exception:
