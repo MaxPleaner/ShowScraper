@@ -5,3 +5,7 @@ debug/*
 debug/
 log.txt
 log_full.txt
+venv/
+__pycache__/
+*.pyc
+llm_server/logs/
