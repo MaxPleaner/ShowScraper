@@ -14,24 +14,29 @@ export default class AboutView extends React.Component {
     const list_link = <a href='http://www.foopee.com/punk/the-list/'>The List</a>
     return (
       <div className='About'>
-        <p>This site was built by Max Pleaner ({dp_link}).</p>
+        <p>
+          Made by <a href='https://maxpleaner.com'>Max Pleaner</a>.
+        </p>
         <br />
 
-        <p>The goal is to build upon the excellent resource known as the "List" by directly scraping
-        venue websites for show listings. "The List" is also scraped, which results in a more comprehensive
-        set of listings. Over 40 web scrapers have been written for the purposes of this site
-        (using Selenium automated browser, scripted in Ruby). The front end is done with React
-        and it's hosted on Github pages. Scrapers are re-run daily.</p>
+        <p>
+          <a href="https://github.com/maxpleaner/showscraper">Source code on Github.</a>
+        </p>
         <br />
 
-        <p>If you would like to request a new venue be added, please email maxpleaner @ gmail.com</p>
+        <p>
+          Over 40 web scrapers are run daily on the server.
+        </p>
+        <br />
+        
+        <p>
+          If you want to get your show added, the best way to get a wide audience is to use the "Send Steve Mail" link on <a href='http://www.foopee.com/punk/the-list/'>The List</a> and it will end up here the following day.
+        </p>
         <br />
 
-        <p>If you would like to add an unlisted show, use the "Send Steve Mail" link on {list_link} and it will end up here the following day.</p>
-        <br />
-
-        <p>If you would like to volunteer to maintain or add scrapers (or work on the site in some other capacity),
-        the repo is {gh_link}. Please be in touch I can help orient you.</p>
+        <p>
+          I am looking for collaborators to improve this website or make other awesome things!
+        </p>
       </div>
     )
   }

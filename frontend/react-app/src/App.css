@@ -17,8 +17,9 @@
     font-size: 1.3em;
     /* margin-right: 10px; */
     margin-left: 20px;
-    text-decoration: underline;
     display: inline-block;
+    font-weight: 700;
+    letter-spacing: 0.5px;
 }
 
 .About a, .About a:visited {
@@ -806,7 +807,7 @@ a .box:hover {
 .ai-loading {
   text-align: center;
   padding: 10px;
-  font-size: 1.2em;
+  font-size: 0.95em;
   color: #4ade80;
 }
 
@@ -1129,6 +1130,42 @@ a .box:hover {
         padding-top: 380px;
     }*/
  
+}
+
+.ai-integration-notice {
+    display: inline-block;
+    margin-left: 20px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background-color: #000000;
+    border: 2px solid #4ade80;
+    border-radius: 6px;
+    color: #e0e0e0;
+    font-weight: 600;
+    letter-spacing: 0.25px;
+    font-size: 0.95em;
+}
+
+.ai-integration-notice .notice-label {
+    color: #fbbf24;
+    font-weight: 900;
+    margin-right: 6px;
+    letter-spacing: 0.5px;
+}
+
+.ai-integration-notice .ai-icon-example {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #7c3aed;
+    border: 1px solid #a78bfa;
+    border-radius: 3px;
+    padding: 2px;
+    font-size: 1em;
+    width: 24px;
+    height: 24px;
+    vertical-align: middle;
+    margin: 0 2px;
 }
 
 .other-links {
