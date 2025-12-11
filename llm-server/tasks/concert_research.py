@@ -1,6 +1,9 @@
 import os
 import asyncio
 import json
+import ipaddress
+import socket
+from urllib.parse import urlparse
 from typing import AsyncGenerator, Optional, List
 from datetime import datetime
 from pathlib import Path
@@ -13,9 +16,68 @@ from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_community.document_loaders import WebBaseLoader
 import agentops
 
-def fetch_url_content(url: str) -> str:
-    """Fetch and extract text content from a URL"""
+def _is_safe_url(url: str) -> tuple[bool, str]:
+    """
+    Validate URL to prevent SSRF attacks.
+    Returns (is_safe, error_message)
+    """
     try:
+        parsed = urlparse(url)
+
+        # Only allow HTTP/HTTPS
+        if parsed.scheme not in ('http', 'https'):
+            return False, f"Invalid protocol: {parsed.scheme}. Only HTTP/HTTPS allowed."
+
+        # Must have a hostname
+        if not parsed.hostname:
+            return False, "Invalid URL: no hostname found."
+
+        # Resolve hostname to IP
+        try:
+            ip = socket.gethostbyname(parsed.hostname)
+        except socket.gaierror:
+            return False, f"Cannot resolve hostname: {parsed.hostname}"
+
+        # Check if IP is private/reserved
+        try:
+            ip_obj = ipaddress.ip_address(ip)
+
+            # Block private networks
+            if ip_obj.is_private:
+                return False, f"Blocked private IP address: {ip}"
+
+            # Block loopback
+            if ip_obj.is_loopback:
+                return False, f"Blocked loopback address: {ip}"
+
+            # Block link-local
+            if ip_obj.is_link_local:
+                return False, f"Blocked link-local address: {ip}"
+
+            # Block multicast
+            if ip_obj.is_multicast:
+                return False, f"Blocked multicast address: {ip}"
+
+            # Block reserved
+            if ip_obj.is_reserved:
+                return False, f"Blocked reserved address: {ip}"
+
+        except ValueError:
+            return False, f"Invalid IP address: {ip}"
+
+        return True, ""
+
+    except Exception as e:
+        return False, f"URL validation error: {str(e)}"
+
+def fetch_url_content(url: str) -> str:
+    """Fetch and extract text content from a URL with SSRF protection"""
+    try:
+        # Validate URL for SSRF protection
+        is_safe, error_msg = _is_safe_url(url)
+        if not is_safe:
+            return f"Error: {error_msg}"
+
         # Don't fetch foopee.com URLs (they block scrapers)
         if 'foopee.com' in url.lower():
             return "Error: foopee.com blocks web scrapers. Please use web search instead."
