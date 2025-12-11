@@ -67,6 +67,21 @@ This runs `nvm use 14; cd frontend/react_app && yarn install & yarn start`
 
 Note you will probably have to change this `nvm use 14` if you are using a different Node version.
 
+## Setup - LLM Server
+
+The LLM server provides AI-powered concert research via streaming SSE endpoints.
+
+1. `cd llm-server`
+2. `pip install -r requirements.txt`
+3. Add API keys to `.env`:
+   ```
+   ANTHROPIC_API_KEY=your_key_here
+   SERPAPI_API_KEY=your_key_here
+   ```
+4. `python main.py` (runs on localhost:8000)
+
+The server is used by the frontend's AI Research feature to provide two-phase streaming concert information.
+
 ## Running Scraper
 
 There is a command line tool at `bin/run_scraper`.
