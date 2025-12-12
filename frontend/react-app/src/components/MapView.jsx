@@ -123,12 +123,17 @@ export default class MapView extends React.Component {
       currentZoom: DEFAULT_ZOOM,
       showMissingEventsModal: false,
     };
-    // Cache computed values
+    // Cache computed values - each method tracks its own props
     this.cachedEventsWithLocation = null;
+    this.lastPropsEventsForWithLocation = null;
+    this.lastPropsVenuesForWithLocation = null;
+
     this.cachedEventsWithoutLocation = null;
+    this.lastPropsEventsForWithoutLocation = null;
+    this.lastPropsVenuesForWithoutLocation = null;
+
     this.cachedTotalEvents = null;
-    this.lastPropsEvents = null;
-    this.lastPropsVenues = null;
+    this.lastPropsEventsForTotal = null;
   }
 
   parseLatLng(latlngStr) {
@@ -141,8 +146,8 @@ export default class MapView extends React.Component {
   getEventsWithLocation() {
     // Return cached result if props haven't changed
     if (this.cachedEventsWithLocation &&
-        this.lastPropsEvents === this.props.events &&
-        this.lastPropsVenues === this.props.venues) {
+        this.lastPropsEventsForWithLocation === this.props.events &&
+        this.lastPropsVenuesForWithLocation === this.props.venues) {
       return this.cachedEventsWithLocation;
     }
 
@@ -187,8 +192,8 @@ export default class MapView extends React.Component {
 
     // Cache the result
     this.cachedEventsWithLocation = eventsWithLocation;
-    this.lastPropsEvents = this.props.events;
-    this.lastPropsVenues = this.props.venues;
+    this.lastPropsEventsForWithLocation = this.props.events;
+    this.lastPropsVenuesForWithLocation = this.props.venues;
 
     return eventsWithLocation;
   }
@@ -200,7 +205,7 @@ export default class MapView extends React.Component {
   getTotalEventCount() {
     // Return cached result if props haven't changed
     if (this.cachedTotalEvents !== null &&
-        this.lastPropsEvents === this.props.events) {
+        this.lastPropsEventsForTotal === this.props.events) {
       return this.cachedTotalEvents;
     }
 
@@ -211,14 +216,15 @@ export default class MapView extends React.Component {
     });
 
     this.cachedTotalEvents = total;
+    this.lastPropsEventsForTotal = this.props.events;
     return total;
   }
 
   getEventsWithoutLocation() {
     // Return cached result if props haven't changed
     if (this.cachedEventsWithoutLocation &&
-        this.lastPropsEvents === this.props.events &&
-        this.lastPropsVenues === this.props.venues) {
+        this.lastPropsEventsForWithoutLocation === this.props.events &&
+        this.lastPropsVenuesForWithoutLocation === this.props.venues) {
       return this.cachedEventsWithoutLocation;
     }
 
@@ -255,6 +261,8 @@ export default class MapView extends React.Component {
     });
 
     this.cachedEventsWithoutLocation = eventsWithoutLocation;
+    this.lastPropsEventsForWithoutLocation = this.props.events;
+    this.lastPropsVenuesForWithoutLocation = this.props.venues;
     return eventsWithoutLocation;
   }
 
