@@ -188,8 +188,8 @@ export default class MapView extends React.Component {
           eventsWithLocation.push({
             ...event,
             lat: coords[0],
-            lng: coords[1],
-            date: date
+            lng: coords[1]
+            // Keep original event.date (YYYY-MM-DD format) for LLM server
           });
         }
       });
