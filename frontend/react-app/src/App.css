@@ -1266,6 +1266,7 @@ a .box:hover {
     position: relative;
     width: 12px;
     height: 30px;
+    filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.9));
 }
 
 /* Circle on top */
@@ -1280,7 +1281,6 @@ a .box:hover {
     background: #4ade80;
     border-radius: 50%;
     border: 2px solid #1a1a1a;
-    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
 /* Stick below */
@@ -1293,7 +1293,6 @@ a .box:hover {
     width: 3px;
     height: 20px;
     background: #4ade80;
-    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
 }
 
 .map-events-missing-notice {
