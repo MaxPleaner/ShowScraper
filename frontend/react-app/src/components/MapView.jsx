@@ -147,16 +147,20 @@ export default class MapView extends React.Component {
     Object.entries(events).forEach(([date, dateEvents]) => {
       dateEvents.forEach(event => {
         const venueName = event.source.name;
+        const venueCommonName = event.source.commonName;
 
-        // Check override file first
+        // Check override file first (using commonName for List venues)
         let coords = null;
-        if (VENUE_LOCATION_OVERRIDES[venueName]) {
-          coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueName]);
+        if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
+          coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueCommonName]);
+          console.log('Using override for:', venueCommonName, coords);
         } else {
-          // Fall back to venues.json data
+          // Fall back to venues.json data (using name)
           const venue = venueMap[venueName];
           if (venue && venue.latlng) {
             coords = this.parseLatLng(venue.latlng);
+          } else {
+            console.log('No location found for:', venueCommonName);
           }
         }
 
@@ -200,14 +204,15 @@ export default class MapView extends React.Component {
     Object.entries(events).forEach(([date, dateEvents]) => {
       const eventsForDate = dateEvents.filter(event => {
         const venueName = event.source.name;
+        const venueCommonName = event.source.commonName;
 
-        // Check if venue has override location
-        if (VENUE_LOCATION_OVERRIDES[venueName]) {
-          const coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueName]);
+        // Check if venue has override location (using commonName for List venues)
+        if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
+          const coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueCommonName]);
           if (coords) return false; // Has location via override
         }
 
-        // Check venues.json
+        // Check venues.json (using name)
         const venue = venueMap[venueName];
         if (!venue || !venue.latlng) return true;
         const coords = this.parseLatLng(venue.latlng);
