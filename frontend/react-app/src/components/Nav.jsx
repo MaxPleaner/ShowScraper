@@ -22,7 +22,11 @@ export default class Nav extends React.Component {
                     <Link to='/TextAndImagesView'>
                         <div className={`nav-item ${(this.props.route === "TextAndImagesView") ? "selected" : ""}`}>Flyers View</div>
                     </Link>
-                
+
+                    <Link to='/MapView'>
+                        <div className={`nav-item ${this.props.route === "MapView" ? "selected" : ""}`}>Map View</div>
+                    </Link>
+
                     <Link to='/VenuesListView'>
                         <div className={`nav-item ${this.props.route === "VenuesListView" ? "selected" : ""}`}>Venues</div>
                     </Link>
