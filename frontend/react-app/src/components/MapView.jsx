@@ -17,7 +17,7 @@ const customPinIcon = L.divIcon({
 });
 
 const BAY_AREA_CENTER = [37.7749, -122.4194]; // San Francisco
-const DEFAULT_ZOOM = 10;
+const DEFAULT_ZOOM = 8; // Zoomed out to show North Bay and Santa Cruz
 
 // Zoom scaling configuration
 const CARD_ZOOM_THRESHOLD = 11; // Show cards at zoom 11 and above, only markers below
