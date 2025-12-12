@@ -74,7 +74,6 @@ export default class EventModal extends React.Component {
 
               <button
                 onClick={() => {
-                  onClose();
                   onAIClick(event);
                 }}
                 className='event-modal-btn event-modal-btn-ai'

@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from 'react-dom/server';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import EventMapCard from './EventMapCard';
+import EventListView from './EventListView';
 
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -119,6 +120,7 @@ export default class MapView extends React.Component {
     super(props);
     this.state = {
       currentZoom: DEFAULT_ZOOM,
+      showMissingEventsModal: false,
     };
   }
 
@@ -167,8 +169,54 @@ export default class MapView extends React.Component {
     this.setState({ currentZoom: zoom });
   }
 
+  getTotalEventCount() {
+    const events = this.props.events || {};
+    let total = 0;
+    Object.values(events).forEach(dateEvents => {
+      total += dateEvents.length;
+    });
+    return total;
+  }
+
+  getEventsWithoutLocation() {
+    const events = this.props.events || {};
+    const venues = this.props.venues || [];
+
+    const venueMap = {};
+    venues.forEach(venue => {
+      venueMap[venue.name] = venue;
+    });
+
+    const eventsWithoutLocation = {};
+    Object.entries(events).forEach(([date, dateEvents]) => {
+      const eventsForDate = dateEvents.filter(event => {
+        const venueName = event.source.name;
+        const venue = venueMap[venueName];
+        if (!venue || !venue.latlng) return true;
+        const coords = this.parseLatLng(venue.latlng);
+        return !coords;
+      });
+
+      if (eventsForDate.length > 0) {
+        eventsWithoutLocation[date] = eventsForDate;
+      }
+    });
+
+    return eventsWithoutLocation;
+  }
+
+  openMissingEventsModal = () => {
+    this.setState({ showMissingEventsModal: true });
+  }
+
+  closeMissingEventsModal = () => {
+    this.setState({ showMissingEventsModal: false });
+  }
+
   render() {
     const eventsWithLocation = this.getEventsWithLocation();
+    const totalEvents = this.getTotalEventCount();
+    const eventsWithoutLocation = totalEvents - eventsWithLocation.length;
 
     if (eventsWithLocation.length === 0) {
       return (
@@ -198,6 +246,20 @@ export default class MapView extends React.Component {
             currentZoom={this.state.currentZoom}
           />
         </MapContainer>
+        {eventsWithoutLocation > 0 && (
+          <div className='map-events-missing-notice' onClick={this.openMissingEventsModal}>
+            {eventsWithoutLocation} event{eventsWithoutLocation !== 1 ? 's' : ''} not shown on map (no location registered for venue)
+          </div>
+        )}
+        {this.state.showMissingEventsModal && (
+          <div className='missing-events-modal-overlay' onClick={this.closeMissingEventsModal}>
+            <div className='missing-events-modal-content' onClick={(e) => e.stopPropagation()}>
+              <button className='event-modal-close' onClick={this.closeMissingEventsModal}>×</button>
+              <h2>Events Without Location Data</h2>
+              <EventListView textOnly={true} events={this.getEventsWithoutLocation()} />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
