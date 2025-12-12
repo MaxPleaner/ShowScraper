@@ -169,8 +169,9 @@ export default class MapView extends React.Component {
 
         // Check override file first (using commonName for List venues)
         let coords = null;
-        if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
-          coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueCommonName]);
+        const override = VENUE_LOCATION_OVERRIDES.find(o => o.lookup(venueCommonName));
+        if (override) {
+          coords = this.parseLatLng(override.location);
         } else {
           // Fall back to venues.json data (using name)
           const venue = venueMap[venueName];
@@ -243,8 +244,9 @@ export default class MapView extends React.Component {
         const venueCommonName = event.source.commonName;
 
         // Check if venue has override location (using commonName for List venues)
-        if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
-          const coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueCommonName]);
+        const override = VENUE_LOCATION_OVERRIDES.find(o => o.lookup(venueCommonName));
+        if (override) {
+          const coords = this.parseLatLng(override.location);
           if (coords) return false; // Has location via override
         }
 
