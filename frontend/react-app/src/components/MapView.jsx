@@ -268,8 +268,13 @@ export default class MapView extends React.Component {
 
   render() {
     const eventsWithLocation = this.getEventsWithLocation();
-    const totalEvents = this.getTotalEventCount();
-    const eventsWithoutLocation = totalEvents - eventsWithLocation.length;
+    const eventsWithoutLocationByDate = this.getEventsWithoutLocation();
+
+    // Count total events without location across all dates
+    let eventsWithoutLocationCount = 0;
+    Object.values(eventsWithoutLocationByDate).forEach(dateEvents => {
+      eventsWithoutLocationCount += dateEvents.length;
+    });
 
     if (eventsWithLocation.length === 0) {
       return (
@@ -299,9 +304,9 @@ export default class MapView extends React.Component {
             currentZoom={this.state.currentZoom}
           />
         </MapContainer>
-        {eventsWithoutLocation > 0 && (
+        {eventsWithoutLocationCount > 0 && (
           <div className='map-events-missing-notice' onClick={this.openMissingEventsModal}>
-            {eventsWithoutLocation} event{eventsWithoutLocation !== 1 ? 's' : ''} not shown on map (no location registered for venue)
+            {eventsWithoutLocationCount} event{eventsWithoutLocationCount !== 1 ? 's' : ''} not shown on map (no location registered for venue)
           </div>
         )}
         {this.state.showMissingEventsModal && (
@@ -309,7 +314,7 @@ export default class MapView extends React.Component {
             <div className='missing-events-modal-content' onClick={(e) => e.stopPropagation()}>
               <button className='event-modal-close' onClick={this.closeMissingEventsModal}>×</button>
               <h2>Events Without Location Data</h2>
-              <EventListView textOnly={true} events={this.getEventsWithoutLocation()} />
+              <EventListView textOnly={true} events={eventsWithoutLocationByDate} />
             </div>
           </div>
         )}
