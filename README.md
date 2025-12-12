@@ -1,88 +1,41 @@
 # ShowScraper
 
-This is a collection of a bunch of scrapers which fetch concert listings from
-various venues in the Bay Area.
+## Basic Architecture
 
-It also is a website to view the listings.
+This repo has three parts:
 
-## Tech Stack
+- **Scraper**: A bunch of scrapers which fetch concert listings from
+various venues in the Bay Area (Ruby / Selenium). Essentially a one-off process which you can schedule to run daily via Cron or Systemd or whatever. It writes results to a GCS bucket.
+- **Frontend**: A website to view the listings (React). Compiled to a static site via `npm build` and deployed to Github pages via a Github action. It reads the files off GCS and can send API requests to the LLM Server
+- **LLM Server**: a LLM backend to research additional concert details (Python / LangChain). It's a web server you need to keep running on some machine.
 
-The scraper uses headless [Selenium](https://www.selenium.dev/)
-([Chromedriver](https://chromedriver.chromium.org/downloads))
-and is written in [Ruby](https://www.ruby-lang.org/en/).
+## Frontend-only quickstart
+- `cd frontend/react-app`
+- `npm i`
+- `npm run dev`
+- To build & deploy, run `ShowScraper/bin/deploy`.
 
-Results are converted to [JSON](https://www.json.org/json-en.html)
-and pushed to a [Google Cloud Storage](https://cloud.google.com/storage)
-bucket.
+## Setting up the scraper
 
-The front end is written in [React](https://reactjs.org/)
-and styled with [Bulma CSS framework](https://bulma.io/).
-
-## Setup - Scraper
-
-1. Run `bundle install` in the root of the repo using a stable Ruby version
-
-1. You're gonna need to install Chromedriver.
-     - **On Raspberry Pi**:  you can do this with `sudo apt-get install chromium-chromedriver` and this will happen automatically (the scraper will check your system architecture and use the right 
-       chromedriver path)
-     - **on OSX and Windows** you can find all versions at [https://chromedriver.chromium.org/](https://chromedriver.chromium.org/) and then add it to your PATH.
-       For example, add this to your `~/.bash_profile`:
-         ```
-         export PATH=$PATH:/path/to/folder/containing/chromedriver/
-         ```
-
-1. Run `cp .env.example .env` in the root of the repo. The `.env` file sets environment variables which can be used to customize the application's behavior. This file can be edited directly.
-
-1. Make a new "project" on google cloud. Create a GCS bucket in the project. Add the credentials to `.env`:
-  
-    ```
-    STORAGE_PROJECT = "my-project-id"
-    STORAGE_CREDENTIALS = "path/to/keyfile.json"
-    ```
-
-1. Change the GCS bucket permissions so all files are publicly available by default.
-
-1. Configure `gsutils` to use your new project, then upload the CORS file which I've included in the repo:
+1. Install a modern ruby and `bundle install`
+2. Install a driver
+   - Currently the app is set up to use Firefox or Chromedriver. I previously was using Chromedriver but I switched to Firefox. Edit [Scraper#init_driver](https://github.com/MaxPleaner/ShowScraper/blob/460a3e3d7bbd8c770bab26bdd82d5606ed86c0be/scraper/scraper.rb#L128) to switch implementation.
+   - For Chromedriver:
+     - On Linux you can `apt-get install chromium-chromedriver`. Our application should hopefully pick up the executable path automatically.
+     - On Windows / OSX, download from [https://chromedriver.chromium.org/](https://chromedriver.chromium.org/) and add the executable-containing folder to your `PATH` manually.
+   - For Firefox:
+     - Install Geckodriver and set `GECKODRIVER_PATH` in env to point directly to the executable. I found it at `/opt/homebrew/bin/geckodriver` for OSX or `/usr/local/bin/geckodriver` for Linux
+3. copy `.env.example` to `.env` and configure it
+4. Make a new project on GCP and create a GCS bucket within it. Set `STORAGE_PROJECT` in `.env` to your project id. Download the `keyfile.json` and set `STORAGE_CREDENTIALS` to this file's path.
+5. Make a new "project" on google cloud. Create a GCS bucket in the project. Add the credentials to `.env`:
+6. Change the GCS bucket permissions so all files are publicly available by default.
+7. Configure `gsutils` to use your new project, then upload the CORS file which I've included in the repo:
 
     ```
     gsutil cors set cors-json-file.json gs://<BUCKET_NAME>
     ```
 
-## Setup - Frontend
-
-1. Make sure you're using a stable Node version
-2. `cd frontend/react-app`
-3. run `yarn install` to get dependencies
-4. `yarn start` and then open `localhost:3000`
-
-To build the project for production, use `yarn build`
-
-_Note_: There is also a script which you can run from the root of the repo to start the react server:
-
-```
-bin/run_frontend
-```
-
-This runs `nvm use 14; cd frontend/react_app && yarn install & yarn start`
-
-Note you will probably have to change this `nvm use 14` if you are using a different Node version.
-
-## Setup - LLM Server
-
-The LLM server provides AI-powered concert research via streaming SSE endpoints.
-
-1. `cd llm-server`
-2. `pip install -r requirements.txt`
-3. Add API keys to `.env`:
-   ```
-   ANTHROPIC_API_KEY=your_key_here
-   SERPAPI_API_KEY=your_key_here
-   ```
-4. `python main.py` (runs on localhost:8000)
-
-The server is used by the frontend's AI Research feature to provide two-phase streaming concert information.
-
-## Running Scraper
+## Running the scraper
 
 There is a command line tool at `bin/run_scraper`.
 By default it will run all scrapers (each will fetch a maximum of 200 events) 
@@ -97,9 +50,14 @@ and then upload the results to GCS.
 # Just print the results, don't upload them to GCS
 --skip-persist
 
-# Don't rescue scraping errors - one broken scraper will stop the whole script
-# If rescue=true (the default) then broken scrapers will just be skipped
+# Don't rescue scraping errors - stop the script immediately
 --rescue=false
+
+# Skip broken scrapers (default behavior)
+--rescue=true
+
+# Trigger a binding.pry breakpoint upon error
+--debugger
 
 # Just update the list of venues. Don't actually scrape any events.
 --no-scrape
@@ -107,25 +65,33 @@ and then upload the results to GCS.
 # Limit the scrape to a set of venues. Comma-separated list.
 --sources=GreyArea,Cornerstone
 
-# Run headlessly, or not
+# Run headlessly
 --headless=true
---headless=false
-```
-
-For example, combining options:
 
 ```
-bin/run-scraper --headless=true --limit=5 --skip-persist --rescue=false sources=ElboRoom,Knockout
-```
-
-There are some other configuration options done through ENV, see `.env.example`
 
 Note that every time you run a scraper, it will completely overwrite the list of events for that venue.
 
-## Testing
 
-There are some basic automated tests for the scrapers. Run `bundle exec rspec` from the root of the repo.
-Using rspec you can also isolate certain tests to run (left as an exercise to the reader).
+## Setup - LLM Server
+
+The LLM server provides AI-powered concert research via streaming SSE endpoints.
+
+It's currently set up to use OpenAI, but you can probably switch it to use another provider easily.
+
+1. Add API keys to `llm-server/.env`:
+   ```
+   OPENAI_API_KEY=your_key_here
+   SERPAPI_API_KEY=your_key_here
+   ```
+1. `cd llm-server`
+2. `uv venv venv` (create a virtual environment)
+3. `source venv/bin/activate`
+2. `uv pip install -r requirements.txt`
+
+4. `python main.py` (runs on localhost:8000)
+
+The server is used by the frontend's AI Research feature to provide two-phase streaming concert information.
 
 ## Adding a new scraper
 
@@ -141,8 +107,8 @@ just copy the blurb from Google Maps as well.
 
 4. Make sure the class name is the exact same as the `name` value in `sources.json`
 
-5. Fill out the contents of the scraper, using `binding.pry` and the `HEADLESS=false`
-   environment variable as needed for debugging.
+5. Fill out the contents of the scraper, using `--debugger` and `--headless=false`
+   as needed for debugging.
 
 6. Add a test case to `scraper_spec.rb` (can just use `generic_run_test` like the other scrapers)
 
@@ -157,7 +123,7 @@ For now it suffices to go backend-less and just host the results on GCS.
 
 ## Development - TODOS
 
-- [ ] Map View
+- [x] Map View
 - [ ] Add more meta-scrapers (e.g. scrape other scrapers/aggregators), especially for electronic shows which aren't really captured by the current venue list or "The List"
 - [ ] Add more venues (have specifically received requests for South Bay, but probably there are new SF / East Bay venues as well). 
 - [ ] Add Venue Events List view (accessible from Venue List View)
