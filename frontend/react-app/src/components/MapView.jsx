@@ -123,6 +123,12 @@ export default class MapView extends React.Component {
       currentZoom: DEFAULT_ZOOM,
       showMissingEventsModal: false,
     };
+    // Cache computed values
+    this.cachedEventsWithLocation = null;
+    this.cachedEventsWithoutLocation = null;
+    this.cachedTotalEvents = null;
+    this.lastPropsEvents = null;
+    this.lastPropsVenues = null;
   }
 
   parseLatLng(latlngStr) {
@@ -133,6 +139,13 @@ export default class MapView extends React.Component {
   }
 
   getEventsWithLocation() {
+    // Return cached result if props haven't changed
+    if (this.cachedEventsWithLocation &&
+        this.lastPropsEvents === this.props.events &&
+        this.lastPropsVenues === this.props.venues) {
+      return this.cachedEventsWithLocation;
+    }
+
     const events = this.props.events || {};
     const venues = this.props.venues || [];
 
@@ -153,14 +166,11 @@ export default class MapView extends React.Component {
         let coords = null;
         if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
           coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueCommonName]);
-          console.log('Using override for:', venueCommonName, coords);
         } else {
           // Fall back to venues.json data (using name)
           const venue = venueMap[venueName];
           if (venue && venue.latlng) {
             coords = this.parseLatLng(venue.latlng);
-          } else {
-            console.log('No location found for:', venueCommonName);
           }
         }
 
@@ -175,6 +185,11 @@ export default class MapView extends React.Component {
       });
     });
 
+    // Cache the result
+    this.cachedEventsWithLocation = eventsWithLocation;
+    this.lastPropsEvents = this.props.events;
+    this.lastPropsVenues = this.props.venues;
+
     return eventsWithLocation;
   }
 
@@ -183,15 +198,30 @@ export default class MapView extends React.Component {
   }
 
   getTotalEventCount() {
+    // Return cached result if props haven't changed
+    if (this.cachedTotalEvents !== null &&
+        this.lastPropsEvents === this.props.events) {
+      return this.cachedTotalEvents;
+    }
+
     const events = this.props.events || {};
     let total = 0;
     Object.values(events).forEach(dateEvents => {
       total += dateEvents.length;
     });
+
+    this.cachedTotalEvents = total;
     return total;
   }
 
   getEventsWithoutLocation() {
+    // Return cached result if props haven't changed
+    if (this.cachedEventsWithoutLocation &&
+        this.lastPropsEvents === this.props.events &&
+        this.lastPropsVenues === this.props.venues) {
+      return this.cachedEventsWithoutLocation;
+    }
+
     const events = this.props.events || {};
     const venues = this.props.venues || [];
 
@@ -224,6 +254,7 @@ export default class MapView extends React.Component {
       }
     });
 
+    this.cachedEventsWithoutLocation = eventsWithoutLocation;
     return eventsWithoutLocation;
   }
 
