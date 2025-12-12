@@ -1268,30 +1268,32 @@ a .box:hover {
     height: 30px;
 }
 
+/* Circle on top */
 .custom-map-pin::before {
     content: '';
     position: absolute;
     top: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 6px solid transparent;
-    border-right: 6px solid transparent;
-    border-top: 18px solid #4ade80;
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+    width: 10px;
+    height: 10px;
+    background: #4ade80;
+    border-radius: 50%;
+    border: 2px solid #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
+/* Stick below */
 .custom-map-pin::after {
     content: '';
     position: absolute;
-    bottom: 0;
+    top: 10px;
     left: 50%;
     transform: translateX(-50%);
     width: 3px;
-    height: 12px;
-    background: linear-gradient(to bottom, #4ade80 0%, #1a1a1a 100%);
-    border-radius: 0 0 2px 2px;
+    height: 20px;
+    background: #4ade80;
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8);
 }
 
 .map-events-missing-notice {
