@@ -7,12 +7,13 @@ import EventMapCard from './EventMapCard';
 import EventListView from './EventListView';
 import { VENUE_LOCATION_OVERRIDES } from '../venueLocationOverrides';
 
-// Fix for default marker icons in React-Leaflet
-delete L.Icon.Default.prototype._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png'),
-  iconUrl: require('leaflet/dist/images/marker-icon.png'),
-  shadowUrl: require('leaflet/dist/images/marker-shadow.png'),
+// Custom marker icon (lime green and black)
+const customPinIcon = L.divIcon({
+  html: '<div class="custom-map-pin"></div>',
+  className: 'custom-pin-icon',
+  iconSize: [12, 30],
+  iconAnchor: [6, 30],
+  popupAnchor: [0, -30]
 });
 
 const BAY_AREA_CENTER = [37.7749, -122.4194]; // San Francisco
@@ -84,6 +85,7 @@ function EventMarkers({ events, onEventClick, currentZoom }) {
 
       // Then add the pin marker on top (higher z-index)
       const pinMarker = L.marker([event.lat, event.lng], {
+        icon: customPinIcon,
         zIndexOffset: 1000
       });
 
