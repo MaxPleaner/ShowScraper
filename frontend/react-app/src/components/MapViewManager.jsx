@@ -488,6 +488,7 @@ export default class MapViewManager extends React.Component {
         </div>
 
         <br />
+        <br />
         <div className='eventDates'>
           <a onClick={this.goToPrevDate.bind(this)}>
             <div className='date-range-select nav-item'>{this.prevDateEntry()}</div>
