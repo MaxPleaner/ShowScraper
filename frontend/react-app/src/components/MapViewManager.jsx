@@ -67,7 +67,9 @@ export default class MapViewManager extends React.Component {
 
           // Check if venue has override location
           const VENUE_LOCATION_OVERRIDES = require('../venueLocationOverrides').VENUE_LOCATION_OVERRIDES;
-          const override = VENUE_LOCATION_OVERRIDES.find(o => o.lookup(venueCommonName));
+          const override = VENUE_LOCATION_OVERRIDES.find(([substrings]) =>
+            substrings.every(substring => venueCommonName.includes(substring))
+          );
           if (override) {
             return; // Has override
           }
