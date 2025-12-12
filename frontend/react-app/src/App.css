@@ -1250,6 +1250,13 @@ a .box:hover {
     position: relative;
 }
 
+@media (min-width: 1024px) {
+    .map-container {
+        margin-left: 10vw;
+        margin-right: 10vw;
+    }
+}
+
 .map-events-missing-notice {
     position: absolute;
     top: 10px;
