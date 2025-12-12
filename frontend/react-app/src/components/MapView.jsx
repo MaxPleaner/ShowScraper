@@ -41,7 +41,7 @@ function calculateScale(zoom) {
   return MIN_SCALE + (position / range) * scaleRange;
 }
 
-function EventMarkers({ events, onEventClick, currentZoom }) {
+function EventMarkers({ events, onEventClick, onEventHover, currentZoom }) {
   const map = useMap();
   const markersRef = React.useRef([]);
 
@@ -80,6 +80,14 @@ function EventMarkers({ events, onEventClick, currentZoom }) {
         onEventClick(event);
       });
 
+      // Hover handlers for card
+      cardMarker.on('mouseover', () => {
+        onEventHover(event);
+      });
+      cardMarker.on('mouseout', () => {
+        onEventHover(null);
+      });
+
       cardMarker.addTo(map);
       markersRef.current.push(cardMarker);
 
@@ -94,6 +102,14 @@ function EventMarkers({ events, onEventClick, currentZoom }) {
         onEventClick(event);
       });
 
+      // Hover handlers for pin
+      pinMarker.on('mouseover', () => {
+        onEventHover(event);
+      });
+      pinMarker.on('mouseout', () => {
+        onEventHover(null);
+      });
+
       pinMarker.addTo(map);
       markersRef.current.push(pinMarker);
     });
@@ -104,7 +120,7 @@ function EventMarkers({ events, onEventClick, currentZoom }) {
       });
       markersRef.current = [];
     };
-  }, [events, currentZoom, map, onEventClick]);
+  }, [events, currentZoom, map, onEventClick, onEventHover]);
 
   return null;
 }
@@ -124,6 +140,7 @@ export default class MapView extends React.Component {
     this.state = {
       currentZoom: DEFAULT_ZOOM,
       showMissingEventsModal: false,
+      hoveredEvent: null,
     };
     // Cache computed values - each method tracks its own props
     this.cachedEventsWithLocation = null;
@@ -205,6 +222,10 @@ export default class MapView extends React.Component {
 
   handleZoomChange = (zoom) => {
     this.setState({ currentZoom: zoom });
+  }
+
+  handleEventHover = (event) => {
+    this.setState({ hoveredEvent: event });
   }
 
   getTotalEventCount() {
@@ -317,9 +338,16 @@ export default class MapView extends React.Component {
           <EventMarkers
             events={eventsWithLocation}
             onEventClick={this.props.onEventClick}
+            onEventHover={this.handleEventHover}
             currentZoom={this.state.currentZoom}
           />
         </MapContainer>
+        {this.state.hoveredEvent && (
+          <div className='map-hover-info-box'>
+            <div className='map-hover-venue'>{this.state.hoveredEvent.source.commonName || this.state.hoveredEvent.source.name}</div>
+            <div className='map-hover-title'>{this.state.hoveredEvent.title}</div>
+          </div>
+        )}
         {eventsWithoutLocationCount > 0 && (
           <div className='map-events-missing-notice' onClick={this.openMissingEventsModal}>
             {eventsWithoutLocationCount} event{eventsWithoutLocationCount !== 1 ? 's' : ''} not shown on map (no location registered for venue)
