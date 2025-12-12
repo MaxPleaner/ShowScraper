@@ -47,7 +47,51 @@ export default class MapViewManager extends React.Component {
     this.closeAIModal = this.closeAIModal.bind(this);
   }
 
+  componentDidMount() {
+    // Expose console command to list all venues without location
+    window.listMissingVenues = () => {
+      const allEvents = this.state.allEvents || {};
+      const venues = this.state.venues || [];
+
+      const venueMap = {};
+      venues.forEach(venue => {
+        venueMap[venue.name] = venue;
+      });
+
+      const missingVenueNames = new Set();
+
+      Object.values(allEvents).forEach(dateEvents => {
+        dateEvents.forEach(event => {
+          const venueName = event.source.name;
+          const venueCommonName = event.source.commonName;
+
+          // Check if venue has override location
+          const VENUE_LOCATION_OVERRIDES = require('../venueLocationOverrides').VENUE_LOCATION_OVERRIDES;
+          if (VENUE_LOCATION_OVERRIDES[venueCommonName]) {
+            return; // Has override
+          }
+
+          // Check venues.json
+          const venue = venueMap[venueName];
+          if (!venue || !venue.latlng) {
+            missingVenueNames.add(venueCommonName);
+          }
+        });
+      });
+
+      const sortedNames = Array.from(missingVenueNames).sort();
+      console.log(`\n=== ${sortedNames.length} Venues Without Location ===\n`);
+      sortedNames.forEach(name => console.log(`"${name}"`));
+      console.log('\n');
+
+      return sortedNames;
+    };
+
+    console.log('Console command available: listMissingVenues()');
+  }
+
   componentWillUnmount() {
+    delete window.listMissingVenues;
     this.clearArtistProgress();
     if (this.eventSource) this.eventSource.close();
     if (this.detailedEventSource) this.detailedEventSource.close();
