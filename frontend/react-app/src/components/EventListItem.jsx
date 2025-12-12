@@ -19,7 +19,10 @@ export default class EventListItem extends React.Component {
       detailedLoading: false,
       artistList: [],
       artistResults: {}, // Map of artist name -> content
+      artistProgress: {}, // Map of artist name -> percent 0-100
     }
+
+    this.artistProgressTimers = {};
 
     this.mouseEnter = this.mouseEnter.bind(this);
     this.mouseLeave = this.mouseLeave.bind(this);
@@ -27,6 +30,16 @@ export default class EventListItem extends React.Component {
     this.handleAIResearch = this.handleAIResearch.bind(this);
     this.handleDetailedResearch = this.handleDetailedResearch.bind(this);
     this.closeAIModal = this.closeAIModal.bind(this);
+    this.startArtistProgress = this.startArtistProgress.bind(this);
+    this.stopArtistProgress = this.stopArtistProgress.bind(this);
+    this.clearArtistProgress = this.clearArtistProgress.bind(this);
+  }
+
+  componentWillUnmount() {
+    this.clearArtistProgress();
+    if (this.eventSource) this.eventSource.close();
+    if (this.detailedEventSource) this.detailedEventSource.close();
+    if (this.quickSummaryTimeout) clearTimeout(this.quickSummaryTimeout);
   }
 
   /////////////////////////////////////////////////////////// 
@@ -278,6 +291,8 @@ export default class EventListItem extends React.Component {
         console.log('[AI Detailed] Artist list received');
         const artistList = JSON.parse(e.data);
 
+        this.startArtistProgress(artistList);
+
         // Create placeholder content for each artist
         const placeholders = artistList.map(artist =>
           `### ${artist}\n- **YouTube**: Loading...\n- **Genres**: Loading...\n- **Bio**: Loading...`
@@ -286,6 +301,7 @@ export default class EventListItem extends React.Component {
         this.setState({
           artistList: artistList,
           artistResults: {},
+          artistProgress: artistList.reduce((acc, name) => ({ ...acc, [name]: 0 }), {}),
           aiContent: placeholders,
           detailedLoading: false,
           aiDrafting: false,
@@ -297,8 +313,11 @@ export default class EventListItem extends React.Component {
         const resultData = JSON.parse(e.data);
         const { artist, content } = resultData;
 
+        this.stopArtistProgress(artist);
+
         this.setState(prevState => {
           const newResults = { ...prevState.artistResults, [artist]: content };
+          const { [artist]: _, ...remainingProgress } = prevState.artistProgress;
 
           // Rebuild content with updated results and placeholders for pending artists
           const orderedContent = prevState.artistList.map(artistName => {
@@ -312,6 +331,7 @@ export default class EventListItem extends React.Component {
 
           return {
             artistResults: newResults,
+            artistProgress: remainingProgress,
             aiContent: orderedContent
           };
         });
@@ -328,6 +348,7 @@ export default class EventListItem extends React.Component {
           const cacheData = { aiContent: this.state.aiContent };
           localStorage.setItem(detailedCacheKey, JSON.stringify(cacheData));
         });
+        this.clearArtistProgress();
         eventSource.close();
       });
 
@@ -353,6 +374,43 @@ export default class EventListItem extends React.Component {
     } catch (e) {
       console.warn('AI cache clear failed', e);
     }
+  }
+
+  startArtistProgress(artistList) {
+    this.clearArtistProgress();
+    const durationMs = 30000;
+
+    artistList.forEach((artist) => {
+      const start = Date.now();
+      const tick = () => {
+        const elapsed = Date.now() - start;
+        const pct = Math.min(100, Math.round((elapsed / durationMs) * 100));
+        this.setState(prev => ({
+          artistProgress: { ...prev.artistProgress, [artist]: pct }
+        }));
+        if (elapsed >= durationMs) {
+          this.stopArtistProgress(artist);
+        }
+      };
+
+      // Initial tick keeps UI snappy
+      tick();
+      this.artistProgressTimers[artist] = setInterval(tick, 300);
+    });
+  }
+
+  stopArtistProgress(artist) {
+    const timer = this.artistProgressTimers[artist];
+    if (timer) {
+      clearInterval(timer);
+      delete this.artistProgressTimers[artist];
+    }
+  }
+
+  clearArtistProgress() {
+    Object.values(this.artistProgressTimers).forEach(clearInterval);
+    this.artistProgressTimers = {};
+    this.setState({ artistProgress: {} });
   }
 
   closeAIModal() {
@@ -381,6 +439,7 @@ export default class EventListItem extends React.Component {
       detailedLoading: false,
       artistList: [],
       artistResults: {},
+      artistProgress: {},
     });
   }
 
@@ -431,6 +490,9 @@ export default class EventListItem extends React.Component {
             proofreading={this.state.aiProofreading}
             drafting={this.state.aiDrafting}
             detailedLoading={this.state.detailedLoading}
+            artistList={this.state.artistList}
+            artistResults={this.state.artistResults}
+            artistProgress={this.state.artistProgress}
             onRefetch={() => this.handleAIResearch(true)}
             onGetDetails={this.handleDetailedResearch}
           />

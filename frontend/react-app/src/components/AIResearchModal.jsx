@@ -74,6 +74,30 @@ export default class AIResearchModal extends React.Component {
                 {this.props.drafting && (
                   <div className="ai-status ai-drafting">Extracting artists…</div>
                 )}
+                {this.props.artistList && this.props.artistList.length > 0 && (
+                  <div className="ai-artist-progress">
+                    {this.props.artistList.map((artist) => {
+                      const progress = this.props.artistProgress?.[artist] ?? null;
+                      // Hide bar once result arrived
+                      if (this.props.artistResults && this.props.artistResults[artist]) {
+                        return null;
+                      }
+
+                      return (
+                        <div key={artist} className="artist-progress-row">
+                          <div className="artist-name">{artist}</div>
+                          <div className="progress-track" aria-label={`Loading ${artist}`}>
+                            <div
+                              className="progress-fill"
+                              style={{ width: progress ? `${progress}%` : '2%' }}
+                            ></div>
+                          </div>
+                          <div className="progress-percent">{progress ? `${progress}%` : '0%'}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
                 <div className="markdown-body">
                   <ReactMarkdown key={this.props.content}>
                     {this.props.content.replace(/^\s+/, '')}
