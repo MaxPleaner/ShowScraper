@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import EventMapCard from './EventMapCard';
 import EventListView from './EventListView';
+import { VENUE_LOCATION_OVERRIDES } from '../venueLocationOverrides';
 
 // Fix for default marker icons in React-Leaflet
 delete L.Icon.Default.prototype._getIconUrl;
@@ -146,18 +147,26 @@ export default class MapView extends React.Component {
     Object.entries(events).forEach(([date, dateEvents]) => {
       dateEvents.forEach(event => {
         const venueName = event.source.name;
-        const venue = venueMap[venueName];
 
-        if (venue && venue.latlng) {
-          const coords = this.parseLatLng(venue.latlng);
-          if (coords) {
-            eventsWithLocation.push({
-              ...event,
-              lat: coords[0],
-              lng: coords[1],
-              date: date
-            });
+        // Check override file first
+        let coords = null;
+        if (VENUE_LOCATION_OVERRIDES[venueName]) {
+          coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueName]);
+        } else {
+          // Fall back to venues.json data
+          const venue = venueMap[venueName];
+          if (venue && venue.latlng) {
+            coords = this.parseLatLng(venue.latlng);
           }
+        }
+
+        if (coords) {
+          eventsWithLocation.push({
+            ...event,
+            lat: coords[0],
+            lng: coords[1],
+            date: date
+          });
         }
       });
     });
@@ -191,6 +200,14 @@ export default class MapView extends React.Component {
     Object.entries(events).forEach(([date, dateEvents]) => {
       const eventsForDate = dateEvents.filter(event => {
         const venueName = event.source.name;
+
+        // Check if venue has override location
+        if (VENUE_LOCATION_OVERRIDES[venueName]) {
+          const coords = this.parseLatLng(VENUE_LOCATION_OVERRIDES[venueName]);
+          if (coords) return false; // Has location via override
+        }
+
+        // Check venues.json
         const venue = venueMap[venueName];
         if (!venue || !venue.latlng) return true;
         const coords = this.parseLatLng(venue.latlng);
