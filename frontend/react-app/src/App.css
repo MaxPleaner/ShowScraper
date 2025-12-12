@@ -1252,8 +1252,8 @@ a .box:hover {
 
 .map-events-missing-notice {
     position: absolute;
-    bottom: 10px;
-    left: 10px;
+    top: 10px;
+    right: 10px;
     background: rgba(0, 0, 0, 0.85);
     color: white;
     padding: 8px 12px;
