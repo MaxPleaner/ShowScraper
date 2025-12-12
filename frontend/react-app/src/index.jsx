@@ -6,7 +6,8 @@ import { HashRouter, Routes, Route } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
-const ROOT_VIEW = "TextView"
+const ROOT_VIEW = "MapView"
+// const ROOT_VIEW = "TextView"
 // const ROOT_VIEW = "TextAndImagesView"
 
 root.render(
