@@ -378,7 +378,7 @@ export default class EventListItem extends React.Component {
 
   startArtistProgress(artistList) {
     this.clearArtistProgress();
-    const durationMs = 30000;
+    const durationMs = 20000;
 
     artistList.forEach((artist) => {
       const start = Date.now();
