@@ -1,8 +1,10 @@
 import React from 'react';
 import moment from 'moment';
 import _ from 'underscore'
+import { useRecoilValue } from 'recoil';
+import { venuesState } from '../state/atoms';
 
-export default class VenuesList extends React.Component {
+class VenuesListInner extends React.Component {
   constructor(props) {
     super(props)
     this.state = { venues: props.venues || [] };
@@ -76,3 +78,10 @@ export default class VenuesList extends React.Component {
     )
   }
 }
+
+const VenuesList = (props) => {
+  const venues = useRecoilValue(venuesState);
+  return <VenuesListInner {...props} venues={venues} />;
+};
+
+export default VenuesList;

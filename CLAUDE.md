@@ -1,5 +1,7 @@
 # ShowScraper - Claude Code Instructions
 
+**Start here:** Before making changes, read `AGENTS.md` for the authoritative, consolidated agent notes (frontend + LLM server). Keep this file brief; defer to `AGENTS.md` for specifics.
+
 ## Project Overview
 
 ShowScraper is a full-stack concert aggregation platform for Bay Area venues. It combines Ruby-based web scrapers, a React frontend, and an AI-powered research server to help users discover local music events.
@@ -49,7 +51,7 @@ frontend/react-app/
 │   │   ├── EventListItem.jsx
 │   │   ├── AIResearchModal.jsx
 │   │   └── ...
-│   ├── utils/DataLoader.js      # GCS data fetcher
+│   ├── utils/GcsDataLoader.js      # GCS data fetcher
 │   └── config.js                # LLM server config
 llm-server/
 ├── main.py                      # FastAPI server
@@ -126,7 +128,7 @@ python main.py          # Starts on localhost:8000
 - Event display logic: `EventListView.jsx` and `EventListItem.jsx`
 - Filtering/sorting: `EventListViewManager.jsx`
 - AI research modal: `AIResearchModal.jsx`
-- Data fetching: `utils/DataLoader.js`
+- Data fetching: `utils/GcsDataLoader.js`
 - Styling: `App.css` (uses Bulma classes)
 
 ### Working with AI Research

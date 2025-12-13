@@ -1,12 +1,14 @@
 import os
 import re
+import uuid
 import asyncio
 import json
 import ipaddress
 import socket
 import hashlib
 from urllib.parse import urlparse
-from typing import AsyncGenerator, Optional, List
+from typing import AsyncGenerator, Optional, List, Dict, Any
+import re
 from datetime import datetime
 from pathlib import Path
 from langchain_openai import ChatOpenAI
@@ -19,6 +21,19 @@ from langchain_community.document_loaders import WebBaseLoader
 import urllib.request
 import urllib.error
 import agentops
+
+# AgentOps compatibility helpers (older client may not expose start_trace/end_trace)
+def _agentops_start_trace(*args, **kwargs):
+    start_fn = getattr(agentops, "start_trace", None)
+    if callable(start_fn):
+        return start_fn(*args, **kwargs)
+    return None
+
+def _agentops_end_trace(*args, **kwargs):
+    end_fn = getattr(agentops, "end_trace", None)
+    if callable(end_fn):
+        return end_fn(*args, **kwargs)
+    return None
 
 CACHE_DIR = Path(__file__).resolve().parent / "logs" / "cache"
 
@@ -392,6 +407,84 @@ Output ONLY the artist section with details. No introduction, no extra text.
 """
     return prompt
 
+
+# --- New granular data-point prompts ----------------------------------------------------
+
+def build_youtube_prompt(artist: str) -> str:
+    return f"""Find one YouTube URL for a live performance by {artist}. If you cannot find an exact live video, provide the best channel/official video. If still unsure, return a YouTube search URL.
+
+Output JSON with keys:
+- youtube_url: direct YouTube watch URL (preferred) OR YouTube channel/video URL
+- fallback_search_url: a YouTube search URL for the artist (always include)
+
+Return ONLY JSON."""
+
+
+def build_bio_genres_prompt(artist: str) -> str:
+    return f"""Provide a short bio and genres for {artist}.
+- Keep bio to one concise sentence, no hype words.
+- Genres: 2-4 genre/subgenre terms.
+
+Output JSON with keys: bio (string), genres (array of strings). Return only JSON."""
+
+
+def build_website_prompt(artist: str) -> str:
+    return f"""Find an official or information-rich link for {artist}. Priority: personal website > Instagram > Facebook page > Linktree > press bio page. Must be artist-specific.
+
+Output JSON: {{"label": "Website|Instagram|Facebook|Linktree|Other", "url": "https://..."}}. If nothing trustworthy, return {{"label": "not_found", "url": null}}. Only JSON."""
+
+
+def build_music_link_prompt(artist: str) -> str:
+    return f"""Find a direct link to {artist}'s music on Spotify or Bandcamp (prefer official artist page). If neither is available, return SoundCloud. Avoid generic home pages.
+
+Output JSON: {{"platform": "Spotify|Bandcamp|SoundCloud|Other", "url": "https://..."}}. If nothing found, return {{"platform": "not_found", "url": null}}. Only JSON."""
+
+
+def compose_artist_section(artist: str, results: Dict[str, Any]) -> str:
+    """Turn per-datapoint JSON results into the markdown section expected by the frontend."""
+    yt = results.get("youtube", {}) or {}
+    bio_gen = results.get("bio_genres", {}) or {}
+    website = results.get("website", {}) or {}
+    music = results.get("music", {}) or {}
+    # Surface top-level errors if all datapoints failed
+    if not any(val for val in [yt, bio_gen, website, music]):
+        yt = {"error": "no datapoints returned"}
+
+    # YouTube link
+    yt_url = yt.get("youtube_url") or yt.get("url") or None
+    search_url = yt.get("fallback_search_url") or f"https://www.youtube.com/results?search_query={artist.replace(' ', '+')}"
+    youtube_md = yt_url or search_url
+
+    # Website/social link
+    website_label = website.get("label")
+    website_url = website.get("url")
+    website_line = None
+    if website_label and website_label != "not_found" and website_url:
+        website_line = f"- **Link**: [{website_label}]({website_url})"
+
+    # Music link
+    music_platform = music.get("platform")
+    music_url = music.get("url")
+    music_line = None
+    if music_platform and music_platform != "not_found" and music_url:
+        music_line = f"- **Music**: [{music_platform}]({music_url})"
+
+    # Bio / Genres
+    bio = bio_gen.get("bio") or bio_gen.get("error") or "(not found)"
+    genres_list = bio_gen.get("genres") or []
+    genres_str = ", ".join(genres_list) if genres_list else "(not found)"
+
+    lines = [f"### {artist}"]
+    lines.append(f"- **YouTube**: [{'Watch' if yt_url else 'Search on YouTube'}]({youtube_md})")
+    if website_line:
+        lines.append(website_line)
+    lines.append(f"- **Genres**: {genres_str}")
+    lines.append(f"- **Bio**: {bio}")
+    if music_line:
+        lines.append(music_line)
+
+    return "\n".join(lines)
+
 def build_editor_prompt(event_data: dict) -> str:
     """DEPRECATED: Old two-pass editor - no longer used in new workflow"""
     artists = parse_artists(event_data['title'])
@@ -438,7 +531,7 @@ async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]
         return
     trace_obj = None
     if os.getenv("AGENTOPS_API_KEY"):
-        trace_obj = agentops.start_trace(tags=["concert-quick", event_data.get('title', 'unknown')[:50]])
+        trace_obj = _agentops_start_trace(tags=["concert-quick", event_data.get('title', 'unknown')[:50]])
 
     try:
         llm = ChatOpenAI(
@@ -459,12 +552,12 @@ async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]
         save_cache(cache_key, {"quickSummary": quick_buffer})
 
         if os.getenv("AGENTOPS_API_KEY"):
-            agentops.end_trace(end_state="Success")
+            _agentops_end_trace(end_state="Success")
 
     except Exception as e:
         yield {"event": "error", "data": f"Error: {str(e)}"}
         if os.getenv("AGENTOPS_API_KEY"):
-            agentops.end_trace(end_state="Fail")
+            _agentops_end_trace(end_state="Fail")
 
 async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, None]:
     """
@@ -487,10 +580,11 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
 
     trace_obj = None
     if os.getenv("AGENTOPS_API_KEY"):
-        trace_obj = agentops.start_trace(tags=[f"concert-detailed", event_data.get('title', 'unknown')[:50]])
+        trace_obj = _agentops_start_trace(tags=[f"concert-detailed", event_data.get('title', 'unknown')[:50]])
 
     try:
         ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        run_id = str(uuid.uuid4())[:8]
         llm = ChatOpenAI(
             model="gpt-4o",
             openai_api_key=os.getenv("OPENAI_API_KEY"),
@@ -521,6 +615,8 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
                     description="Search the web for info about artists, events, venues. Input: a search query string."
                 )
             )
+        has_search = any(t.name == "search" for t in tools)
+        field_timeout = int(os.getenv("ARTIST_DATAPOINT_TIMEOUT", "25"))
 
         # Phase 1: Extract artist list
         yield {"event": "status", "data": "extracting_artists"}
@@ -538,7 +634,7 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
         if not artists or artist_list_text.strip() == "Unable to determine artists":
             yield {"event": "final", "data": "Unable to determine artists for this event."}
             if os.getenv("AGENTOPS_API_KEY"):
-                agentops.end_trace(end_state="Success")
+                _agentops_end_trace(end_state="Success")
             return
 
         # Stream the artist list immediately (JSON-serialized for SSE)
@@ -547,80 +643,116 @@ async def detailed_research_handler(event_data: dict) -> AsyncGenerator[dict, No
         # Phase 2: Get artist details (parallel mode - streaming as they complete)
         yield {"event": "status", "data": "researching_artists"}
 
-        artist_sections: list[str] = []
         artist_results_map: dict[str, str] = {}
 
-        # Create parallel tasks for each artist (with 2-phase research + verification)
-        async def research_and_verify_artist(artist: str) -> tuple[str, str]:
-            """
-            Research a single artist with 2-phase approach:
-            1. Get initial details with web search
-            2. Verify and clean up the results
-            Returns (artist_name, final_content) only after both phases complete
-            """
+        # Shared queue for streaming datapoints as they finish
+        datapoint_queue: asyncio.Queue = asyncio.Queue()
+
+        async def emit_datapoint(artist: str, field: str, value: Any):
+            payload = {"artist": artist, "field": field, "value": value}
+            log_dp({"type": "datapoint", "payload": payload})
+            await datapoint_queue.put({
+                "event": "artist_datapoint",
+                "data": json.dumps(payload)
+            })
+
+        async def run_json_prompt(prompt_text: str) -> dict:
+            """Run a short JSON-format prompt with tools and return parsed dict or {'error': ...}."""
+            llm_dp = ChatOpenAI(
+                model="gpt-4o-mini",
+                openai_api_key=os.getenv("OPENAI_API_KEY"),
+                streaming=False,
+                max_tokens=512,
+                temperature=0.2,
+            )
+            raw = ""
             try:
-                # Phase 1: Get initial details
-                prompt = build_single_artist_prompt(artist)
-                draft_result = await run_with_tools(llm, tools, prompt)
-
-                # Phase 2: Verify and clean up (no tools needed, just review)
-                verify_prompt = f"""Review and finalize this artist research for {artist}. Fix any issues:
-
-{draft_result}
-
-CRITICAL - Link Validation:
-- **REMOVE** any links that are generic root domains (e.g., "https://bandcamp.com", "https://instagram.com", "https://soundcloud.com")
-- Links MUST be artist-specific URLs (e.g., "https://artistname.bandcamp.com", "https://instagram.com/artistname")
-- If a link is invalid/generic, REMOVE the entire Link line - don't include it at all
-- Only include the YouTube search link and ONE additional valid artist-specific link (if found in draft)
-- If no valid additional link exists, omit the Link bullet entirely
-
-Other Guidelines:
-- Verify all links are properly formatted markdown
-- Ensure genres are concise (no fluff words)
-- Ensure bio is a single concise line (no fluff)
-- Remove any "(not found)" entries IF you can infer information from the content
-- If YouTube link is missing or malformed, add it: [Search on YouTube](https://www.youtube.com/results?search_query={artist.replace(' ', '+')})
-- Keep the ### heading and bullet structure exactly
-- Output ONLY the finalized artist section
-
-Return the cleaned up artist section:"""
-
-                # Use LLM without tools for quick verification
-                verify_llm = ChatOpenAI(
-                    model="gpt-4o-mini",  # Faster model for verification
-                    openai_api_key=os.getenv("OPENAI_API_KEY"),
-                    streaming=False,
-                    max_tokens=512,
-                    temperature=0.1,
-                )
-                final_result = await verify_llm.ainvoke(verify_prompt)
-                final_content = final_result.content if hasattr(final_result, 'content') else str(final_result)
-
-                return (artist, final_content)
+                tool_hint = "\\n\\nTools available: search (web), fetch_url (HTML fetch). Use them when unsure."
+                no_search_hint = "\\n\\nNote: web search tool is unavailable in this environment; rely on known data."
+                prompt_with_hint = prompt_text + (tool_hint if has_search else no_search_hint)
+                raw = await run_with_tools(llm_dp, tools, prompt_with_hint)
+                return json.loads(raw)
             except Exception as e:
-                # Return error placeholder for this artist
-                fallback = f"### {artist}\n- **YouTube**: [Search on YouTube](https://www.youtube.com/results?search_query={artist.replace(' ', '+')})\n- **Genres**: (error: {str(e)[:50]})\n- **Bio**: (error during research)\n"
-                return (artist, fallback)
+                # Try to salvage a JSON object from the text
+                def _extract_json(text: str):
+                    m = re.search(r"\\{.*\\}", text, re.S)
+                    if m:
+                        try:
+                            return json.loads(m.group(0))
+                        except Exception:
+                            return None
+                    return None
+                parsed = _extract_json(raw) or _extract_json(raw.strip('`\\n ')) or None
+                if parsed is not None:
+                    return parsed
+                msg = str(e) or e.__class__.__name__
+                return {"error": msg}
 
-        # Launch all artist research tasks in parallel
-        tasks = [research_and_verify_artist(artist) for artist in artists]
+        # simple debug logger
+        log_dir = Path(__file__).resolve().parent.parent / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        dp_log_path = log_dir / f"dp_{ts}_{run_id}.log"
 
-        # Stream results as they complete (each artist sent only ONCE after full research+verify)
-        for coro in asyncio.as_completed(tasks):
+        def log_dp(payload: dict):
             try:
-                artist_name, artist_content = await coro
-                # JSON-serialize the dict for SSE
+                dp_log_path.write_text(dp_log_path.read_text() + json.dumps(payload) + "\\n") if dp_log_path.exists() else dp_log_path.write_text(json.dumps(payload) + "\\n")
+            except Exception:
+                pass
+
+        async def research_artist(artist: str) -> tuple[str, str]:
+            """Research one artist with per-datapoint parallelism and stream datapoints as they land."""
+            try:
+                async def run_field(name: str, coro):
+                    try:
+                        res = await asyncio.wait_for(coro, timeout=field_timeout)
+                        return name, res or {}
+                    except Exception as e:
+                        msg = str(e) or e.__class__.__name__
+                        return name, {"error": msg}
+
+                tasks_list = [
+                    asyncio.create_task(run_field("youtube", run_json_prompt(build_youtube_prompt(artist)))),
+                    asyncio.create_task(run_field("bio_genres", run_json_prompt(build_bio_genres_prompt(artist)))),
+                    asyncio.create_task(run_field("website", run_json_prompt(build_website_prompt(artist)))),
+                    asyncio.create_task(run_field("music", run_json_prompt(build_music_link_prompt(artist)))),
+                ]
+
+                results: Dict[str, Any] = {"youtube": {}, "bio_genres": {}, "website": {}, "music": {}}
+
+                for task in asyncio.as_completed(tasks_list):
+                    key, res = await task
+                    results[key] = res or {}
+                    await emit_datapoint(artist, key, res or {})
+
+                final_section = compose_artist_section(artist, results)
+                log_dp({"type": "artist_result", "artist": artist, "results": results})
+                return artist, final_section
+            except Exception as e:
+                msg = str(e) or e.__class__.__name__
+                fallback = f"### {artist}\\n- **YouTube**: [Search on YouTube](https://www.youtube.com/results?search_query={artist.replace(' ', '+')})\\n- **Link**: (error)\\n- **Genres**: (error: {msg[:60]})\\n- **Bio**: (error during research)\\n- **Music**: (error)"
+                return artist, fallback
+
+        tasks = [research_artist(artist) for artist in artists]
+
+        pending = set(asyncio.create_task(t) for t in tasks)
+
+        while pending:
+            # Flush any datapoint events waiting
+            while not datapoint_queue.empty():
+                yield await datapoint_queue.get()
+
+            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=0.1)
+            for d in done:
+                artist_name, artist_content = await d
                 yield {"event": "artist_result", "data": json.dumps({"artist": artist_name, "content": artist_content})}
                 artist_results_map[artist_name] = artist_content
-            except Exception as e:
-                # Shouldn't reach here due to error handling in research_and_verify_artist, but just in case
-                yield {"event": "error", "data": f"Unexpected error: {str(e)}"}
 
-        # All artists completed
+        # Drain remaining datapoints
+        while not datapoint_queue.empty():
+            yield await datapoint_queue.get()
+
         yield {"event": "complete", "data": "all_artists_researched"}
 
-        # Persist cache in artist order
         ordered_sections = [artist_results_map.get(name, "") for name in artists]
         full_content = "\n\n".join(ordered_sections)
         save_cache(cache_key, {
@@ -628,6 +760,7 @@ Return the cleaned up artist section:"""
             "artistSections": ordered_sections,
             "aiContent": full_content,
         })
+        log_dp({"type": "complete", "artists": artists})
 
         # Log result
         try:
@@ -640,13 +773,13 @@ Return the cleaned up artist section:"""
             pass
 
         if os.getenv("AGENTOPS_API_KEY"):
-            agentops.end_trace(end_state="Success")
+            _agentops_end_trace(end_state="Success")
 
     except Exception as e:
         error_msg = f"Error: {str(e)}"
         yield {"event": "error", "data": error_msg}
         if os.getenv("AGENTOPS_API_KEY"):
-            agentops.end_trace(end_state="Fail")
+            _agentops_end_trace(end_state="Fail")
 
 def parse_artists(title: str) -> list[str]:
     """Parse artist names from event title"""

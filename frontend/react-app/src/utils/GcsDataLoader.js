@@ -2,7 +2,7 @@ import moment from 'moment';
 import _ from 'underscore';
 import $ from 'jquery';
 
-export default class DataLoader {
+export default class GcsGcsDataLoader {
   static async loadVenueData() {
     const data = await $.getJSON("https://storage.googleapis.com/show-scraper-data/sources.json", { _: new Date().getTime()})
     return data

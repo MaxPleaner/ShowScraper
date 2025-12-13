@@ -1,54 +1,57 @@
 import './App.css';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import 'bulma/css/bulma.min.css';
-// import './vendor/handdrawn.css';
-
-// import { Link } from "react-router-dom";
-
 
 import Nav from './components/Nav';
 import EventListViewManager from './components/EventListViewManager';
 import MapViewManager from './components/MapViewManager';
 import AboutView from './components/AboutView';
 import VenuesList from './components/VenuesList';
-import DataLoader from "./utils/DataLoader"
+import GcsDataLoader from "./utils/GcsDataLoader"
+import AIResearchModal from './components/ai_research/AIResearchModal';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { eventsState, venuesState } from './state/atoms';
 
-class App extends React.Component {
+function App({ route }) {
+  const setEvents = useSetRecoilState(eventsState);
+  const setVenues = useSetRecoilState(venuesState);
+  const events = useRecoilValue(eventsState);
 
-  constructor(props) {
-    super(props);
-    this.state = { events: [], venues: [] };
+  useEffect(() => {
+    const fetchJsonData = async () => {
+      const venues = await GcsDataLoader.loadVenueData();
+      const events = await GcsDataLoader.loadEventData(venues);
+      setVenues(venues);
+      setEvents(events);
+    };
+
+    fetchJsonData();
+  }, []);
+
+  const hasEvents = Object.keys(events || {}).length > 0;
+  const loadingMessage = <div className='loading'>Loading months and months of show listings. Give it just a few seconds ...</div>;
+
+  let currentView;
+  if (route === "TextAndImagesView") {
+    currentView = hasEvents ? <EventListViewManager /> : loadingMessage;
   }
-
-  async fetchJsonData() {
-    const venues = await DataLoader.loadVenueData()
-    const events = await DataLoader.loadEventData(venues)
-
-    this.setState({ events: events, venues: venues });
+  if (route === "TextView") {
+    currentView = hasEvents ? <EventListViewManager textOnly={true} /> : loadingMessage;
   }
+  if (route === "MapView") { currentView = <MapViewManager />; }
+  if (route === "VenuesListView") { currentView = <VenuesList />; }
+  if (route === "About") { currentView = <AboutView />; }
 
-  async componentDidMount() {
-    await this.fetchJsonData()
-  }
-
-  render() {
-    let currentView
-    if (this.props.route == "TextAndImagesView") { currentView = <EventListViewManager events={this.state.events} />; }
-    if (this.props.route == "TextView") { currentView = <EventListViewManager events={this.state.events} textOnly={true} />; }
-    if (this.props.route == "MapView") { currentView = <MapViewManager events={this.state.events} venues={this.state.venues} />; }
-    if (this.props.route == "VenuesListView") { currentView = <VenuesList venues={this.state.venues} />; }
-    if (this.props.route == "About") { currentView = <AboutView />; }
-
-    return (
-        <div className="App-body">
-          <div className="App-body-content">
-            <Nav route={this.props.route} />
-            {currentView}
-          </div>
+  return (
+      <div className="App-body">
+        <div className="App-body-content">
+          <Nav route={route} />
+          {currentView}
+          <AIResearchModal />
         </div>
-    );
-  }
+      </div>
+  );
 }
 
 export { App }
