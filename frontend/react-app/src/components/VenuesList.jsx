@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import _ from 'underscore'
 import { useRecoilValue } from 'recoil';
-import { venuesState } from '../state/atoms';
+import * as Atoms from '../state/atoms';
 
 class VenuesListInner extends React.Component {
   constructor(props) {
@@ -80,7 +80,7 @@ class VenuesListInner extends React.Component {
 }
 
 const VenuesList = (props) => {
-  const venues = useRecoilValue(venuesState);
+  const venues = useRecoilValue(Atoms.venuesState);
   return <VenuesListInner {...props} venues={venues} />;
 };
 

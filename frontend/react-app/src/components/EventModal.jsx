@@ -1,34 +1,18 @@
 import React from 'react';
-import moment from 'moment';
 import MissingImage from '../MissingImage.png';
+import EventButtons from './EventButtons';
 
 export default class EventModal extends React.Component {
-  generateCalendarLinks(event) {
-    const date = moment(event.date, 'MM-DD').format('YYYYMMDD');
-    const title = encodeURIComponent(`${event.title} at ${event.source.commonName}`);
-    const location = encodeURIComponent(event.source.commonName);
-    const description = encodeURIComponent(`Event URL: ${event.url}`);
-
-    const googleCalendarUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&dates=${date}/${date}&text=${title}&location=${location}&details=${description}`;
-    const icalUrl = `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ADTSTART:${date}%0ADTEND:${date}%0ASUMMARY:${title}%0ALOCATION:${location}%0ADESCRIPTION:${description}%0AEND:VEVENT%0AEND:VCALENDAR`;
-
-    return {
-      google: googleCalendarUrl,
-      ical: icalUrl
-    };
-  }
-
   render() {
-    const { event, isOpen, onClose, onAIClick } = this.props;
+    const { event, isOpen, onClose } = this.props;
 
     if (!isOpen || !event) return null;
 
     let imgSrc = event.img;
     if (imgSrc == "" || imgSrc == null) {
+      // Default to the venue's image
       imgSrc = event.source.img;
     }
-
-    const calendarLinks = this.generateCalendarLinks(event);
 
     return (
       <div className='event-modal-overlay' onClick={onClose}>
@@ -51,38 +35,7 @@ export default class EventModal extends React.Component {
             <p className='event-modal-title'>{event.title}</p>
 
             <div className='event-modal-actions'>
-              <a
-                href={calendarLinks.google}
-                target="_blank"
-                rel="noopener noreferrer"
-                className='event-modal-btn'
-                title="Add to Google Calendar"
-              >
-                <i className="fab fa-google"></i>
-                <span>Google Calendar</span>
-              </a>
-
-              <a
-                href={calendarLinks.ical}
-                download={`${event.title}.ics`}
-                className='event-modal-btn'
-                title="Download iCal"
-              >
-                <i className="fas fa-calendar-alt"></i>
-                <span>Download .ics</span>
-              </a>
-
-              <button
-                onClick={() => {
-                  onAIClick(event);
-                }}
-                className='event-modal-btn event-modal-btn-ai'
-                title="AI Concert Research"
-              >
-                <i className="fas fa-robot"></i>
-                <span>AI Research</span>
-              </button>
-
+              <EventButtons event={event} />
               <a
                 href={event.url}
                 target="_blank"

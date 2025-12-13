@@ -1,13 +1,13 @@
 import React, { useEffect } from 'react';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { aiModalOpenState, aiModalEventState } from '../../state/atoms';
+import * as Atoms from '../../state/atoms';
 import AiModalHeader from './AiModalHeader';
 import AiModalBody from './AiModalBody';
 import useAIResearch from '../../hooks/useAIResearch';
 
 const AIResearchModal = () => {
-  const [isOpen, setIsOpen] = useRecoilState(aiModalOpenState);
-  const event = useRecoilValue(aiModalEventState);
+  const [isOpen, setIsOpen] = useRecoilState(Atoms.aiModalOpenState);
+  const event = useRecoilValue(Atoms.aiModalEventState);
   const { actions: { handleAIResearch } } = useAIResearch(event);
 
   useEffect(() => {

@@ -1,123 +1,54 @@
-import React from 'react';
+import React, { useCallback, useMemo, useState, useRef } from 'react';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
-import { renderToStaticMarkup } from 'react-dom/server';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
-import EventMapCard from './EventMapCard';
 import EventListView from './EventListView';
 import { VENUE_LOCATION_OVERRIDES } from '../venueLocationOverrides';
-
-// Custom marker icon (lime green and black)
-const customPinIcon = L.divIcon({
-  html: '<div class="custom-map-pin"></div>',
-  className: 'custom-pin-icon',
-  iconSize: [12, 30],
-  iconAnchor: [6, 30],
-  popupAnchor: [0, -30]
-});
-
-const BAY_AREA_CENTER = [37.7749, -122.4194]; // San Francisco
-const DEFAULT_ZOOM = 8; // Zoomed out to show North Bay and Santa Cruz
-
-// Zoom scaling configuration
-const CARD_ZOOM_THRESHOLD = 11; // Show cards at zoom 11 and above, only markers below
-const MIN_ZOOM = 11;
-const MAX_ZOOM = 16;
-const MIN_SCALE = 0.2;
-const MAX_SCALE = 0.9;
-
-// Image size - largest dimension will be clamped to this value
-const BASE_SIZE = 120;
-
-function calculateScale(zoom) {
-  if (zoom <= MIN_ZOOM) return MIN_SCALE;
-  if (zoom >= MAX_ZOOM) return MAX_SCALE;
-
-  // Linear interpolation between MIN_SCALE and MAX_SCALE
-  const range = MAX_ZOOM - MIN_ZOOM;
-  const position = zoom - MIN_ZOOM;
-  const scaleRange = MAX_SCALE - MIN_SCALE;
-
-  return MIN_SCALE + (position / range) * scaleRange;
-}
+import mapPinIcon from './map/MapPinIcon';
+import { parseLatLng, BAY_AREA_CENTER, DEFAULT_ZOOM } from '../utils/mapUtils';
+import { buildEventCardIcon } from './map/MapEventIcon';
 
 function EventMarkers({ events, onEventClick, onEventHover, currentZoom }) {
   const map = useMap();
-  const markersRef = React.useRef([]);
+  const markersRef = useRef([]);
 
   React.useEffect(() => {
-    // Clear existing markers
-    markersRef.current.forEach(marker => {
+    markersRef.current.forEach((marker) => {
       map.removeLayer(marker);
     });
     markersRef.current = [];
 
     events.forEach((event) => {
-      // First add the image card (lower z-index)
-      const scale = calculateScale(currentZoom);
-      const scaledSize = BASE_SIZE * scale;
-
-      const iconHtml = renderToStaticMarkup(
-        <EventMapCard event={event} />
-      );
-
-      const customIcon = L.divIcon({
-        html: iconHtml,
-        className: 'custom-marker-icon',
-        iconSize: [scaledSize, scaledSize],
-        // Center the image at the marker point
-        iconAnchor: [scaledSize / 2, scaledSize / 2],
-      });
+      const customIcon = buildEventCardIcon(event, currentZoom);
 
       const cardMarker = L.marker([event.lat, event.lng], {
         icon: customIcon,
         interactive: true,
-        zIndexOffset: -1000
+        zIndexOffset: -1000,
       });
 
-      // Click on card opens event modal
-      cardMarker.on('click', () => {
-        onEventClick(event);
-      });
-
-      // Hover handlers for card
-      cardMarker.on('mouseover', () => {
-        onEventHover(event);
-      });
-      cardMarker.on('mouseout', () => {
-        onEventHover(null);
-      });
+      cardMarker.on('click', () => onEventClick(event));
+      cardMarker.on('mouseover', () => onEventHover(event));
+      cardMarker.on('mouseout', () => onEventHover(null));
 
       cardMarker.addTo(map);
       markersRef.current.push(cardMarker);
 
-      // Then add the pin marker on top (higher z-index)
       const pinMarker = L.marker([event.lat, event.lng], {
-        icon: customPinIcon,
-        zIndexOffset: 1000
+        icon: mapPinIcon,
+        zIndexOffset: 1000,
       });
 
-      // Click on marker opens event modal
-      pinMarker.on('click', () => {
-        onEventClick(event);
-      });
-
-      // Hover handlers for pin
-      pinMarker.on('mouseover', () => {
-        onEventHover(event);
-      });
-      pinMarker.on('mouseout', () => {
-        onEventHover(null);
-      });
+      pinMarker.on('click', () => onEventClick(event));
+      pinMarker.on('mouseover', () => onEventHover(event));
+      pinMarker.on('mouseout', () => onEventHover(null));
 
       pinMarker.addTo(map);
       markersRef.current.push(pinMarker);
     });
 
     return () => {
-      markersRef.current.forEach(marker => {
-        map.removeLayer(marker);
-      });
+      markersRef.current.forEach((marker) => map.removeLayer(marker));
       markersRef.current = [];
     };
   }, [events, currentZoom, map, onEventClick, onEventHover]);
@@ -126,243 +57,140 @@ function EventMarkers({ events, onEventClick, onEventHover, currentZoom }) {
 }
 
 function ZoomHandler({ onZoomChange }) {
-  const map = useMapEvents({
-    zoomend: () => {
-      onZoomChange(map.getZoom());
+  useMapEvents({
+    zoomend: (e) => {
+      onZoomChange(e.target.getZoom());
     },
   });
   return null;
 }
 
-export default class MapView extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      currentZoom: DEFAULT_ZOOM,
-      showMissingEventsModal: false,
-      hoveredEvent: null,
-    };
-    // Cache computed values - each method tracks its own props
-    this.cachedEventsWithLocation = null;
-    this.lastPropsEventsForWithLocation = null;
-    this.lastPropsVenuesForWithLocation = null;
+const MapView = ({ events = {}, venues = [], onEventClick }) => {
+  const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
+  const [showMissingEventsModal, setShowMissingEventsModal] = useState(false);
+  const [hoveredEvent, setHoveredEvent] = useState(null);
 
-    this.cachedEventsWithoutLocation = null;
-    this.lastPropsEventsForWithoutLocation = null;
-    this.lastPropsVenuesForWithoutLocation = null;
+  const venueMap = useMemo(() => {
+    const map = {};
+    venues.forEach((venue) => { map[venue.name] = venue; });
+    return map;
+  }, [venues]);
 
-    this.cachedTotalEvents = null;
-    this.lastPropsEventsForTotal = null;
-  }
-
-  parseLatLng(latlngStr) {
-    if (!latlngStr) return null;
-    const parts = latlngStr.split(',').map(s => parseFloat(s.trim()));
-    if (parts.length !== 2 || isNaN(parts[0]) || isNaN(parts[1])) return null;
-    return parts; // [lat, lng]
-  }
-
-  getEventsWithLocation() {
-    // Return cached result if props haven't changed
-    if (this.cachedEventsWithLocation &&
-        this.lastPropsEventsForWithLocation === this.props.events &&
-        this.lastPropsVenuesForWithLocation === this.props.venues) {
-      return this.cachedEventsWithLocation;
-    }
-
-    const events = this.props.events || {};
-    const venues = this.props.venues || [];
-
-    // Create a map of venue name -> venue data for quick lookup
-    const venueMap = {};
-    venues.forEach(venue => {
-      venueMap[venue.name] = venue;
-    });
-
-    // Flatten all events for the day and filter those with lat/lng
-    const eventsWithLocation = [];
-    Object.entries(events).forEach(([date, dateEvents]) => {
-      dateEvents.forEach(event => {
+  const eventsWithLocation = useMemo(() => {
+    const list = [];
+    Object.values(events || {}).forEach((dateEvents = []) => {
+      dateEvents.forEach((event) => {
         const venueName = event.source.name;
         const venueCommonName = event.source.commonName;
 
-        // Check override file first (using commonName for List venues)
         let coords = null;
         const override = VENUE_LOCATION_OVERRIDES.find(([substrings]) =>
-          substrings.every(substring => venueCommonName.includes(substring))
+          substrings.every((substring) => venueCommonName.includes(substring))
         );
         if (override) {
-          coords = this.parseLatLng(override[1]);
+          coords = parseLatLng(override[1]);
         } else {
-          // Fall back to venues.json data (using name)
           const venue = venueMap[venueName];
           if (venue && venue.latlng) {
-            coords = this.parseLatLng(venue.latlng);
+            coords = parseLatLng(venue.latlng);
           }
         }
 
         if (coords) {
-          eventsWithLocation.push({
-            ...event,
-            lat: coords[0],
-            lng: coords[1]
-            // Keep original event.date (YYYY-MM-DD format) for LLM server
-          });
+          list.push({ ...event, lat: coords[0], lng: coords[1] });
         }
       });
     });
+    return list;
+  }, [events, venueMap]);
 
-    // Cache the result
-    this.cachedEventsWithLocation = eventsWithLocation;
-    this.lastPropsEventsForWithLocation = this.props.events;
-    this.lastPropsVenuesForWithLocation = this.props.venues;
-
-    return eventsWithLocation;
-  }
-
-  handleZoomChange = (zoom) => {
-    this.setState({ currentZoom: zoom });
-  }
-
-  handleEventHover = (event) => {
-    this.setState({ hoveredEvent: event });
-  }
-
-  getTotalEventCount() {
-    // Return cached result if props haven't changed
-    if (this.cachedTotalEvents !== null &&
-        this.lastPropsEventsForTotal === this.props.events) {
-      return this.cachedTotalEvents;
-    }
-
-    const events = this.props.events || {};
-    let total = 0;
-    Object.values(events).forEach(dateEvents => {
-      total += dateEvents.length;
-    });
-
-    this.cachedTotalEvents = total;
-    this.lastPropsEventsForTotal = this.props.events;
-    return total;
-  }
-
-  getEventsWithoutLocation() {
-    // Return cached result if props haven't changed
-    if (this.cachedEventsWithoutLocation &&
-        this.lastPropsEventsForWithoutLocation === this.props.events &&
-        this.lastPropsVenuesForWithoutLocation === this.props.venues) {
-      return this.cachedEventsWithoutLocation;
-    }
-
-    const events = this.props.events || {};
-    const venues = this.props.venues || [];
-
-    const venueMap = {};
-    venues.forEach(venue => {
-      venueMap[venue.name] = venue;
-    });
-
-    const eventsWithoutLocation = {};
-    Object.entries(events).forEach(([date, dateEvents]) => {
-      const eventsForDate = dateEvents.filter(event => {
+  const eventsWithoutLocationByDate = useMemo(() => {
+    const result = {};
+    Object.entries(events || {}).forEach(([date, dateEvents]) => {
+      const missing = dateEvents.filter((event) => {
         const venueName = event.source.name;
         const venueCommonName = event.source.commonName;
 
-        // Check if venue has override location (using commonName for List venues)
         const override = VENUE_LOCATION_OVERRIDES.find(([substrings]) =>
-          substrings.every(substring => venueCommonName.includes(substring))
+          substrings.every((substring) => venueCommonName.includes(substring))
         );
         if (override) {
-          const coords = this.parseLatLng(override[1]);
-          if (coords) return false; // Has location via override
+          const coords = parseLatLng(override[1]);
+          if (coords) return false;
         }
 
-        // Check venues.json (using name)
         const venue = venueMap[venueName];
         if (!venue || !venue.latlng) return true;
-        const coords = this.parseLatLng(venue.latlng);
+        const coords = parseLatLng(venue.latlng);
         return !coords;
       });
 
-      if (eventsForDate.length > 0) {
-        eventsWithoutLocation[date] = eventsForDate;
+      if (missing.length > 0) {
+        result[date] = missing;
       }
     });
+    return result;
+  }, [events, venueMap]);
 
-    this.cachedEventsWithoutLocation = eventsWithoutLocation;
-    this.lastPropsEventsForWithoutLocation = this.props.events;
-    this.lastPropsVenuesForWithoutLocation = this.props.venues;
-    return eventsWithoutLocation;
-  }
+  const eventsWithoutLocationCount = useMemo(
+    () => Object.values(eventsWithoutLocationByDate).reduce((acc, dateEvents) => acc + dateEvents.length, 0),
+    [eventsWithoutLocationByDate]
+  );
 
-  openMissingEventsModal = () => {
-    this.setState({ showMissingEventsModal: true });
-  }
+  const handleZoomChange = useCallback((zoom) => setCurrentZoom(zoom), []);
+  const handleEventHover = useCallback((event) => setHoveredEvent(event), []);
 
-  closeMissingEventsModal = () => {
-    this.setState({ showMissingEventsModal: false });
-  }
-
-  render() {
-    const eventsWithLocation = this.getEventsWithLocation();
-    const eventsWithoutLocationByDate = this.getEventsWithoutLocation();
-
-    // Count total events without location across all dates
-    let eventsWithoutLocationCount = 0;
-    Object.values(eventsWithoutLocationByDate).forEach(dateEvents => {
-      eventsWithoutLocationCount += dateEvents.length;
-    });
-
-    if (eventsWithLocation.length === 0) {
-      return (
-        <div className='map-container'>
-          <div className='map-no-events'>
-            No events with location data for this day.
-          </div>
-        </div>
-      );
-    }
-
+  if (eventsWithLocation.length === 0) {
     return (
       <div className='map-container'>
-        <MapContainer
-          center={BAY_AREA_CENTER}
-          zoom={DEFAULT_ZOOM}
-          style={{ height: '600px', width: '100%' }}
-        >
-          <TileLayer
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          />
-          <ZoomHandler onZoomChange={this.handleZoomChange} />
-          <EventMarkers
-            events={eventsWithLocation}
-            onEventClick={this.props.onEventClick}
-            onEventHover={this.handleEventHover}
-            currentZoom={this.state.currentZoom}
-          />
-        </MapContainer>
-        {this.state.hoveredEvent && (
-          <div className='map-hover-info-box'>
-            <div className='map-hover-venue'>{this.state.hoveredEvent.source.commonName || this.state.hoveredEvent.source.name}</div>
-            <div className='map-hover-title'>{this.state.hoveredEvent.title}</div>
-          </div>
-        )}
-        {eventsWithoutLocationCount > 0 && (
-          <div className='map-events-missing-notice' onClick={this.openMissingEventsModal}>
-            {eventsWithoutLocationCount} event{eventsWithoutLocationCount !== 1 ? 's' : ''} not shown on map (no location registered for venue)
-          </div>
-        )}
-        {this.state.showMissingEventsModal && (
-          <div className='missing-events-modal-overlay' onClick={this.closeMissingEventsModal}>
-            <div className='missing-events-modal-content' onClick={(e) => e.stopPropagation()}>
-              <button className='event-modal-close' onClick={this.closeMissingEventsModal}>×</button>
-              <h2>Events Without Location Data</h2>
-              <EventListView textOnly={true} events={eventsWithoutLocationByDate} />
-            </div>
-          </div>
-        )}
+        <div className='map-no-events'>
+          No events with location data for this day.
+        </div>
       </div>
     );
   }
-}
+
+  return (
+    <div className='map-container'>
+      <MapContainer
+        center={BAY_AREA_CENTER}
+        zoom={DEFAULT_ZOOM}
+        style={{ height: '600px', width: '100%' }}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+        />
+        <ZoomHandler onZoomChange={handleZoomChange} />
+        <EventMarkers
+          events={eventsWithLocation}
+          onEventClick={onEventClick}
+          onEventHover={handleEventHover}
+          currentZoom={currentZoom}
+        />
+      </MapContainer>
+      {hoveredEvent && (
+        <div className='map-hover-info-box'>
+          <div className='map-hover-venue'>{hoveredEvent.source.commonName || hoveredEvent.source.name}</div>
+          <div className='map-hover-title'>{hoveredEvent.title}</div>
+        </div>
+      )}
+      {eventsWithoutLocationCount > 0 && (
+        <div className='map-events-missing-notice' onClick={() => setShowMissingEventsModal(true)}>
+          {eventsWithoutLocationCount} event{eventsWithoutLocationCount !== 1 ? 's' : ''} not shown on map (no location registered for venue)
+        </div>
+      )}
+      {showMissingEventsModal && (
+        <div className='missing-events-modal-overlay' onClick={() => setShowMissingEventsModal(false)}>
+          <div className='missing-events-modal-content' onClick={(e) => e.stopPropagation()}>
+            <button className='event-modal-close' onClick={() => setShowMissingEventsModal(false)}>×</button>
+            <h2>Events Without Location Data</h2>
+            <EventListView textOnly={true} events={eventsWithoutLocationByDate} />
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MapView;

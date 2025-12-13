@@ -26,12 +26,12 @@ export const REGION_SORTING = [
 ];
 
 export const REGION_FALLBACKS = [
-  [REGIONS.EAST_BAY, ['crockett', 'oakland', 'port costa', 'richmond', 'berkeley', 'alameda', 'vallejo', 'emeryville', 'oakley', 'walnut creek', 'antioch', 'concord', 'lafayette']],
+  [REGIONS.EAST_BAY, ['el cerrito', 'hayward','tamarack', 'crockett', 'oakland', 'port costa', 'richmond', 'berkeley', 'alameda', 'vallejo', 'emeryville', 'oakley', 'walnut creek', 'antioch', 'concord', 'lafayette']],
   [REGIONS.PACIFICA, ['pacifica']],
   [REGIONS.SANTA_CRUZ, ['santa cruz', 'santa curz', 'monterey', 'big sur', 'felton']],
   [REGIONS.SAN_FRANCISCO, ['san francisco', 'sf', 's.f.', 'thrillhouse']],
   [REGIONS.SACRAMENTO, ['sacramento', 'brooks']],
-  [REGIONS.SOUTH_BAY, ['fremont', 'freemont', 'menlo park', 'redwood city', 'saratoga', 'memlo park', 'palo alto', 'san jose']],
+  [REGIONS.SOUTH_BAY, ['sunnyvale', 'fremont', 'freemont', 'menlo park', 'redwood city', 'saratoga', 'memlo park', 'palo alto', 'san jose']],
   [REGIONS.NORTH_BAY, ['novato', 'sebastopol', 'mill valley', 'piedmont', 'santa rosa', 'fairfax', 'marin', 'petaluma', 'sonoma', 'napa', 'healdsburg']],
 ];
 

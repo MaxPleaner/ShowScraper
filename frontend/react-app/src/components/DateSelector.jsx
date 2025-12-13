@@ -7,7 +7,7 @@ const DateSelector = ({
   onPreviousClick,
   onNextClick
 }) => (
-  <div className='eventDates'>
+  <div className='eventDates date-selector-group'>
     <a onClick={onPreviousClick}>
       <div className='date-range-select  nav-item'>{previousValue}</div>
     </a>

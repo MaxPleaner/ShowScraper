@@ -4,19 +4,19 @@ import React, { useEffect } from 'react';
 import 'bulma/css/bulma.min.css';
 
 import Nav from './components/Nav';
-import EventListViewManager from './components/EventListViewManager';
-import MapViewManager from './components/MapViewManager';
-import AboutView from './components/AboutView';
+import EventListViewManager from './components/pages/EventListViewManager';
+import MapViewManager from './components/pages/MapViewManager';
+import AboutView from './components/pages/AboutView';
 import VenuesList from './components/VenuesList';
 import GcsDataLoader from "./utils/GcsDataLoader"
 import AIResearchModal from './components/ai_research/AIResearchModal';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { eventsState, venuesState } from './state/atoms';
+import * as Atoms from './state/atoms';
 
 function App({ route }) {
-  const setEvents = useSetRecoilState(eventsState);
-  const setVenues = useSetRecoilState(venuesState);
-  const events = useRecoilValue(eventsState);
+  const setEvents = useSetRecoilState(Atoms.eventsState);
+  const setVenues = useSetRecoilState(Atoms.venuesState);
+  const events = useRecoilValue(Atoms.eventsState);
 
   useEffect(() => {
     const fetchJsonData = async () => {

@@ -1,10 +1,10 @@
 import React from 'react';
 import { useSetRecoilState } from 'recoil';
-import { aiModalOpenState, aiModalEventState } from '../state/atoms';
+import * as Atoms from '../state/atoms';
 
 const AIResearchControls = ({ event }) => {
-  const setOpen = useSetRecoilState(aiModalOpenState);
-  const setEvent = useSetRecoilState(aiModalEventState);
+  const setOpen = useSetRecoilState(Atoms.aiModalOpenState);
+  const setEvent = useSetRecoilState(Atoms.aiModalEventState);
 
   const openModal = () => {
     setEvent(event);

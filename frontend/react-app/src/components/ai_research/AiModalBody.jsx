@@ -1,6 +1,6 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import { aiModalEventState } from '../../state/atoms';
+import * as Atoms from '../../state/atoms';
 import AiLoadingMessage from './AiLoadingMessage';
 import AiErrorMessage from './AiErrorMessage';
 import AiDisclaimer from './AiDisclaimer';
@@ -16,7 +16,7 @@ const statusTextMap = {
 };
 
 const AiModalBody = () => {
-  const event = useRecoilValue(aiModalEventState);
+  const event = useRecoilValue(Atoms.aiModalEventState);
   const { state } = useAIResearch(event);
 
   const {

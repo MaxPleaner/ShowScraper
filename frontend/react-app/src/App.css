@@ -184,43 +184,37 @@ nav h2 {
 
 
 
-/* ======  LIST VIEW MANAGER  ====== */
-
-
-.ListViewManager .date-range-select {
-    background-color: #1a3a4a !important;
-    color: #4ade80;
-    text-align: center;
-    padding: 6px 12px;
-    border: 2px solid #4ade80;
-    border-radius: 4px;
+/* DateSelector shared styling (map-style buttons) */
+.date-range-select {
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    color: #c7ffe9;
     font-weight: 700;
-    transition: all 0.12s ease;
-    cursor: pointer;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.35px;
 }
 
-.ListViewManager h2{
-    color: #ffffff;
-    text-align: center;
-    font-weight: 700;
-    font-size: 1.1em;
+.date-range-select:hover {
+    background: transparent;
+    color: #f3fff9;
 }
 
-.ListViewManager .date-range-select:hover {
-    background-color: #2a5a6a !important;
+.date-range-select-static {
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
     color: #ffffff;
-    border-color: #60a5fa;
-    box-shadow: 0 0 12px rgba(74, 222, 128, 0.3);
+    font-weight: 800;
 }
 
-.ListViewManager .date-range-select-static {
-    background-color: #0C7B93 !important;
-    text-align: center;
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-weight: 600;
-    color: #ffffff;
+.date-selector-group {
+    margin-top: 6px;
+}
+
+.date-selector-group .nav-item,
+.date-selector-group .nav-item:hover {
+    outline: none !important;
+    box-shadow: none !important;
 }
 
 /* .img-background {
@@ -618,6 +612,80 @@ a .box:hover {
   margin: 0;
   padding: 0;
   overflow: visible;
+}
+
+.calendar-buttons {
+  display: flex;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+}
+
+.calendar-button {
+  background-color: #0C7B93;
+  color: #4ade80;
+  padding: 3px 4px;
+  border-radius: 3px;
+  font-size: 0.9em;
+  text-decoration: none;
+  transition: all 0.12s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid #4ade80;
+  font-weight: 700;
+  cursor: pointer;
+  position: relative;
+}
+
+.calendar-button:hover {
+  background-color: #1a8f9e;
+  border-color: #ffffff;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+}
+
+.calendar-button i {
+  font-size: 1em;
+}
+
+.calendar-button::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  top: 100%;
+  left: 100%;
+  transform: translate(0, 4px);
+  background: rgba(13, 17, 23, 0.95);
+  color: #e0e0e0;
+  border: 1px solid #4ade80;
+  border-radius: 4px;
+  padding: 4px 8px;
+  white-space: nowrap;
+  font-size: 0.75em;
+  line-height: 1.2;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  z-index: 50;
+}
+
+.calendar-button:hover::after {
+  opacity: 1;
+  transform: translate(0, 2px);
+}
+
+.calendar-button.ai-button {
+  background-color: #7c3aed;
+  border-color: #a78bfa;
+}
+
+.calendar-button.ai-button:hover {
+  background-color: #8b5cf6;
+  border-color: #ffffff;
+  box-shadow: 0 0 10px rgba(167, 139, 250, 0.4);
 }
 
 .textViewEntry .calendar-button {

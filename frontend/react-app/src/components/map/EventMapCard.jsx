@@ -1,11 +1,11 @@
 import React from 'react';
-import MissingImage from '../MissingImage.png';
 
 export default class EventMapCard extends React.Component {
   render() {
     const { event } = this.props;
+
     let imgSrc = event.img;
-    if (imgSrc == "" || imgSrc == null) {
+    if (imgSrc === '' || imgSrc == null) {
       imgSrc = event.source.img;
     }
 
@@ -14,10 +14,7 @@ export default class EventMapCard extends React.Component {
         <img
           src={imgSrc}
           alt={event.title}
-          onError={(e) => {
-            e.currentTarget.onerror = null;
-            e.currentTarget.src = MissingImage;
-          }}
+          style={{ width: '100%', height: '100%', objectFit: 'cover' }}
         />
       </div>
     );
