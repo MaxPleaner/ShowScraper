@@ -958,11 +958,75 @@ a .box:hover {
   color: #cbd5e1;
 }
 
+.artist-progress-row.artist-fields {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  background: #0c0f14;
+  border: 1px solid #1f2937;
+  border-radius: 8px;
+  padding: 6px 8px;
+  margin: 4px 0;
+  font-size: 0.9em; /* match quick summary sizing */
+}
+
 .artist-name {
-  font-weight: 600;
+  font-weight: 700;
+  font-size: 1.05em;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  width: 100%;
+  border-bottom: 1px solid #1f2937;
+  padding-bottom: 4px;
+  margin-bottom: 4px;
+}
+
+/* Artist fields layout */
+.artist-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  align-items: stretch;
+}
+
+.artist-field-row {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 4px;
+  align-items: center;
+  background: #0f1115;
+  padding: 4px 6px;
+  border-radius: 6px;
+  margin: 0;
+}
+
+.artist-field-name {
+  color: #d3d8e0;
+  font-weight: 600;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.artist-field-value {
+  color: #e5e7eb; /* light text */
+  line-height: 1.25;
+  text-align: left;
+}
+
+.artist-field-value a {
+  color: #b6f2c0;
+  text-decoration: none;
+}
+
+.artist-field-value a:hover {
+  color: #a3edb2;
+  text-decoration: underline;
+}
+
+.artist-field-value p {
+  margin: 0;
 }
 
 .progress-track {

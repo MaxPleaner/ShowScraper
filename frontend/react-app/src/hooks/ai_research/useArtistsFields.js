@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import useLlmServer from './useLlmServer';
 
 // Expected fields that the server researches for each artist
-const EXPECTED_FIELDS = ['youtube', 'bio_genres', 'website', 'music'];
+const EXPECTED_FIELDS = ['youtube', 'bio', 'genres', 'website', 'music'];
 
 /**
  * Hook for researching field details for multiple artists.

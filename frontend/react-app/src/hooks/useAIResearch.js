@@ -159,15 +159,16 @@ export default function useAiResearch(event) {
     // Always clear errors when starting a new research run
     setAiError(null);
     
+    // Always clear previous state for a clean run
+    resetQuickStage();
+    resetArtistsList();
+    resetArtistsFields();
+    
     // Track skipCache for phase transitions
     currentSkipCacheRef.current = skipCache;
     
+    // Skip server cache flag
     if (skipCache) {
-      // Clear all state values immediately
-      resetQuickStage();
-      resetArtistsList();
-      resetArtistsFields();
-      // Skip server cache when refetching - update both state and ref immediately
       skipServerCacheRef.current = true;
       setSkipServerCache(true);
     } else {

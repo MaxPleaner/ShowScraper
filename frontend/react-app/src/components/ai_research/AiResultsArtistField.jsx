@@ -71,7 +71,11 @@ const AiResultsArtistField = ({ field, value, isLoading }) => {
 
   // Normalize not_found to a friendly string so the UI shows something
   const normalizedValue = isNotFound ? '(not found)' : value;
-  const formattedValue = formatFieldValue(field, normalizedValue);
+  let formattedValue = formatFieldValue(field, normalizedValue);
+  // Collapse newlines to keep entries single-line/compact for the UI
+  if (typeof formattedValue === 'string') {
+    formattedValue = formattedValue.replace(/\s*\n\s*/g, ' ');
+  }
 
   return (
     <div className="artist-field-row">

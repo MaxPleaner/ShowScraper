@@ -28,7 +28,8 @@ async def _research_single_field(
     """Research a single field for an artist and return display-ready data (with markdown)."""
     prompt_map = {
         "youtube": build_youtube_prompt,
-        "bio_genres": build_bio_genres_prompt,
+        "bio": build_bio_genres_prompt,
+        "genres": build_bio_genres_prompt,
         "website": build_website_prompt,
         "music": build_music_link_prompt,
     }
@@ -53,12 +54,14 @@ async def _research_single_field(
             return {"url": url, "markdown": f"[Watch]({url})"}
         return {"error": "not_found"}
     
-    if field == "bio_genres":
+    if field == "bio":
         bio = res.get("bio") or "(not found)"
+        return {"bio": bio, "markdown": bio}
+    
+    if field == "genres":
         genres = res.get("genres") or []
         genres_str = ", ".join(genres) if genres else "(not found)"
-        md = f"**Bio:** {bio}\n\n**Genres:** {genres_str}"
-        return {"bio": bio, "genres": genres, "markdown": md}
+        return {"genres": genres, "markdown": genres_str}
     
     if field == "website":
         label = res.get("label")
@@ -100,7 +103,7 @@ async def artists_fields_handler(
     field_timeout = Config.ARTIST_DATAPOINT_TIMEOUT
     
     # Expected fields for each artist
-    expected_fields = ["youtube", "bio_genres", "website", "music"]
+    expected_fields = ["youtube", "bio", "genres", "website", "music"]
     # Parse no_cache - handle both bool and string "true"/"false"
     no_cache_raw = event_data.get("no_cache", False)
     if isinstance(no_cache_raw, str):
@@ -120,18 +123,35 @@ async def artists_fields_handler(
                 cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
                 cached = load_cache(cache_key)
                 if cached and "fields" in cached:
-                    artist_cache_map[artist] = cached["fields"]
-                    # Stream cached fields immediately
-                    for field, value in cached["fields"].items():
-                        yield {
-                            "event": "data",
-                            "data": json.dumps({
-                                "type": "artist_datapoint",
-                                "artist": artist,
-                                "field": field,
-                                "value": value
-                            })
-                        }
+                    fields = cached["fields"]
+                    
+                    # Migrate old bio_genres field to separate bio and genres fields
+                    if "bio_genres" in fields:
+                        bio_genres_value = fields["bio_genres"]
+                        if isinstance(bio_genres_value, dict):
+                            # Extract bio and genres from the old structure
+                            if "bio" in bio_genres_value:
+                                fields["bio"] = {"bio": bio_genres_value["bio"], "markdown": bio_genres_value.get("bio", "(not found)")}
+                            if "genres" in bio_genres_value:
+                                genres_list = bio_genres_value.get("genres", [])
+                                genres_str = ", ".join(genres_list) if genres_list else "(not found)"
+                                fields["genres"] = {"genres": genres_list, "markdown": genres_str}
+                        # Remove the old field
+                        del fields["bio_genres"]
+                    
+                    artist_cache_map[artist] = fields
+                    # Stream cached fields immediately (only new field names)
+                    for field in expected_fields:
+                        if field in fields:
+                            yield {
+                                "event": "data",
+                                "data": json.dumps({
+                                    "type": "artist_datapoint",
+                                    "artist": artist,
+                                    "field": field,
+                                    "value": fields[field]
+                                })
+                            }
                     continue  # Skip to next artist if cached
             except Exception as e:
                 print(f"[artists_fields_handler] Error loading cache for {artist}: {e}")

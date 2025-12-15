@@ -61,6 +61,10 @@ const useQuickStage = ({
     const shouldSkipCache = forceSkipCache !== null ? forceSkipCache : skipServerCacheRef.current;
     console.log(`[useQuickStage] Starting request with skipCache=${shouldSkipCache} (forceSkipCache=${forceSkipCache}, ref=${skipServerCacheRef.current})`);
     
+    // Clear any previous accumulation before starting a new run
+    accumulatedSummaryRef.current = '';
+    setQuickSummary('');
+    
     // Temporarily override ref for this request
     const originalValue = skipServerCacheRef.current;
     if (forceSkipCache !== null) {
@@ -78,6 +82,7 @@ const useQuickStage = ({
   }, [startLlmRequest]);
 
   const reset = useCallback(() => {
+    accumulatedSummaryRef.current = '';
     setQuickSummary('');
   }, []);
 

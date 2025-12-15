@@ -16,7 +16,7 @@ const statusTextMap = {
 };
 
 // Expected fields that match the backend
-const EXPECTED_FIELDS = ['youtube', 'bio_genres', 'website', 'music'];
+const EXPECTED_FIELDS = ['youtube', 'bio', 'genres', 'website', 'music'];
 
 const AiModalBody = ({ researchState }) => {
   const { aiError, researchPhase, quickSummary, artistsData = [] } = researchState || {};
@@ -34,15 +34,15 @@ const AiModalBody = ({ researchState }) => {
             <AiResultsArtist key={name} name={name}>
               {EXPECTED_FIELDS.map((field, idx) => {
                 const value = fields[field];
-                // Check if value exists and is not an error
+                const hasValue = value !== undefined && value !== null;
                 const isError = value && typeof value === 'object' && value.error;
-                const hasValue = !isError && value !== undefined && value !== null;
                 return (
                   <AiResultsArtistField
                     key={`${name}-${field}-${idx}`}
                     field={field}
                     value={value}
-                    isLoading={!hasValue}
+                    // Treat errors as complete (no spinner), only show loading when missing
+                    isLoading={!hasValue && !isError}
                   />
                 );
               })}
