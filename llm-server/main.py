@@ -54,14 +54,18 @@ async def concert_research(
     title: str = Query(..., description="Event title/artists"),
     venue: str = Query(..., description="Venue name"),
     url: str = Query("", description="Event URL (optional)"),
-    mode: str = Query("quick", description="Research mode: 'quick' (fast 2-3 sentence summary) or 'detailed' (full research)")
+    mode: str = Query("quick", description="Research mode: 'quick' (fast summary), 'artists_list' (extract artists), 'artist_fields' (research single artist), or 'artists_fields' (research multiple artists)"),
+    artist: str = Query("", description="Single artist name (required for 'artist_fields' mode)"),
+    artists: str = Query("", description="JSON array of artist names (required for 'artists_fields' mode)")
 ):
     """
     Stream concert research via SSE using LangChain + Claude.
 
-    Two modes:
+    Modes:
     - quick: Fast streaming 2-3 sentence summary (no tools, ~2 seconds)
-    - detailed: Full research with artist details, links, bios (~15 seconds)
+    - artists_list: Extract list of performing artists (~5 seconds)
+    - artist_fields: Research fields for a single artist (~15 seconds)
+    - artists_fields: Research fields for given artists list (~15 seconds per artist)
 
     This endpoint performs web research about a concert event and streams
     results in real-time using Server-Sent Events.
@@ -94,8 +98,24 @@ async def concert_research(
         raise HTTPException(status_code=400, detail="url too long (max 300 chars)")
 
     # Validate mode
-    if mode not in ["quick", "detailed"]:
-        raise HTTPException(status_code=400, detail="mode must be 'quick' or 'detailed'")
+    if mode not in ["quick", "artists_list", "artist_fields", "artists_fields", "detailed"]:
+        raise HTTPException(status_code=400, detail="mode must be 'quick', 'artists_list', 'artist_fields', 'artists_fields', or 'detailed'")
+
+    # Parse artists parameter if provided
+    artists_list = None
+    if artists:
+        try:
+            artists_list = json.loads(artists)
+            if not isinstance(artists_list, list):
+                raise HTTPException(status_code=400, detail="artists must be a JSON array")
+        except json.JSONDecodeError:
+            raise HTTPException(status_code=400, detail="Invalid JSON in artists parameter")
+
+    # Validate artist/artists required for respective modes
+    if mode == "artist_fields" and not artist:
+        raise HTTPException(status_code=400, detail="artist parameter required for artist_fields mode")
+    if mode == "artists_fields" and not artists_list:
+        raise HTTPException(status_code=400, detail="artists parameter required for artists_fields mode")
 
     event_data = {
         "date": clean_date,
@@ -113,6 +133,10 @@ async def concert_research(
             "mode": mode,
             "query": event_data
         }
+        if artists_list:
+            req_log["artists"] = artists_list
+        if artist:
+            req_log["artist"] = artist
         log_dir = Path(__file__).resolve().parent / "logs"
         log_path = log_dir / f"req_{ts}_{os.getpid()}.json"
         log_path.parent.mkdir(parents=True, exist_ok=True)
@@ -120,7 +144,7 @@ async def concert_research(
     except Exception:
         pass
 
-    return EventSourceResponse(concert_research_handler(event_data, mode=mode))
+    return EventSourceResponse(concert_research_handler(event_data, mode=mode, artist=artist, artists=artists_list))
 
 if __name__ == "__main__":
     import uvicorn

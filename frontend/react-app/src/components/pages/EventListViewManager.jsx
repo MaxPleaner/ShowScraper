@@ -1,15 +1,15 @@
 import React, { useMemo, useState } from 'react';
 import { Columns, Box } from 'react-bulma-components';
 const { Column } = Columns;
-import EventListView from '../EventListView'
+import EventListView from '../event_list/EventListView'
 import { useRecoilState, useRecoilValue } from 'recoil';
 import * as Atoms from '../../state/atoms';
 import * as DateUtils from '../../utils/dateUtils';
 import { filterEventsList } from '../../utils/eventFilterUtils';
-import AiIntegrationNotice from '../AiIntegrationNotice';
-import OtherEventLists from '../OtherEventLists';
-import SearchVenuesForm from '../SearchVenuesForm';
-import DateSelector from '../DateSelector';
+import AiIntegrationNotice from '../header/AiIntegrationNotice';
+import OtherEventLists from '../header/OtherEventLists';
+import SearchVenuesForm from '../event_list/SearchVenuesForm';
+import DateSelector from '../event_list/DateSelector';
 
 // This handles filtering the event list using dates and search.
 // It calls EventListView which performs the actual rendering (either text or flyer)

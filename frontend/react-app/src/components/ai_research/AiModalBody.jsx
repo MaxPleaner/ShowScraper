@@ -17,20 +17,13 @@ const statusTextMap = {
 
 const AiModalBody = () => {
   const event = useRecoilValue(Atoms.aiModalEventState);
-  const { state } = useAIResearch(event);
-
-  const {
-    aiError,
-    quickSummary,
-    aiPhase,
-    artistsData = [],
-  } = state;
+  const { state: { aiError, aiPhase, quickSummary, artistsData = [] } } = useAIResearch(event);
 
   return (
     <div className="ai-modal-body">
       <AiLoadingMessage text={statusTextMap[aiPhase]} />
       {aiError && <AiErrorMessage error={aiError} />}
-      {(quickSummary || artistsData.length > 0) && <AiDisclaimer />}
+      <AiDisclaimer />
       {quickSummary && <AiQuickSummary summary={quickSummary} />}
 
       {artistsData.length > 0 && (

@@ -1,7 +1,7 @@
 import React from 'react';
 import AIResearchControls from './AIResearchControls';
-import GoogleCalendarButton from './GoogleCalendarButton';
-import IcalCalendarButton from './IcalCalendarButton';
+import GoogleCalendarButton from '../calendar/GoogleCalendarButton';
+import IcalCalendarButton from '../calendar/IcalCalendarButton';
 
 const EventButtons = ({ event }) => {
   return (

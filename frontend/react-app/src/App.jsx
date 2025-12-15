@@ -3,11 +3,11 @@ import './App.css';
 import React, { useEffect } from 'react';
 import 'bulma/css/bulma.min.css';
 
-import Nav from './components/Nav';
+import Nav from './components/header/Nav';
 import EventListViewManager from './components/pages/EventListViewManager';
 import MapViewManager from './components/pages/MapViewManager';
 import AboutView from './components/pages/AboutView';
-import VenuesList from './components/VenuesList';
+import VenuesList from './components/event_list/VenuesList';
 import GcsDataLoader from "./utils/GcsDataLoader"
 import AIResearchModal from './components/ai_research/AIResearchModal';
 import { useRecoilValue, useSetRecoilState } from 'recoil';

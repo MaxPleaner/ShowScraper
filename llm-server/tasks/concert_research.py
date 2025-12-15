@@ -521,13 +521,13 @@ Return the final markdown only."""
 async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]:
     """
     Quick mode: single streaming LLM call, no tools, 2-3 sentence summary.
-    Events: {"event": "quick", "data": "...streaming text..."}
+    Events: {"event": "data", "data": "...streaming text chunk..."}
     """
     cache_key = build_cache_key(event_data, "quick")
     cached = load_cache(cache_key)
     if cached and "quickSummary" in cached:
         print(f"[cache] quick hit for key={cache_key}")
-        yield {"event": "quick", "data": cached["quickSummary"]}
+        yield {"event": "data", "data": cached["quickSummary"]}
         return
     trace_obj = None
     if os.getenv("AGENTOPS_API_KEY"):
@@ -548,7 +548,7 @@ async def quick_research_handler(event_data: dict) -> AsyncGenerator[dict, None]
         quick_buffer = ""
         async for chunk in chain.astream({}):
             quick_buffer += chunk
-            yield {"event": "quick", "data": chunk}
+            yield {"event": "data", "data": chunk}
         save_cache(cache_key, {"quickSummary": quick_buffer})
 
         if os.getenv("AGENTOPS_API_KEY"):
@@ -844,24 +844,458 @@ def chunk_text(text: str, size: int):
     for i in range(0, len(text), size):
         yield text[i:i+size]
 
-async def concert_research_handler(event_data: dict, mode: str = "quick") -> AsyncGenerator[dict, None]:
+async def artists_list_handler(event_data: dict) -> AsyncGenerator[dict, None]:
     """
-    Main handler that dispatches to quick or detailed mode.
+    Extract artist list from event data.
+    Emits: {"event": "data", "data": "..."} where data is JSON array of artist names
+    """
+    cache_key = build_cache_key(event_data, "artists_list")
+    cached = load_cache(cache_key)
+    if cached and "artists" in cached:
+        print(f"[cache] artists_list hit for key={cache_key}")
+        yield {"event": "data", "data": json.dumps(cached["artists"])}
+        return
+
+    trace_obj = None
+    if os.getenv("AGENTOPS_API_KEY"):
+        trace_obj = _agentops_start_trace(tags=["concert-artists-list", event_data.get('title', 'unknown')[:50]])
+
+    try:
+        ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        llm = ChatOpenAI(
+            model="gpt-4o",
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            streaming=False,
+            max_tokens=4096,
+            temperature=0.3,
+        )
+
+        # Setup tools
+        tools: List[Tool] = []
+
+        # Add URL fetching tool
+        tools.append(
+            Tool(
+                name="fetch_url",
+                func=fetch_url_content,
+                description="Fetch and extract text content from a URL. Input: a URL string. Returns the page content as text. Note: foopee.com URLs will fail (use search instead)."
+            )
+        )
+
+        # Add Serper search tool if available
+        if os.getenv("SERPER_API_KEY"):
+            serper = GoogleSerperAPIWrapper(serper_api_key=os.getenv("SERPER_API_KEY"))
+            tools.append(
+                Tool(
+                    name="search",
+                    func=serper.run,
+                    description="Search the web for info about artists, events, venues. Input: a search query string."
+                )
+            )
+
+        extract_prompt = build_extract_artists_prompt(event_data)
+        artist_list_text = await run_with_tools(llm, tools, extract_prompt)
+
+        # Parse artist list (one artist per line)
+        artists = [
+            line.strip()
+            for line in artist_list_text.strip().split('\n')
+            if line.strip() and line.strip() != "Unable to determine artists"
+        ]
+
+        if not artists or artist_list_text.strip() == "Unable to determine artists":
+            yield {"event": "error", "data": "Unable to determine artists for this event."}
+            if os.getenv("AGENTOPS_API_KEY"):
+                _agentops_end_trace(end_state="Success")
+            return
+
+        # Stream the artist list (JSON-serialized for SSE)
+        yield {"event": "data", "data": json.dumps(artists)}
+
+        # Cache the result
+        save_cache(cache_key, {"artists": artists})
+
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Success")
+
+    except Exception as e:
+        error_msg = f"Error: {str(e)}"
+        yield {"event": "error", "data": error_msg}
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Fail")
+
+
+async def artist_fields_handler(event_data: dict, artist: str) -> AsyncGenerator[dict, None]:
+    """
+    Research field details for a single artist.
+    Emits: {"event": "data", "data": "..."} where data is JSON with:
+    - {"type": "artist_datapoint", "artist": "...", "field": "...", "value": {...}}
+    - {"type": "artist_result", "artist": "...", "content": "..."}
+    """
+    cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
+    cached = load_cache(cache_key)
+    if cached and "artist" in cached and cached["artist"] == artist:
+        print(f"[cache] artist_fields hit for key={cache_key}")
+        # Reconstruct and emit cached datapoints and result
+        if "datapoints" in cached:
+            for dp in cached["datapoints"]:
+                yield {"event": "data", "data": json.dumps({"type": "artist_datapoint", "artist": artist, "field": dp["field"], "value": dp["value"]})}
+        yield {"event": "data", "data": json.dumps({"type": "artist_result", "artist": artist, "content": cached["content"]})}
+        return
+
+    trace_obj = None
+    if os.getenv("AGENTOPS_API_KEY"):
+        trace_obj = _agentops_start_trace(tags=[f"concert-artist-fields", artist[:50]])
+
+    try:
+        ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        run_id = str(uuid.uuid4())[:8]
+        llm = ChatOpenAI(
+            model="gpt-4o",
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            streaming=False,
+            max_tokens=4096,
+            temperature=0.3,
+        )
+
+        # Setup tools
+        tools: List[Tool] = []
+
+        # Add URL fetching tool
+        tools.append(
+            Tool(
+                name="fetch_url",
+                func=fetch_url_content,
+                description="Fetch and extract text content from a URL. Input: a URL string. Returns the page content as text. Note: foopee.com URLs will fail (use search instead)."
+            )
+        )
+
+        # Add Serper search tool if available
+        if os.getenv("SERPER_API_KEY"):
+            serper = GoogleSerperAPIWrapper(serper_api_key=os.getenv("SERPER_API_KEY"))
+            tools.append(
+                Tool(
+                    name="search",
+                    func=serper.run,
+                    description="Search the web for info about artists, events, venues. Input: a search query string."
+                )
+            )
+        has_search = any(t.name == "search" for t in tools)
+        field_timeout = int(os.getenv("ARTIST_DATAPOINT_TIMEOUT", "25"))
+
+        datapoints = []
+
+        def emit_datapoint(field: str, value: Any):
+            payload = {"type": "artist_datapoint", "artist": artist, "field": field, "value": value}
+            datapoints.append({"field": field, "value": value})
+            return {"event": "data", "data": json.dumps(payload)}
+
+        async def run_json_prompt(prompt_text: str) -> dict:
+            """Run a short JSON-format prompt with tools and return parsed dict or {'error': ...}."""
+            llm_dp = ChatOpenAI(
+                model="gpt-4o-mini",
+                openai_api_key=os.getenv("OPENAI_API_KEY"),
+                streaming=False,
+                max_tokens=512,
+                temperature=0.2,
+            )
+            raw = ""
+            try:
+                tool_hint = "\\n\\nTools available: search (web), fetch_url (HTML fetch). Use them when unsure."
+                no_search_hint = "\\n\\nNote: web search tool is unavailable in this environment; rely on known data."
+                prompt_with_hint = prompt_text + (tool_hint if has_search else no_search_hint)
+                raw = await run_with_tools(llm_dp, tools, prompt_with_hint)
+                return json.loads(raw)
+            except Exception as e:
+                # Try to salvage a JSON object from the text
+                def _extract_json(text: str):
+                    m = re.search(r"\\{.*\\}", text, re.S)
+                    if m:
+                        try:
+                            return json.loads(m.group(0))
+                        except Exception:
+                            return None
+                    return None
+                parsed = _extract_json(raw) or _extract_json(raw.strip('`\\n ')) or None
+                if parsed is not None:
+                    return parsed
+                msg = str(e) or e.__class__.__name__
+                return {"error": msg}
+
+        # simple debug logger
+        log_dir = Path(__file__).resolve().parent.parent / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        dp_log_path = log_dir / f"dp_{ts}_{run_id}.log"
+
+        def log_dp(payload: dict):
+            try:
+                dp_log_path.write_text(dp_log_path.read_text() + json.dumps(payload) + "\\n") if dp_log_path.exists() else dp_log_path.write_text(json.dumps(payload) + "\\n")
+            except Exception:
+                pass
+
+        async def run_field(name: str, coro):
+            try:
+                res = await asyncio.wait_for(coro, timeout=field_timeout)
+                return name, res or {}
+            except Exception as e:
+                msg = str(e) or e.__class__.__name__
+                return name, {"error": msg}
+
+        tasks_list = [
+            asyncio.create_task(run_field("youtube", run_json_prompt(build_youtube_prompt(artist)))),
+            asyncio.create_task(run_field("bio_genres", run_json_prompt(build_bio_genres_prompt(artist)))),
+            asyncio.create_task(run_field("website", run_json_prompt(build_website_prompt(artist)))),
+            asyncio.create_task(run_field("music", run_json_prompt(build_music_link_prompt(artist)))),
+        ]
+
+        results: Dict[str, Any] = {"youtube": {}, "bio_genres": {}, "website": {}, "music": {}}
+
+        for task in asyncio.as_completed(tasks_list):
+            key, res = await task
+            results[key] = res or {}
+            yield emit_datapoint(key, res or {})
+
+        final_section = compose_artist_section(artist, results)
+        log_dp({"type": "artist_result", "artist": artist, "results": results})
+        
+        yield {"event": "data", "data": json.dumps({"type": "artist_result", "artist": artist, "content": final_section})}
+
+        save_cache(cache_key, {
+            "artist": artist,
+            "datapoints": datapoints,
+            "content": final_section,
+        })
+        log_dp({"type": "complete", "artist": artist})
+
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Success")
+
+    except Exception as e:
+        error_msg = f"Error: {str(e)}"
+        yield {"event": "error", "data": error_msg}
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Fail")
+
+
+async def artists_fields_handler(event_data: dict, artists: List[str]) -> AsyncGenerator[dict, None]:
+    """
+    Research field details for a list of artists.
+    Emits: {"event": "data", "data": "..."} where data is JSON with:
+    - {"type": "artist_datapoint", "artist": "...", "field": "...", "value": {...}}
+    - {"type": "artist_result", "artist": "...", "content": "..."}
+    - {"type": "complete"}
+    """
+    cache_key = build_cache_key(event_data, "artists_fields")
+    cached = load_cache(cache_key)
+    if cached and "artists" in cached and cached["artists"] == artists:
+        print(f"[cache] artists_fields hit for key={cache_key}")
+        # Reconstruct and emit cached results
+        for artist_name, artist_content in zip(cached.get("artists", []), cached.get("artistSections", [])):
+            yield {"event": "data", "data": json.dumps({"type": "artist_result", "artist": artist_name, "content": artist_content})}
+        yield {"event": "data", "data": json.dumps({"type": "complete"})}
+        return
+
+    trace_obj = None
+    if os.getenv("AGENTOPS_API_KEY"):
+        trace_obj = _agentops_start_trace(tags=[f"concert-artists-fields", event_data.get('title', 'unknown')[:50]])
+
+    try:
+        ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
+        run_id = str(uuid.uuid4())[:8]
+        llm = ChatOpenAI(
+            model="gpt-4o",
+            openai_api_key=os.getenv("OPENAI_API_KEY"),
+            streaming=False,
+            max_tokens=4096,
+            temperature=0.3,
+        )
+
+        # Setup tools
+        tools: List[Tool] = []
+
+        # Add URL fetching tool
+        tools.append(
+            Tool(
+                name="fetch_url",
+                func=fetch_url_content,
+                description="Fetch and extract text content from a URL. Input: a URL string. Returns the page content as text. Note: foopee.com URLs will fail (use search instead)."
+            )
+        )
+
+        # Add Serper search tool if available
+        if os.getenv("SERPER_API_KEY"):
+            serper = GoogleSerperAPIWrapper(serper_api_key=os.getenv("SERPER_API_KEY"))
+            tools.append(
+                Tool(
+                    name="search",
+                    func=serper.run,
+                    description="Search the web for info about artists, events, venues. Input: a search query string."
+                )
+            )
+        has_search = any(t.name == "search" for t in tools)
+        field_timeout = int(os.getenv("ARTIST_DATAPOINT_TIMEOUT", "25"))
+
+        artist_results_map: dict[str, str] = {}
+
+        # Shared queue for streaming datapoints as they finish
+        datapoint_queue: asyncio.Queue = asyncio.Queue()
+
+        async def emit_datapoint(artist: str, field: str, value: Any):
+            payload = {"type": "artist_datapoint", "artist": artist, "field": field, "value": value}
+            log_dp({"type": "datapoint", "payload": payload})
+            await datapoint_queue.put({
+                "event": "data",
+                "data": json.dumps(payload)
+            })
+
+        async def run_json_prompt(prompt_text: str) -> dict:
+            """Run a short JSON-format prompt with tools and return parsed dict or {'error': ...}."""
+            llm_dp = ChatOpenAI(
+                model="gpt-4o-mini",
+                openai_api_key=os.getenv("OPENAI_API_KEY"),
+                streaming=False,
+                max_tokens=512,
+                temperature=0.2,
+            )
+            raw = ""
+            try:
+                tool_hint = "\\n\\nTools available: search (web), fetch_url (HTML fetch). Use them when unsure."
+                no_search_hint = "\\n\\nNote: web search tool is unavailable in this environment; rely on known data."
+                prompt_with_hint = prompt_text + (tool_hint if has_search else no_search_hint)
+                raw = await run_with_tools(llm_dp, tools, prompt_with_hint)
+                return json.loads(raw)
+            except Exception as e:
+                # Try to salvage a JSON object from the text
+                def _extract_json(text: str):
+                    m = re.search(r"\\{.*\\}", text, re.S)
+                    if m:
+                        try:
+                            return json.loads(m.group(0))
+                        except Exception:
+                            return None
+                    return None
+                parsed = _extract_json(raw) or _extract_json(raw.strip('`\\n ')) or None
+                if parsed is not None:
+                    return parsed
+                msg = str(e) or e.__class__.__name__
+                return {"error": msg}
+
+        # simple debug logger
+        log_dir = Path(__file__).resolve().parent.parent / "logs"
+        log_dir.mkdir(parents=True, exist_ok=True)
+        dp_log_path = log_dir / f"dp_{ts}_{run_id}.log"
+
+        def log_dp(payload: dict):
+            try:
+                dp_log_path.write_text(dp_log_path.read_text() + json.dumps(payload) + "\\n") if dp_log_path.exists() else dp_log_path.write_text(json.dumps(payload) + "\\n")
+            except Exception:
+                pass
+
+        async def research_artist(artist: str) -> tuple[str, str]:
+            """Research one artist with per-datapoint parallelism and stream datapoints as they land."""
+            try:
+                async def run_field(name: str, coro):
+                    try:
+                        res = await asyncio.wait_for(coro, timeout=field_timeout)
+                        return name, res or {}
+                    except Exception as e:
+                        msg = str(e) or e.__class__.__name__
+                        return name, {"error": msg}
+
+                tasks_list = [
+                    asyncio.create_task(run_field("youtube", run_json_prompt(build_youtube_prompt(artist)))),
+                    asyncio.create_task(run_field("bio_genres", run_json_prompt(build_bio_genres_prompt(artist)))),
+                    asyncio.create_task(run_field("website", run_json_prompt(build_website_prompt(artist)))),
+                    asyncio.create_task(run_field("music", run_json_prompt(build_music_link_prompt(artist)))),
+                ]
+
+                results: Dict[str, Any] = {"youtube": {}, "bio_genres": {}, "website": {}, "music": {}}
+
+                for task in asyncio.as_completed(tasks_list):
+                    key, res = await task
+                    results[key] = res or {}
+                    await emit_datapoint(artist, key, res or {})
+
+                final_section = compose_artist_section(artist, results)
+                log_dp({"type": "artist_result", "artist": artist, "results": results})
+                return artist, final_section
+            except Exception as e:
+                msg = str(e) or e.__class__.__name__
+                fallback = f"### {artist}\\n- **YouTube**: [Search on YouTube](https://www.youtube.com/results?search_query={artist.replace(' ', '+')})\\n- **Link**: (error)\\n- **Genres**: (error: {msg[:60]})\\n- **Bio**: (error during research)\\n- **Music**: (error)"
+                return artist, fallback
+
+        tasks = [research_artist(artist) for artist in artists]
+
+        pending = set(asyncio.create_task(t) for t in tasks)
+
+        while pending:
+            # Flush any datapoint events waiting
+            while not datapoint_queue.empty():
+                yield await datapoint_queue.get()
+
+            done, pending = await asyncio.wait(pending, return_when=asyncio.FIRST_COMPLETED, timeout=0.1)
+            for d in done:
+                artist_name, artist_content = await d
+                yield {"event": "data", "data": json.dumps({"type": "artist_result", "artist": artist_name, "content": artist_content})}
+                artist_results_map[artist_name] = artist_content
+
+        # Drain remaining datapoints
+        while not datapoint_queue.empty():
+            yield await datapoint_queue.get()
+
+        yield {"event": "data", "data": json.dumps({"type": "complete"})}
+
+        ordered_sections = [artist_results_map.get(name, "") for name in artists]
+        save_cache(cache_key, {
+            "artists": artists,
+            "artistSections": ordered_sections,
+        })
+        log_dp({"type": "complete", "artists": artists})
+
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Success")
+
+    except Exception as e:
+        error_msg = f"Error: {str(e)}"
+        yield {"event": "error", "data": error_msg}
+        if os.getenv("AGENTOPS_API_KEY"):
+            _agentops_end_trace(end_state="Fail")
+
+
+async def concert_research_handler(event_data: dict, mode: str = "quick", artist: Optional[str] = None, artists: Optional[List[str]] = None) -> AsyncGenerator[dict, None]:
+    """
+    Main handler that dispatches to different modes.
 
     Args:
         event_data: Event details (title, venue, date, url)
-        mode: "quick" (fast streaming summary) or "detailed" (full research with tools)
+        mode: "quick" (fast streaming summary), "artists_list" (extract artists), "artist_fields" (research single artist), or "artists_fields" (research artist fields)
+        artist: Single artist name (required for "artist_fields" mode)
+        artists: List of artist names (required for "artists_fields" mode)
 
     Returns:
         AsyncGenerator yielding event dicts:
-        - Quick mode: {"event": "quick", "data": "streaming text..."}
-        - Detailed mode: {"event": "draft"/"status"/"final", "data": "..."}
+        - Quick mode: {"event": "data", "data": "streaming text chunk..."}
+        - Artists list mode: {"event": "data", "data": "JSON array of artist names"}
+        - Artist fields mode: {"event": "data", "data": "JSON with type field"}
+        - Artists fields mode: {"event": "data", "data": "JSON with type field"}
     """
     if mode == "quick":
         async for event in quick_research_handler(event_data):
             yield event
-    elif mode == "detailed":
-        async for event in detailed_research_handler(event_data):
+    elif mode == "artists_list":
+        async for event in artists_list_handler(event_data):
             yield event
+    elif mode == "artist_fields":
+        if not artist:
+            yield {"event": "error", "data": "artist parameter required for artist_fields mode"}
+        else:
+            async for event in artist_fields_handler(event_data, artist):
+                yield event
+    elif mode == "artists_fields":
+        if not artists:
+            yield {"event": "error", "data": "artists parameter required for artists_fields mode"}
+        else:
+            async for event in artists_fields_handler(event_data, artists):
+                yield event
     else:
-        yield {"event": "error", "data": f"Invalid mode: {mode}. Use 'quick' or 'detailed'."}
+        yield {"event": "error", "data": f"Invalid mode: {mode}. Use 'quick', 'artists_list', 'artist_fields', or 'artists_fields'."}
