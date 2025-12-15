@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 // Format field value for display
 const formatFieldValue = (field, value) => {
@@ -14,9 +16,14 @@ const formatFieldValue = (field, value) => {
     if (Array.isArray(value)) {
       return value.join(', ');
     }
-    // If it has a URL property, use that
+    // If explicit markdown is provided, prefer that
+    if (value.markdown) {
+      return value.markdown;
+    }
+    // If it has a URL property, render as markdown link
     if (value.url) {
-      return value.url;
+      const label = value.label || value.platform || value.name || value.text || value.url;
+      return `[${label}](${value.url})`;
     }
     // If it has a text/name property, use that
     if (value.text || value.name) {
@@ -32,8 +39,9 @@ const formatFieldValue = (field, value) => {
 const AiResultsArtistField = ({ field, value, isLoading }) => {
   const [progress, setProgress] = useState(0);
   
-  // Check if value is an error
-  const isError = value && typeof value === 'object' && value.error;
+  // Distinguish a hard error from a simple not-found
+  const isNotFound = value && typeof value === 'object' && value.error === 'not_found';
+  const isError = value && typeof value === 'object' && value.error && value.error !== 'not_found';
   const hasValidValue = !isError && value !== undefined && value !== null;
   // Only show loading if we're actually loading (not if there's an error)
   const shouldShowLoading = isLoading && !isError;
@@ -61,13 +69,17 @@ const AiResultsArtistField = ({ field, value, isLoading }) => {
     }
   }, [shouldShowLoading]);
 
-  const formattedValue = formatFieldValue(field, value);
+  // Normalize not_found to a friendly string so the UI shows something
+  const normalizedValue = isNotFound ? '(not found)' : value;
+  const formattedValue = formatFieldValue(field, normalizedValue);
 
   return (
     <div className="artist-field-row">
       <span className="artist-field-name">{field}:</span>
       {hasValidValue && formattedValue ? (
-        <span className="artist-field-value"> {formattedValue}</span>
+        <span className="artist-field-value">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>{formattedValue}</ReactMarkdown>
+        </span>
       ) : isError ? (
         // Show nothing or a subtle indicator when there's an error (timeout, etc.)
         <span className="artist-field-value" style={{ color: '#9ca3af', fontStyle: 'italic' }}>

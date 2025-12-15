@@ -84,19 +84,30 @@ async def run_json_prompt(
     tools: List[Tool],
     has_search: bool
 ) -> Dict[str, Any]:
-    """Run a short JSON-format prompt with tools and return parsed dict or {'error': ...}."""
-    llm_dp = create_llm(
-        model=Config.QUICK_MODEL,
-        streaming=False,
-        max_tokens=512,
-        temperature=Config.TEMPERATURE_STRICT
-    )
+    """
+    Run a short JSON-format prompt (no tool calls) and return parsed dict or {'error': ...}.
+    Uses the detailed model directly to avoid LangChain/tool parsing issues.
+    """
+    from openai import AsyncOpenAI
+
+    client = AsyncOpenAI(api_key=Config.OPENAI_API_KEY)
     raw = ""
     try:
-        tool_hint = "\n\nTools available: search (web), fetch_url (HTML fetch). Use them when unsure."
-        no_search_hint = "\n\nNote: web search tool is unavailable in this environment; rely on known data."
-        prompt_with_hint = prompt_text + (tool_hint if has_search else no_search_hint)
-        raw = await run_with_tools(llm_dp, tools, prompt_with_hint)
+        hint = (
+            "\n\nTools may be available (search/fetch). "
+            "Even if unsure, return your best factual guess. "
+            "Never return empty values; use 'unknown' strings instead of omitting keys."
+        )
+        prompt_with_hint = prompt_text + hint
+
+        completion = await client.chat.completions.create(
+            model=Config.DETAILED_MODEL,
+            messages=[{"role": "user", "content": prompt_with_hint}],
+            max_tokens=512,
+            temperature=Config.TEMPERATURE_STRICT,
+            stream=False,
+        )
+        raw = completion.choices[0].message.content or ""
         return json.loads(raw)
     except Exception as e:
         # Try to salvage a JSON object from the text
@@ -112,4 +123,5 @@ async def run_json_prompt(
         if parsed is not None:
             return parsed
         msg = str(e) or e.__class__.__name__
+        print(f"[run_json_prompt] Error parsing response: {msg}")
         return {"error": msg}

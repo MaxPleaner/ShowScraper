@@ -25,43 +25,56 @@ async def _research_single_field(
     has_search: bool,
     field_timeout: int
 ) -> Dict[str, Any]:
-    """Research a single field for an artist. Returns cached result if available."""
-    # TEMPORARY: Return mock data after 2 seconds for testing
-    await asyncio.sleep(2)
-    
-    # Generate mock data based on field type
-    mock_data = {
-        "youtube": {"url": f"https://www.youtube.com/channel/{artist.lower().replace(' ', '')}"},
-        "bio_genres": {"text": f"{artist} is known for their unique blend of genres"},
-        "website": {"url": f"https://www.{artist.lower().replace(' ', '')}.com"},
-        "music": {"url": f"https://open.spotify.com/artist/{artist.lower().replace(' ', '')}"},
+    """Research a single field for an artist and return display-ready data (with markdown)."""
+    prompt_map = {
+        "youtube": build_youtube_prompt,
+        "bio_genres": build_bio_genres_prompt,
+        "website": build_website_prompt,
+        "music": build_music_link_prompt,
     }
     
-    if field in mock_data:
-        return mock_data[field]
+    if field not in prompt_map:
+        return {"error": f"Unknown field: {field}"}
     
-    return {"error": f"Unknown field: {field}"}
+    try:
+        res = await asyncio.wait_for(
+            run_json_prompt(prompt_map[field](artist), tools, has_search),
+            timeout=field_timeout
+        )
+        res = res or {}
+    except Exception as e:
+        msg = str(e) or e.__class__.__name__
+        return {"error": msg}
     
-    # ORIGINAL CODE (commented out for testing):
-    # prompt_map = {
-    #     "youtube": build_youtube_prompt,
-    #     "bio_genres": build_bio_genres_prompt,
-    #     "website": build_website_prompt,
-    #     "music": build_music_link_prompt,
-    # }
-    # 
-    # if field not in prompt_map:
-    #     return {"error": f"Unknown field: {field}"}
-    # 
-    # try:
-    #     res = await asyncio.wait_for(
-    #         run_json_prompt(prompt_map[field](artist), tools, has_search),
-    #         timeout=field_timeout
-    #     )
-    #     return res or {}
-    # except Exception as e:
-    #     msg = str(e) or e.__class__.__name__
-    #     return {"error": msg}
+    # Normalize into a markdown-friendly shape
+    if field == "youtube":
+        url = res.get("youtube_url") or res.get("url") or res.get("fallback_search_url")
+        if url:
+            return {"url": url, "markdown": f"[Watch]({url})"}
+        return {"error": "not_found"}
+    
+    if field == "bio_genres":
+        bio = res.get("bio") or "(not found)"
+        genres = res.get("genres") or []
+        genres_str = ", ".join(genres) if genres else "(not found)"
+        md = f"**Bio:** {bio}\n\n**Genres:** {genres_str}"
+        return {"bio": bio, "genres": genres, "markdown": md}
+    
+    if field == "website":
+        label = res.get("label")
+        url = res.get("url")
+        if label and url and label != "not_found":
+            return {"label": label, "url": url, "markdown": f"[{label}]({url})"}
+        return {"error": "not_found"}
+    
+    if field == "music":
+        platform = res.get("platform")
+        url = res.get("url")
+        if platform and url and platform != "not_found":
+            return {"platform": platform, "url": url, "markdown": f"[{platform}]({url})"}
+        return {"error": "not_found"}
+    
+    return {"error": "Unhandled field"}
 
 
 async def artists_fields_handler(
