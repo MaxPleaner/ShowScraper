@@ -1,5 +1,5 @@
 import React from 'react';
-import { generateCalendarLinks } from '../utils/calendarLinkUtils';
+import { generateCalendarLinks } from '../../utils/calendarLinkUtils';
 
 const IcalCalendarButton = ({ event }) => {
   const { ical } = generateCalendarLinks(event);

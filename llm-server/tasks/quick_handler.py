@@ -15,12 +15,39 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
     Quick mode: single streaming LLM call, no tools, 2-3 sentence summary.
     Events: {"event": "data", "data": "...streaming text chunk..."}
     """
-    cache_key = build_cache_key(event_data, "quick")
-    cached = load_cache(cache_key)
-    if cached and "quickSummary" in cached:
-        print(f"[cache] quick hit for key={cache_key}")
-        yield {"event": "data", "data": cached["quickSummary"]}
-        return
+    # Parse no_cache - handle both bool and string "true"/"false"
+    no_cache_raw = event_data.get("no_cache", False)
+    if isinstance(no_cache_raw, str):
+        no_cache = no_cache_raw.lower() in ("true", "1", "yes")
+    else:
+        no_cache = bool(no_cache_raw)
+    
+    print(f"[quick_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
+    
+    # Build cache key - initialize to None first to avoid scoping issues
+    cache_key = None
+    try:
+        cache_key = build_cache_key(event_data, "quick")
+    except Exception as e:
+        print(f"[quick_handler] Error building cache key: {e}")
+        cache_key = None  # Explicitly set to None on error
+    
+    # Check cache only if not skipping and we have a valid key
+    if not no_cache and cache_key is not None:
+        try:
+            cached = load_cache(cache_key)
+            if cached and "quickSummary" in cached:
+                print(f"[cache] quick hit for key={cache_key}")
+                yield {"event": "data", "data": cached["quickSummary"]}
+                return
+        except Exception as e:
+            print(f"[quick_handler] Error loading cache: {e}")
+            # Continue to fetch fresh data
+    else:
+        if no_cache:
+            print(f"[quick_handler] Skipping cache due to no_cache=True, will fetch fresh data")
+        else:
+            print(f"[quick_handler] No cache key available, will fetch fresh data")
 
     trace_obj = start_trace(["concert-quick", event_data.get('title', 'unknown')[:50]])
 
@@ -33,16 +60,42 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
         )
 
         quick_prompt = build_quick_prompt(event_data)
-        chain = ChatPromptTemplate.from_messages([("user", quick_prompt)]) | llm | StrOutputParser()
-
+        
+        # Use OpenAI SDK directly to avoid LangChain async context manager bug
+        from openai import AsyncOpenAI
+        
+        client = AsyncOpenAI(api_key=Config.OPENAI_API_KEY)
         quick_buffer = ""
-        async for chunk in chain.astream({}):
-            quick_buffer += chunk
-            yield {"event": "data", "data": chunk}
-        save_cache(cache_key, {"quickSummary": quick_buffer})
+        
+        # Stream directly from OpenAI API
+        stream = await client.chat.completions.create(
+            model=Config.QUICK_MODEL,
+            messages=[{"role": "user", "content": quick_prompt}],
+            max_tokens=Config.QUICK_MAX_TOKENS,
+            temperature=Config.TEMPERATURE,
+            stream=True
+        )
+        
+        async for chunk in stream:
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                quick_buffer += content
+                yield {"event": "data", "data": content}
+        
+        # Only save to cache if we have a valid cache_key and not skipping cache
+        if cache_key is not None and not no_cache:
+            try:
+                save_cache(cache_key, {"quickSummary": quick_buffer})
+            except Exception as e:
+                print(f"[quick_handler] Error saving cache: {e}")
+                # Non-fatal error, continue
 
         end_trace(trace_obj, "Success")
 
     except Exception as e:
-        yield {"event": "error", "data": f"Error: {str(e)}"}
+        error_msg = str(e)
+        print(f"[quick_handler] Exception: {error_msg}")
+        import traceback
+        traceback.print_exc()
+        yield {"event": "error", "data": f"Error: {error_msg}"}
         end_trace(trace_obj, "Fail")

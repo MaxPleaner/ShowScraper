@@ -2,7 +2,7 @@ import React from 'react';
 import moment from 'moment';
 import _ from 'underscore'
 import { useRecoilValue } from 'recoil';
-import * as Atoms from '../state/atoms';
+import * as Atoms from '../../state/atoms';
 
 class VenuesListInner extends React.Component {
   constructor(props) {

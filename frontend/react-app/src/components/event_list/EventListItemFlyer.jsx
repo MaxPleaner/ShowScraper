@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
-import MissingImage from '../MissingImage.png';
-import { truncateTitle } from '../utils/textUtils';
+import MissingImage from '../../MissingImage.png';
+import { truncateTitle } from '../../utils/textUtils';
 
 const EventListItemFlyer = ({ event }) => {
   const [overlayDisplay, setOverlayDisplay] = useState('none');

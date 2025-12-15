@@ -1,5 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
-import useResearchCache from './useResearchCache';
+import { useEffect, useState, useCallback, useMemo, useRef } from 'react';
 import useLlmServer from './useLlmServer';
 
 // Expected fields that the server researches for each artist
@@ -14,55 +13,61 @@ const EXPECTED_FIELDS = ['youtube', 'bio_genres', 'website', 'music'];
 const useArtistsFields = ({
   event,
   artistsDataNoFields,
-  useCache,
+  skipServerCache = false,
   onComplete,
 }) => {
   const [artistsData, setArtistsData] = useState([]);
-  const cache = useResearchCache();
+  const skipServerCacheRef = useRef(skipServerCache);
 
-  const loadOrInitArtists = (artists) => {
-    return artists.map(artist => {
-      const cached = cache.getCached(event, `artist_fields_${artist.name}`);
-      if (cached && cached.fields) {
-        const hasAllFields = EXPECTED_FIELDS.every(f => cached.fields[f] !== undefined);
-        return {
-          ...artist,
-          status: hasAllFields ? 'done' : 'in_progress',
-          fields: cached.fields || {},
-        };
-      }
-      return {
-        ...artist,
-        status: 'in_progress',
-        fields: {},
-      };
-    });
+  // Keep ref in sync with prop
+  useEffect(() => {
+    skipServerCacheRef.current = skipServerCache;
+  }, [skipServerCache]);
+
+  const initArtists = (artists) => {
+    return artists.map(artist => ({
+      ...artist,
+      status: 'in_progress',
+      fields: {},
+    }));
   };
 
   // Handle incoming data events - only artist_datapoint events
   const handleData = useCallback((data) => {
-    const { artist: artistName, field, value } = data;
-    setArtistsData((prev) => {
-      return prev.map(item => {
-        if (item.name !== artistName) return item;
+    // Handle wrapped format: { type: "artist_datapoint", artist, field, value }
+    if (data && data.type === 'artist_datapoint') {
+      const { artist: artistName, field, value } = data;
+      
+      if (!artistName || !field) {
+        console.warn('[useArtistsFields] Missing artist or field in datapoint:', data);
+        return;
+      }
 
-        const updatedFields = { ...(item.fields || {}), [field]: value };
-        const hasAllFields = EXPECTED_FIELDS.every(f => updatedFields[f] !== undefined);
-        const newStatus = hasAllFields ? 'done' : item.status;
-
-        // Cache when all fields are complete
-        if (hasAllFields && item.status !== 'done') {
-          cache.setCached(event, `artist_fields_${artistName}`, { fields: updatedFields });
+      setArtistsData((prev) => {
+        // Check if artist exists in the list
+        const artistExists = prev.some(item => item.name === artistName);
+        if (!artistExists) {
+          console.warn(`[useArtistsFields] Artist "${artistName}" not found in artistsData. Current artists:`, prev.map(a => a.name));
+          return prev;
         }
 
-        return {
-          ...item,
-          fields: updatedFields,
-          status: newStatus,
-        };
+        return prev.map(item => {
+          if (item.name !== artistName) return item;
+
+          const updatedFields = { ...(item.fields || {}), [field]: value };
+          const hasAllFields = EXPECTED_FIELDS.every(f => updatedFields[f] !== undefined);
+          const newStatus = hasAllFields ? 'done' : item.status;
+
+          return {
+            ...item,
+            fields: updatedFields,
+            status: newStatus,
+          };
+        });
       });
-    });
-  }, [event, cache]);
+    }
+    // Ignore other event types (like "complete")
+  }, []);
 
   const handleError = useCallback(() => {
     // Mark all in-progress artists as done (with error state)
@@ -77,14 +82,22 @@ const useArtistsFields = ({
   const inProgressArtists = artistsData.filter(a => a.status === 'in_progress');
   const artistNames = inProgressArtists.map(a => a.name);
 
+  // Use a function for additionalParams so it reads the latest ref value
+  const additionalParamsFn = useCallback(() => {
+    const params = artistNames.length > 0 ? { artists: JSON.stringify(artistNames) } : {};
+    if (skipServerCacheRef.current) {
+      params.no_cache = true;
+    }
+    console.log(`[useArtistsFields] additionalParams function called with skipServerCacheRef.current=${skipServerCacheRef.current}, artistNames.length=${artistNames.length}:`, params);
+    return params;
+  }, [artistNames.join(',')]); // Use join to create stable dependency
+
   const startLlmRequest = useLlmServer({
     event,
     mode: 'artists_fields',
     onData: handleData,
     onError: handleError,
-    additionalParams: () => {
-      return artistNames.length > 0 ? { artists: JSON.stringify(artistNames) } : {};
-    },
+    additionalParams: additionalParamsFn,
   });
 
   // Check if all artists are complete
@@ -103,15 +116,24 @@ const useArtistsFields = ({
     }
   }, [artistNames.length, startLlmRequest]);
 
-  const run = (artistsDataNoFieldsOverride) => {
+  const run = useCallback((artistsDataNoFieldsOverride) => {
     const artists = artistsDataNoFieldsOverride || artistsDataNoFields;
     if (!artists || artists.length === 0) return;
 
-    const initialData = loadOrInitArtists(artists);
+    const initialData = initArtists(artists);
     setArtistsData(initialData);
-  };
+  }, [artistsDataNoFields]);
 
-  return { artistsData, run };
+  // Reset artistsData when event changes
+  useEffect(() => {
+    setArtistsData([]);
+  }, [event]);
+
+  const reset = useCallback(() => {
+    setArtistsData([]);
+  }, []);
+
+  return { artistsData, run, reset };
 };
 
 export default useArtistsFields;

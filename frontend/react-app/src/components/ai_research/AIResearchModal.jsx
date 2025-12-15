@@ -8,13 +8,13 @@ import useAIResearch from '../../hooks/useAIResearch';
 const AIResearchModal = () => {
   const [isOpen, setIsOpen] = useRecoilState(Atoms.aiModalOpenState);
   const event = useRecoilValue(Atoms.aiModalEventState);
-  const { actions: { runAIResearch } } = useAIResearch(event);
+  const { state, actions: { runAIResearch } } = useAIResearch(event);
 
   useEffect(() => {
     if (isOpen && event) {
       runAIResearch();
     }
-  }, [isOpen, event]);
+  }, [isOpen, event, runAIResearch]);
 
   if (!isOpen || !event) return null;
 
@@ -25,7 +25,7 @@ const AIResearchModal = () => {
           onRefetch={() => runAIResearch(true)}
           onClose={() => setIsOpen(false)}
         />
-        <AiModalBody />
+        <AiModalBody researchState={state} />
       </div>
     </div>
   );

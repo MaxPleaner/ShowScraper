@@ -14,11 +14,22 @@ const clearCacheKey = (event, cacheType) => {
 };
 
 const getCached = (event, cacheType) => {
-  return JSON.parse(localStorage.getItem(cacheKeyForEvent(event, cacheType)));
+  const cached = localStorage.getItem(cacheKeyForEvent(event, cacheType));
+  if (!cached) return null;
+  try {
+    return JSON.parse(cached);
+  } catch (e) {
+    console.error('Error parsing cached data:', e);
+    return null;
+  }
 };
 
 const setCached = (event, cacheType, data) => {
   localStorage.setItem(cacheKeyForEvent(event, cacheType), JSON.stringify(data));
+};
+
+const clearCached = (event, cacheType) => {
+  clearCacheKey(event, cacheType);
 };
 
 const clearAll = (event) => {

@@ -3,7 +3,7 @@ import EventListItemText from './EventListItemText';
 import EventListItemFlyer from './EventListItemFlyer';
 import moment from 'moment';
 
-import { groupByRegion } from '../utils/regionUtils';
+import { groupByRegion } from '../../utils/regionUtils';
 import DayGroup from './DayGroup';
 import DayGroupTitle from './DayGroupTitle';
 import DayEventsGrid from './DayEventsGrid';

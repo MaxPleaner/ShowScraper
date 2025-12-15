@@ -1,0 +1,152 @@
+@startuml ShowScraper System Architecture
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam backgroundColor #FEFEFE
+skinparam component {
+    BackgroundColor<<scraper>> #FFE5E5
+    BackgroundColor<<llm>> #E5F5FF
+    BackgroundColor<<frontend>> #E5FFE5
+    BackgroundColor<<external>> #FFF5E5
+    BackgroundColor<<storage>> #F5E5FF
+}
+
+title ShowScraper - Bay Area Concert Aggregation Platform
+
+' === SCRAPER TIER ===
+package "Scraper Backend (Ruby + Selenium)" <<scraper>> {
+    component [bin/run_scraper\nCLI Entry Point] as CLI
+    component [scraper.rb\nMain Orchestrator] as Scraper
+    component [54+ Venue Scrapers\n(DnaLounge.rb, Fillmore.rb, etc.)] as Venues
+    component [GCS Upload\n(gcs.rb)] as GCSUpload
+    component [Selenium WebDriver\nFirefox/Chrome] as Selenium
+}
+
+' === STORAGE TIER ===
+package "Google Cloud Storage" <<storage>> {
+    database [show-scraper-data\n• sources.json\n• {VenueName}.json (54+ files)] as GCS
+}
+
+' === LLM TIER ===
+package "LLM Server (Python FastAPI)" <<llm>> {
+    component [FastAPI Server\nlocalhost:8000] as FastAPI
+    component [Concert Research Handler\n(concert_research.py)] as Handler
+
+    package "Research Modes" {
+        component [Quick Mode\n(2-3 sentence summary)] as Quick
+        component [Artists List Mode\n(multi-artist research)] as ArtistsList
+        component [Artists Fields Mode\n(deep dive research)] as ArtistsFields
+    }
+
+    component [Cache System\n(tasks/cache/)] as Cache
+    component [Logging\n(tasks/logs/)] as Logs
+}
+
+' === FRONTEND TIER ===
+package "Frontend (React + GitHub Pages)" <<frontend>> {
+    component [React App\n(App.jsx)] as ReactApp
+    component [GcsDataLoader\n(fetch venue & event data)] as DataLoader
+
+    package "State Management (Recoil)" {
+        component [eventsState\nvenuesState\naiModalState] as State
+    }
+
+    package "Views" {
+        component [EventListView\n(Text + Images)] as EventList
+        component [MapView\n(Leaflet)] as MapView
+        component [VenuesList] as VenuesList
+        component [AIResearchModal] as AIModal
+    }
+
+    component [Utilities\n(date, filter, calendar, map)] as Utils
+}
+
+' === EXTERNAL SERVICES ===
+package "External Services" <<external>> {
+    component [Venue Websites\n(50+ venues)] as Websites
+    component [OpenAI API\n(Claude LLM)] as OpenAI
+    component [SerpAPI\n(Web Search)] as SerpAPI
+    component [GitHub Pages\nbayareashows.org] as GitHubPages
+}
+
+' === SCRAPER FLOW ===
+CLI --> Scraper : launches
+Scraper --> Venues : orchestrates 54+ scrapers\n(3min timeout each)
+Venues --> Selenium : browser automation
+Selenium --> Websites : HTTP requests
+Websites --> Selenium : HTML responses
+Venues --> Scraper : event arrays\n[{url, title, date, img, details}]
+Scraper --> GCSUpload : validated events
+GCSUpload --> GCS : upload JSON files
+
+' === FRONTEND DATA FLOW ===
+GCS --> DataLoader : fetch sources.json +\n54 venue JSON files
+DataLoader --> State : populate eventsState\n& venuesState
+State --> EventList : render events by date
+State --> MapView : render venue markers
+State --> VenuesList : render venue list
+State --> AIModal : event selection
+
+' === AI RESEARCH FLOW ===
+AIModal --> FastAPI : SSE request\n/tasks/concert-research?date&title&venue&mode
+FastAPI --> Handler : route request
+Handler --> Quick : mode=quick
+Handler --> ArtistsList : mode=artists_list
+Handler --> ArtistsFields : mode=artists_fields
+
+Quick --> OpenAI : simple LLM call
+ArtistsList --> OpenAI : LLM with SerpAPI tool
+ArtistsList --> SerpAPI : web searches
+ArtistsFields --> OpenAI : multi-query LLM
+ArtistsFields --> SerpAPI : multiple searches
+
+Quick --> Cache : store results
+ArtistsList --> Cache : store results
+ArtistsFields --> Cache : store results
+
+Handler --> Logs : log requests/responses
+Handler --> AIModal : SSE stream response
+AIModal --> State : cache to localStorage
+
+' === DEPLOYMENT ===
+ReactApp --> GitHubPages : yarn deploy\n(gh-pages branch)
+
+' === NOTES ===
+note right of Scraper
+  **Scraper Configuration**
+  • runs on-demand or cron
+  • headless mode option
+  • dry-run mode
+  • per-venue timeout
+  • event validation
+end note
+
+note right of GCS
+  **Data Format**
+  Event: {
+    url: string
+    title: string
+    date: DateTime
+    img: string
+    details: string
+  }
+end note
+
+note right of FastAPI
+  **Infrastructure**
+  • Rate limit: 10/min, 200/day
+  • CORS: localhost + production
+  • AgentOps tracing
+  • SSE streaming
+end note
+
+note right of State
+  **Key State Atoms**
+  • eventsState (grouped by MM-DD)
+  • venuesState (54+ venues)
+  • currentDayState
+  • timeGroupingModeState
+end note
+
+@enduml

@@ -32,10 +32,11 @@ async def concert_research(
     url: str = Query("", description="Event URL (optional)"),
     mode: str = Query("quick", description="Research mode"),
     artist: str = Query("", description="Single artist name (required for 'artist_fields' mode)"),
-    artists: str = Query("", description="JSON array of artist names (required for 'artists_fields' mode)")
+    artists: str = Query("", description="JSON array of artist names (required for 'artists_fields' mode)"),
+    no_cache: bool = Query(False, description="Skip cache and force fresh data")
 ):
     """Stream concert research via SSE."""
-    return await handle_concert_research(request, date, title, venue, url, mode, artist, artists)
+    return await handle_concert_research(request, date, title, venue, url, mode, artist, artists, no_cache)
 
 
 if __name__ == "__main__":

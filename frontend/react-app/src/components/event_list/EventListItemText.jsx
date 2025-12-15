@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import EventButtons from './EventButtons';
-import { truncateTitle } from '../utils/textUtils';
+import { truncateTitle } from '../../utils/textUtils';
 
 const EventListItemText = ({ event }) => {
   const title = useMemo(() => truncateTitle(event.title), [event.title]);

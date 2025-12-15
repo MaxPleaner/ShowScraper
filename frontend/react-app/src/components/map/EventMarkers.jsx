@@ -34,8 +34,8 @@ const EventMarkers = ({ events, onEventClick, onEventHover, currentZoom }) => {
   const map = useMap();
   return (
     <>
-      {events.map((event) => (
-        <React.Fragment key={`${event.source.name}-${event.title}`}>
+      {events.map((event, index) => (
+        <React.Fragment key={`${event.source.name}-${event.title}-${event.date}-${index}`}>
           <MapImageMarker
             map={map}
             event={event}

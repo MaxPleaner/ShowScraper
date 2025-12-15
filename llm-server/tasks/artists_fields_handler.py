@@ -26,25 +26,42 @@ async def _research_single_field(
     field_timeout: int
 ) -> Dict[str, Any]:
     """Research a single field for an artist. Returns cached result if available."""
-    prompt_map = {
-        "youtube": build_youtube_prompt,
-        "bio_genres": build_bio_genres_prompt,
-        "website": build_website_prompt,
-        "music": build_music_link_prompt,
+    # TEMPORARY: Return mock data after 2 seconds for testing
+    await asyncio.sleep(2)
+    
+    # Generate mock data based on field type
+    mock_data = {
+        "youtube": {"url": f"https://www.youtube.com/channel/{artist.lower().replace(' ', '')}"},
+        "bio_genres": {"text": f"{artist} is known for their unique blend of genres"},
+        "website": {"url": f"https://www.{artist.lower().replace(' ', '')}.com"},
+        "music": {"url": f"https://open.spotify.com/artist/{artist.lower().replace(' ', '')}"},
     }
     
-    if field not in prompt_map:
-        return {"error": f"Unknown field: {field}"}
+    if field in mock_data:
+        return mock_data[field]
     
-    try:
-        res = await asyncio.wait_for(
-            run_json_prompt(prompt_map[field](artist), tools, has_search),
-            timeout=field_timeout
-        )
-        return res or {}
-    except Exception as e:
-        msg = str(e) or e.__class__.__name__
-        return {"error": msg}
+    return {"error": f"Unknown field: {field}"}
+    
+    # ORIGINAL CODE (commented out for testing):
+    # prompt_map = {
+    #     "youtube": build_youtube_prompt,
+    #     "bio_genres": build_bio_genres_prompt,
+    #     "website": build_website_prompt,
+    #     "music": build_music_link_prompt,
+    # }
+    # 
+    # if field not in prompt_map:
+    #     return {"error": f"Unknown field: {field}"}
+    # 
+    # try:
+    #     res = await asyncio.wait_for(
+    #         run_json_prompt(prompt_map[field](artist), tools, has_search),
+    #         timeout=field_timeout
+    #     )
+    #     return res or {}
+    # except Exception as e:
+    #     msg = str(e) or e.__class__.__name__
+    #     return {"error": msg}
 
 
 async def artists_fields_handler(
@@ -71,30 +88,45 @@ async def artists_fields_handler(
     
     # Expected fields for each artist
     expected_fields = ["youtube", "bio_genres", "website", "music"]
+    # Parse no_cache - handle both bool and string "true"/"false"
+    no_cache_raw = event_data.get("no_cache", False)
+    if isinstance(no_cache_raw, str):
+        no_cache = no_cache_raw.lower() in ("true", "1", "yes")
+    else:
+        no_cache = bool(no_cache_raw)
+    
+    print(f"[artists_fields_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
     
     # Check cache for each artist
     artist_cache_map: Dict[str, Dict[str, Any]] = {}
     artists_to_research: List[str] = []
     
     for artist in artists:
-        cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
-        cached = load_cache(cache_key)
-        if cached and "fields" in cached:
-            artist_cache_map[artist] = cached["fields"]
-            # Stream cached fields immediately
-            for field, value in cached["fields"].items():
-                yield {
-                    "event": "data",
-                    "data": json.dumps({
-                        "type": "artist_datapoint",
-                        "artist": artist,
-                        "field": field,
-                        "value": value
-                    })
-                }
-        else:
-            artists_to_research.append(artist)
-            artist_cache_map[artist] = {}
+        if not no_cache:
+            try:
+                cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
+                cached = load_cache(cache_key)
+                if cached and "fields" in cached:
+                    artist_cache_map[artist] = cached["fields"]
+                    # Stream cached fields immediately
+                    for field, value in cached["fields"].items():
+                        yield {
+                            "event": "data",
+                            "data": json.dumps({
+                                "type": "artist_datapoint",
+                                "artist": artist,
+                                "field": field,
+                                "value": value
+                            })
+                        }
+                    continue  # Skip to next artist if cached
+            except Exception as e:
+                print(f"[artists_fields_handler] Error loading cache for {artist}: {e}")
+                # Continue to research this artist
+        
+        # Artist not cached or no_cache is True
+        artists_to_research.append(artist)
+        artist_cache_map[artist] = {}
     
     # If all artists are cached, we're done
     if not artists_to_research:
@@ -110,22 +142,25 @@ async def artists_fields_handler(
         
         # Create all field research tasks in parallel
         # This creates N artists × M fields = total parallel requests
-        all_tasks = []
-        task_to_artist_field = {}
+        # Wrap each task to preserve artist/field information
+        async def _research_with_metadata(artist: str, field: str):
+            """Wrapper to preserve artist/field metadata with the result."""
+            result = await _research_single_field(artist, field, tools, has_search, field_timeout)
+            return (artist, field, result)
         
+        all_tasks = []
         for artist in artists_to_research:
             for field in expected_fields:
                 task = asyncio.create_task(
-                    _research_single_field(artist, field, tools, has_search, field_timeout)
+                    _research_with_metadata(artist, field)
                 )
                 all_tasks.append(task)
-                task_to_artist_field[id(task)] = (artist, field)
         
         # Stream results as they complete
-        for task in asyncio.as_completed(all_tasks):
-            artist, field = task_to_artist_field[id(task)]
+        # asyncio.as_completed returns an iterator of futures, use regular for loop
+        for completed_task in asyncio.as_completed(all_tasks):
             try:
-                value = await task
+                artist, field, value = await completed_task
                 artist_cache_map[artist][field] = value
                 
                 # Stream the datapoint immediately
@@ -141,13 +176,17 @@ async def artists_fields_handler(
                 
                 log_dp({"type": "datapoint", "artist": artist, "field": field, "value": value})
                 
-                # Cache when all fields for an artist are complete
-                if all(f in artist_cache_map[artist] for f in expected_fields):
-                    cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
-                    save_cache(cache_key, {
-                        "artist": artist,
-                        "fields": artist_cache_map[artist]
-                    })
+                # Cache when all fields for an artist are complete (only if not skipping cache)
+                if all(f in artist_cache_map[artist] for f in expected_fields) and not no_cache:
+                    try:
+                        cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
+                        save_cache(cache_key, {
+                            "artist": artist,
+                            "fields": artist_cache_map[artist]
+                        })
+                    except Exception as e:
+                        print(f"[artists_fields_handler] Error saving cache for {artist}: {e}")
+                        # Non-fatal error, continue
                     log_dp({"type": "artist_complete", "artist": artist})
             
             except Exception as e:
@@ -170,6 +209,10 @@ async def artists_fields_handler(
         end_trace(trace_obj, "Success")
     
     except Exception as e:
-        error_msg = f"Error: {str(e)}"
-        yield {"event": "error", "data": error_msg}
+        # Provide a more user-friendly error message
+        error_msg = str(e) or e.__class__.__name__
+        # If the error message looks like a memory address or object ID, provide a generic message
+        if error_msg.isdigit() and len(error_msg) > 8:
+            error_msg = "A timeout or processing error occurred. Please try again."
+        yield {"event": "error", "data": f"Error: {error_msg}"}
         end_trace(trace_obj, "Fail")

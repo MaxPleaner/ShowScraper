@@ -18,12 +18,16 @@ async def handle_concert_research(
     url: str,
     mode: str,
     artist: str,
-    artists: str
+    artists: str,
+    no_cache: bool = False
 ) -> EventSourceResponse:
     """Handle concert research request."""
     # Validate and normalize input
     event_data = validate_event_data(date, title, venue, url)
     mode = validate_mode(mode)
+    
+    # Add no_cache flag to event_data so handlers can access it
+    event_data["no_cache"] = no_cache
 
     # Parse artists parameter if provided
     artists_list = None
@@ -52,16 +56,25 @@ async def handle_concert_research(
     log_request(req_log)
 
     # Dispatch to appropriate handler based on mode
-    if mode == "quick":
-        handler = quick_research_handler(event_data)
-    elif mode == "artists_list":
-        handler = artists_list_handler(event_data)
-    elif mode == "artists_fields":
-        handler = artists_fields_handler(event_data, artists_list)
-    else:
-        # This shouldn't happen due to validate_mode, but handle it anyway
-        async def error_handler():
-            yield {"event": "error", "data": f"Invalid mode: {mode}"}
-        handler = error_handler()
+    # Wrap in a generator that catches any exceptions during handler creation
+    async def safe_handler():
+        try:
+            if mode == "quick":
+                async for item in quick_research_handler(event_data):
+                    yield item
+            elif mode == "artists_list":
+                async for item in artists_list_handler(event_data):
+                    yield item
+            elif mode == "artists_fields":
+                async for item in artists_fields_handler(event_data, artists_list):
+                    yield item
+            else:
+                yield {"event": "error", "data": f"Invalid mode: {mode}"}
+        except Exception as e:
+            error_msg = str(e)
+            print(f"[handle_concert_research] Exception in handler: {error_msg}")
+            import traceback
+            traceback.print_exc()
+            yield {"event": "error", "data": f"Error: {error_msg}"}
 
-    return EventSourceResponse(handler)
+    return EventSourceResponse(safe_handler())

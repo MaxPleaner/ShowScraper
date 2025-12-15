@@ -1,5 +1,5 @@
 import React from 'react';
-import MissingImage from '../MissingImage.png';
+import MissingImage from '../../MissingImage.png';
 import EventButtons from './EventButtons';
 
 export default class EventModal extends React.Component {

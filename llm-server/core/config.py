@@ -20,7 +20,8 @@ class Config:
     
     # Rate Limits
     DEFAULT_RATE_LIMIT = "20/minute, 200/day"
-    CONCERT_RESEARCH_RATE_LIMIT = "10/minute"
+    # Increased for development - refetch makes 3 requests (quick, artists_list, artists_fields)
+    CONCERT_RESEARCH_RATE_LIMIT = os.getenv("CONCERT_RESEARCH_RATE_LIMIT", "60/minute")
     
     # CORS
     CORS_ORIGINS = ["https://bayareashows.org", "http://localhost:3000"]
