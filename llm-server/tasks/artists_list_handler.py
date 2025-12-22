@@ -22,19 +22,25 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
     
     print(f"[artists_list_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
     
-    # Build cache key - initialize to None first to avoid scoping issues
+    # Build cache key - we need it for both reading and writing
     cache_key = None
-    if not no_cache:
+    try:
+        cache_key = build_cache_key(event_data, "artists_list")
+    except Exception as e:
+        print(f"[artists_list_handler] Error building cache key: {e}")
+        cache_key = None  # Continue without cache
+    
+    # Check cache only if not skipping and we have a valid key
+    if not no_cache and cache_key is not None:
         try:
-            cache_key = build_cache_key(event_data, "artists_list")
             cached = load_cache(cache_key)
             if cached and "artists" in cached:
                 print(f"[cache] artists_list hit for key={cache_key}")
                 yield {"event": "data", "data": json.dumps(cached["artists"])}
                 return
         except Exception as e:
-            print(f"[artists_list_handler] Error with cache: {e}")
-            cache_key = None  # Continue without cache
+            print(f"[artists_list_handler] Error loading cache: {e}")
+            # Continue to fetch fresh data
 
     trace_obj = start_trace(["concert-artists-list", event_data.get('title', 'unknown')[:50]])
 
@@ -70,10 +76,13 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
         # Stream the artist list (JSON-serialized for SSE)
         yield {"event": "data", "data": json.dumps(artists)}
 
-        # Cache the result only if we have a valid cache_key and not skipping cache
-        if cache_key is not None and not no_cache:
+        # Always save to cache after fetching fresh data (even if no_cache was True)
+        # The no_cache flag only controls reading from cache, not writing to it
+        if cache_key is not None:
             try:
                 save_cache(cache_key, {"artists": artists})
+                if no_cache:
+                    print(f"[artists_list_handler] Saved fresh data to cache (refetch)")
             except Exception as e:
                 print(f"[artists_list_handler] Error saving cache: {e}")
                 # Non-fatal error, continue

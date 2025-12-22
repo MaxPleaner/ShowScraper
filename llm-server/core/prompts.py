@@ -124,13 +124,25 @@ Output ONLY the artist section with details. No introduction, no extra text.
 
 def build_youtube_prompt(artist: str) -> str:
     """Build prompt for finding YouTube URL."""
-    return f"""Find one YouTube URL for a live performance by {artist}. If you cannot find an exact live video, provide the best channel/official video. If still unsure, return a YouTube search URL.
+    return f"""Find a valid YouTube URL for {artist}. 
+
+Use search tool if available. If search fails, use your training data knowledge.
+
+Steps:
+1. Try searching for "{artist} youtube" - look for official channels or popular videos
+2. Extract actual YouTube URLs (must start with https://www.youtube.com/ or https://youtu.be/)
+3. If search fails or returns no results, use your training data to provide known YouTube URLs
+
+CRITICAL: If you know of a valid YouTube channel or video URL for {artist} from your training data, return it even if search failed. Only return null if you truly have no knowledge.
 
 Output JSON with keys:
-- youtube_url: direct YouTube watch URL (preferred) OR YouTube channel/video URL
-- fallback_search_url: a YouTube search URL for the artist (always include)
+- youtube_url: a valid YouTube watch URL (https://www.youtube.com/watch?v=...) OR channel URL (https://www.youtube.com/@... or https://www.youtube.com/c/...). Can be from your training data if search unavailable.
+- fallback_search_url: a YouTube search URL (https://www.youtube.com/results?search_query=...) - always include this
 
-Return ONLY JSON."""
+If you cannot find any YouTube URL, return:
+{{"youtube_url": null, "fallback_search_url": "https://www.youtube.com/results?search_query={artist.replace(' ', '+')}"}}
+
+Return ONLY JSON, no other text."""
 
 
 def build_bio_genres_prompt(artist: str) -> str:
@@ -144,16 +156,40 @@ Output JSON with keys: bio (string), genres (array of strings). Return only JSON
 
 def build_website_prompt(artist: str) -> str:
     """Build prompt for finding website/social links."""
-    return f"""Find an official or information-rich link for {artist}. Priority: personal website > Instagram > Facebook page > Linktree > press bio page. Must be artist-specific.
+    return f"""Find an official or information-rich link for {artist}. 
+
+Use search tool if available. If search fails, use your training data knowledge.
+
+Priority: personal website > Instagram > Facebook page > Linktree > press bio page. Must be artist-specific.
+
+CRITICAL: If you know of a valid website/Instagram/Facebook URL for {artist} from your training data, return it even if search failed. Only return "not_found" if you truly have no knowledge of this artist's online presence.
 
 Output JSON: {{"label": "Website|Instagram|Facebook|Linktree|Other", "url": "https://..."}}. If nothing trustworthy, return {{"label": "not_found", "url": null}}. Only JSON."""
 
 
 def build_music_link_prompt(artist: str) -> str:
     """Build prompt for finding music platform links."""
-    return f"""Find a direct link to {artist}'s music on Spotify or Bandcamp (prefer official artist page). If neither is available, return SoundCloud. Avoid generic home pages.
+    return f"""Find a valid, working link to {artist}'s music.
 
-Output JSON: {{"platform": "Spotify|Bandcamp|SoundCloud|Other", "url": "https://..."}}. If nothing found, return {{"platform": "not_found", "url": null}}. Only JSON."""
+IMPORTANT: Use the search tool if available. If search fails or returns no results, use your training data knowledge.
+
+Steps:
+1. Try searching for "{artist} spotify" - look for open.spotify.com/artist/ URLs
+2. If not found, try "{artist} bandcamp" - look for [artistname].bandcamp.com URLs  
+3. If still not found, try "{artist} soundcloud" - look for soundcloud.com URLs
+4. If search is unavailable or returns no results, use your training data to provide known URLs
+
+Priority order:
+1. Spotify artist page (https://open.spotify.com/artist/...)
+2. Bandcamp artist page (https://[artistname].bandcamp.com)
+3. SoundCloud profile (https://soundcloud.com/...)
+
+CRITICAL: If you know of a valid Spotify/Bandcamp/SoundCloud URL for {artist} from your training data, return it even if search failed. Only return "not_found" if you truly have no knowledge of this artist's music platforms.
+
+Output JSON: {{"platform": "Spotify|Bandcamp|SoundCloud|Other", "url": "https://..."}}. 
+If nothing found, return {{"platform": "not_found", "url": null}}.
+
+Return ONLY JSON, no other text."""
 
 
 def compose_artist_section(artist: str, results: Dict[str, any]) -> str:

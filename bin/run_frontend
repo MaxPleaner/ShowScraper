@@ -2,5 +2,5 @@
 
 (
   nvm use v14
-  cd ./frontend/react-app && yarn && yarn start
+  cd ./frontend && yarn && yarn start
 )

@@ -14,7 +14,7 @@ from core.prompts import (
     build_music_link_prompt,
 )
 from core.tools import build_tools, has_search_tool
-from core.llm import run_json_prompt
+from core.llm import run_json_prompt, SerperCreditsExhausted
 from core.logging import start_trace, end_trace, create_datapoint_logger
 
 
@@ -43,6 +43,9 @@ async def _research_single_field(
             timeout=field_timeout
         )
         res = res or {}
+    except SerperCreditsExhausted:
+        # Re-raise to be caught by the handler
+        raise
     except Exception as e:
         msg = str(e) or e.__class__.__name__
         return {"error": msg}
@@ -209,19 +212,25 @@ async def artists_fields_handler(
                 
                 log_dp({"type": "datapoint", "artist": artist, "field": field, "value": value})
                 
-                # Cache when all fields for an artist are complete (only if not skipping cache)
-                if all(f in artist_cache_map[artist] for f in expected_fields) and not no_cache:
+                # Always cache when all fields for an artist are complete (even if no_cache was True)
+                # The no_cache flag only controls reading from cache, not writing to it
+                if all(f in artist_cache_map[artist] for f in expected_fields):
                     try:
                         cache_key = build_cache_key(event_data, f"artist_fields_{artist}")
                         save_cache(cache_key, {
                             "artist": artist,
                             "fields": artist_cache_map[artist]
                         })
+                        if no_cache:
+                            print(f"[artists_fields_handler] Saved fresh data to cache for {artist} (refetch)")
                     except Exception as e:
                         print(f"[artists_fields_handler] Error saving cache for {artist}: {e}")
                         # Non-fatal error, continue
                     log_dp({"type": "artist_complete", "artist": artist})
             
+            except SerperCreditsExhausted:
+                # Re-raise to be caught by outer handler
+                raise
             except Exception as e:
                 msg = str(e) or e.__class__.__name__
                 error_value = {"error": msg}
@@ -241,6 +250,9 @@ async def artists_fields_handler(
         
         end_trace(trace_obj, "Success")
     
+    except SerperCreditsExhausted:
+        yield {"event": "error", "data": "Out of Serper Credits"}
+        end_trace(trace_obj, "Fail")
     except Exception as e:
         # Provide a more user-friendly error message
         error_msg = str(e) or e.__class__.__name__

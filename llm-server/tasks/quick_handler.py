@@ -82,10 +82,13 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
                 quick_buffer += content
                 yield {"event": "data", "data": content}
         
-        # Only save to cache if we have a valid cache_key and not skipping cache
-        if cache_key is not None and not no_cache:
+        # Always save to cache after fetching fresh data (even if no_cache was True)
+        # The no_cache flag only controls reading from cache, not writing to it
+        if cache_key is not None:
             try:
                 save_cache(cache_key, {"quickSummary": quick_buffer})
+                if no_cache:
+                    print(f"[quick_handler] Saved fresh data to cache (refetch)")
             except Exception as e:
                 print(f"[quick_handler] Error saving cache: {e}")
                 # Non-fatal error, continue
