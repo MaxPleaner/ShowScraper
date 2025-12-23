@@ -95,7 +95,6 @@ const AiResultsArtistField = ({ field, value, isLoading }) => {
             className="progress-fill"
             style={{ width: `${Math.max(progress, 2)}%` }}
           ></div>
-          <div className="progress-percent">{Math.round(progress)}%</div>
         </div>
       )}
     </div>
