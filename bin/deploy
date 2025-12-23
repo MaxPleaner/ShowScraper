@@ -1,5 +1,5 @@
 #!/bin/bash
 
 (
-  cd ./frontend/react-app && NODE_ENV=production yarn deploy
+  cd ./frontend && NODE_ENV=production yarn deploy
 )
