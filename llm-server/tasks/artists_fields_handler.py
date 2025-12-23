@@ -23,15 +23,16 @@ async def _research_single_field(
     field: str,
     tools: List,
     has_search: bool,
-    field_timeout: int
+    field_timeout: int,
+    event_data: Dict[str, str] = None
 ) -> Dict[str, Any]:
     """Research a single field for an artist and return display-ready data (with markdown)."""
     prompt_map = {
-        "youtube": build_youtube_prompt,
-        "bio": build_bio_genres_prompt,
-        "genres": build_bio_genres_prompt,
-        "website": build_website_prompt,
-        "music": build_music_link_prompt,
+        "youtube": lambda a: build_youtube_prompt(a),
+        "bio": lambda a: build_bio_genres_prompt(a),
+        "genres": lambda a: build_bio_genres_prompt(a),
+        "website": lambda a: build_website_prompt(a, event_data),
+        "music": lambda a: build_music_link_prompt(a),
     }
     
     if field not in prompt_map:
@@ -181,7 +182,7 @@ async def artists_fields_handler(
         # Wrap each task to preserve artist/field information
         async def _research_with_metadata(artist: str, field: str):
             """Wrapper to preserve artist/field metadata with the result."""
-            result = await _research_single_field(artist, field, tools, has_search, field_timeout)
+            result = await _research_single_field(artist, field, tools, has_search, field_timeout, event_data)
             return (artist, field, result)
         
         all_tasks = []
