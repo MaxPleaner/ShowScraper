@@ -9,6 +9,9 @@ load_dotenv()
 class Config:
     """Application configuration."""
     
+    # Verbose logging (for tests/debugging)
+    VERBOSE = False
+    
     # API Keys
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     SERPER_API_KEY = os.getenv("SERPER_API_KEY")
@@ -37,7 +40,9 @@ class Config:
     TEMPERATURE_STRICT = 0.2
     
     # Timeouts
-    ARTIST_DATAPOINT_TIMEOUT = int(os.getenv("ARTIST_DATAPOINT_TIMEOUT", "25"))
+    # Increased from 25 to 40 seconds to handle complex tool-calling scenarios
+    # (multiple tool calls per field can take longer)
+    ARTIST_DATAPOINT_TIMEOUT = int(os.getenv("ARTIST_DATAPOINT_TIMEOUT", "40"))
     
     # Paths
     BASE_DIR = Path(__file__).resolve().parent.parent

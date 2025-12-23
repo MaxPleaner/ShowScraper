@@ -165,7 +165,7 @@ export default function useLlmServer({
             onError?.('Request timed out. The server may be taking longer than expected. Please try again.');
           }, timeoutMs);
         }
-        console.log(`[SSE ${mode}] Received data event:`, e.data?.substring(0, 100));
+        // console.log(`[SSE ${mode}] Received data event:`, e.data?.substring(0, 100));
         try {
           // Try to parse as JSON, fall back to raw string if it fails
           const parsed = JSON.parse(e.data);

@@ -8,6 +8,12 @@ from core.prompts import build_extract_artists_prompt
 from core.logging import start_trace, end_trace
 
 
+def verbose_print(*args, **kwargs):
+    """Print only if verbose mode is enabled."""
+    if Config.VERBOSE:
+        print(*args, **kwargs)
+
+
 async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dict[str, str], None]:
     """
     Extract artist list from event data.
@@ -20,14 +26,14 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
     else:
         no_cache = bool(no_cache_raw)
     
-    print(f"[artists_list_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
+    verbose_print(f"[artists_list_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
     
     # Build cache key - we need it for both reading and writing
     cache_key = None
     try:
         cache_key = build_cache_key(event_data, "artists_list")
     except Exception as e:
-        print(f"[artists_list_handler] Error building cache key: {e}")
+        verbose_print(f"[artists_list_handler] Error building cache key: {e}")
         cache_key = None  # Continue without cache
     
     # Check cache only if not skipping and we have a valid key
@@ -35,11 +41,11 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
         try:
             cached = load_cache(cache_key)
             if cached and "artists" in cached:
-                print(f"[cache] artists_list hit for key={cache_key}")
+                verbose_print(f"[cache] artists_list hit for key={cache_key}")
                 yield {"event": "data", "data": json.dumps(cached["artists"])}
                 return
         except Exception as e:
-            print(f"[artists_list_handler] Error loading cache: {e}")
+            verbose_print(f"[artists_list_handler] Error loading cache: {e}")
             # Continue to fetch fresh data
 
     trace_obj = start_trace(["concert-artists-list", event_data.get('title', 'unknown')[:50]])
@@ -50,6 +56,9 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
 
         client = AsyncOpenAI(api_key=Config.OPENAI_API_KEY)
         extract_prompt = build_extract_artists_prompt(event_data)
+        
+        # Log query start (non-verbose)
+        print(f"  → Querying LLM: Extract artists from '{event_data.get('title', 'event')[:50]}'")
 
         completion = await client.chat.completions.create(
             model=Config.DETAILED_MODEL,
@@ -82,9 +91,9 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
             try:
                 save_cache(cache_key, {"artists": artists})
                 if no_cache:
-                    print(f"[artists_list_handler] Saved fresh data to cache (refetch)")
+                    verbose_print(f"[artists_list_handler] Saved fresh data to cache (refetch)")
             except Exception as e:
-                print(f"[artists_list_handler] Error saving cache: {e}")
+                verbose_print(f"[artists_list_handler] Error saving cache: {e}")
                 # Non-fatal error, continue
 
         end_trace(trace_obj, "Success")
@@ -93,7 +102,8 @@ async def artists_list_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dic
         # Log full exception to help diagnose parsing/type errors
         import traceback
         error_msg = f"Error: {str(e)}"
-        print(f"[artists_list_handler] Exception: {error_msg}")
-        traceback.print_exc()
+        verbose_print(f"[artists_list_handler] Exception: {error_msg}")
+        if Config.VERBOSE:
+            traceback.print_exc()
         yield {"event": "error", "data": error_msg}
         end_trace(trace_obj, "Fail")

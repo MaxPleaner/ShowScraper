@@ -10,6 +10,12 @@ from core.llm import create_llm
 from core.logging import start_trace, end_trace
 
 
+def verbose_print(*args, **kwargs):
+    """Print only if verbose mode is enabled."""
+    if Config.VERBOSE:
+        print(*args, **kwargs)
+
+
 async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[Dict[str, str], None]:
     """
     Quick mode: single streaming LLM call, no tools, 2-3 sentence summary.
@@ -22,14 +28,14 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
     else:
         no_cache = bool(no_cache_raw)
     
-    print(f"[quick_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
+    verbose_print(f"[quick_handler] no_cache={no_cache}, type={type(no_cache)}, raw={no_cache_raw}")
     
     # Build cache key - initialize to None first to avoid scoping issues
     cache_key = None
     try:
         cache_key = build_cache_key(event_data, "quick")
     except Exception as e:
-        print(f"[quick_handler] Error building cache key: {e}")
+        verbose_print(f"[quick_handler] Error building cache key: {e}")
         cache_key = None  # Explicitly set to None on error
     
     # Check cache only if not skipping and we have a valid key
@@ -37,17 +43,17 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
         try:
             cached = load_cache(cache_key)
             if cached and "quickSummary" in cached:
-                print(f"[cache] quick hit for key={cache_key}")
+                verbose_print(f"[cache] quick hit for key={cache_key}")
                 yield {"event": "data", "data": cached["quickSummary"]}
                 return
         except Exception as e:
-            print(f"[quick_handler] Error loading cache: {e}")
+            verbose_print(f"[quick_handler] Error loading cache: {e}")
             # Continue to fetch fresh data
     else:
         if no_cache:
-            print(f"[quick_handler] Skipping cache due to no_cache=True, will fetch fresh data")
+            verbose_print(f"[quick_handler] Skipping cache due to no_cache=True, will fetch fresh data")
         else:
-            print(f"[quick_handler] No cache key available, will fetch fresh data")
+            verbose_print(f"[quick_handler] No cache key available, will fetch fresh data")
 
     trace_obj = start_trace(["concert-quick", event_data.get('title', 'unknown')[:50]])
 
@@ -60,6 +66,9 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
         )
 
         quick_prompt = build_quick_prompt(event_data)
+        
+        # Log query start (non-verbose)
+        print(f"  → Querying LLM: Quick summary for '{event_data.get('title', 'event')[:50]}'")
         
         # Use OpenAI SDK directly to avoid LangChain async context manager bug
         from openai import AsyncOpenAI
@@ -91,17 +100,18 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
             try:
                 save_cache(cache_key, {"quickSummary": quick_buffer})
                 if no_cache:
-                    print(f"[quick_handler] Saved fresh data to cache (refetch)")
+                    verbose_print(f"[quick_handler] Saved fresh data to cache (refetch)")
             except Exception as e:
-                print(f"[quick_handler] Error saving cache: {e}")
+                verbose_print(f"[quick_handler] Error saving cache: {e}")
                 # Non-fatal error, continue
 
         end_trace(trace_obj, "Success")
 
     except Exception as e:
         error_msg = str(e)
-        print(f"[quick_handler] Exception: {error_msg}")
-        import traceback
-        traceback.print_exc()
+        verbose_print(f"[quick_handler] Exception: {error_msg}")
+        if Config.VERBOSE:
+            import traceback
+            traceback.print_exc()
         yield {"event": "error", "data": f"Error: {error_msg}"}
         end_trace(trace_obj, "Fail")

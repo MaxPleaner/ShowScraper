@@ -117,10 +117,56 @@ Return ONLY JSON, no other text."""
 def build_bio_genres_prompt(artist: str) -> str:
     """Build prompt for finding bio and genres."""
     return f"""Provide a short bio and genres for {artist}.
-- Keep bio to one concise sentence, no hype words.
-- Genres: 2-4 genre/subgenre terms.
 
-Output JSON with keys: bio (string), genres (array of strings). Return only JSON."""
+CRITICAL: Use tools to find information. Do NOT return "not found" without thoroughly searching.
+
+SEARCH STRATEGY:
+1. FIRST: Use the search tool to find information about {artist}
+   - Search for "{artist} band" or "{artist} music" or "{artist} artist"
+   - Look for bio information in search result snippets
+   - Extract bio from Wikipedia entries, music platform descriptions, or article previews
+2. CRITICAL: If search results mention ANY website, Bandcamp, or music platform link:
+   - IMMEDIATELY use the fetch_url tool to visit that URL
+   - Read the full page content to extract bio information
+   - Many artist websites have "About", "Bio", or "Artist" sections
+   - Bandcamp pages often have detailed artist descriptions
+   - Look for paragraphs that describe: origin, background, style, influences, notable works
+   - Even if search snippets have some info, the full page usually has more complete bio
+3. If you find multiple sources (search results + website content), synthesize the best information
+4. Extract genres from any information you find (bio text, search results, website content, page descriptions)
+
+BIO REQUIREMENTS:
+- Keep bio to one concise sentence, no hype words
+- Include factual information: origin, style, notable works, or background
+- If you find multiple sources, synthesize the most relevant information
+- Only return "(not found)" if you've thoroughly searched and found absolutely nothing
+
+GENRES REQUIREMENTS:
+- Extract 2-4 genre/subgenre terms from any information you find
+- Look for genre mentions in:
+  * Bio text and search result snippets
+  * Website/Bandcamp page content (when you fetch URLs)
+  * Music platform descriptions
+  * Bandcamp pages often list genres in tags, descriptions, or "About" sections
+- CRITICAL: When you fetch a website or Bandcamp page, carefully read the content for genre information
+  - Look for genre tags, category labels, or style descriptions
+  - Many Bandcamp pages have genre tags visible in the page content
+  - Artist websites often mention genres in their bio/about sections
+- Examples: "House, Dance", "R&B, Soul", "Alternative Rock", "Jazz, Bebop"
+- If no genres found after thorough search (including fetched pages), return empty array []
+
+IMPORTANT:
+- ALWAYS use search tool first - don't rely only on training data
+- If a website/Bandcamp link appears in search results, fetch it to get BOTH bio AND genre information
+- Many artists have bios AND genre information on their Bandcamp pages or personal websites
+- When fetching pages, extract BOTH bio text AND genre tags/descriptions from the content
+- Extract and synthesize information from multiple sources if available
+
+Output JSON with keys: bio (string), genres (array of strings). 
+- bio: One concise sentence, or "(not found)" only if absolutely nothing found after thorough search
+- genres: Array of genre strings, or [] if none found
+
+Return ONLY JSON, no other text."""
 
 
 def build_website_prompt(artist: str, event_data: Dict[str, str] = None) -> str:
@@ -198,37 +244,48 @@ def build_music_link_prompt(artist: str, event_data: Dict[str, str] = None) -> s
     
     return f"""Find a valid, working link to {artist}'s music.{context_str}
 
-CRITICAL: Use the spotify_search_artist tool FIRST for Spotify links. It searches Spotify directly and only returns URLs for exact name matches, which is much more reliable than web search.
+CRITICAL: Do NOT return "not_found" unless you've thoroughly searched all options. Prefer finding ANY valid music link over leaving the field blank.
 
 SEARCH STRATEGY:
-1. FIRST: Use the spotify_search_artist tool with "{artist}" - this will search Spotify directly and return the URL only if there's an exact name match
-   - The tool will return a URL like "https://open.spotify.com/artist/..." if an exact match is found
-   - Extract the URL from the tool result
-2. If Spotify search finds an exact match, use that URL
-3. If Spotify search doesn't find an exact match, try web search for Bandcamp or SoundCloud:
-   - Search for "{artist} bandcamp" - look for [artistname].bandcamp.com URLs
+1. FIRST: Use the spotify_search_artist tool with "{artist}" - this searches Spotify directly
+   - The tool returns a URL if it finds an exact name match
+   - Extract the URL from the tool result if found
+2. If Spotify search doesn't find an exact match, IMMEDIATELY try Bandcamp (it's the easiest fallback):
+   - Search for "{artist} bandcamp" - this often finds [artistname].bandcamp.com URLs quickly
+   - Bandcamp links are very common for independent artists and easy to verify
+   - If you find ANY Bandcamp link that matches the artist name (even loosely), use it
+3. If Bandcamp search doesn't find results, try other platforms:
+   - Search for "{artist} spotify" - sometimes web search finds Spotify links the tool missed
    - Search for "{artist} soundcloud" - look for soundcloud.com URLs
-   - Verify the artist name matches before using any URL
+   - Search for "{artist} music" - general search may reveal music platform links
 
-VERIFICATION REQUIREMENTS:
-- For Spotify: The spotify_search_artist tool only returns URLs for exact name matches, so you can trust it
-- For other platforms: Verify the artist name matches "{artist}" exactly before using the URL
-- Do NOT use a URL for a different artist, even if it appears in search results
-- If you cannot find a URL that clearly matches "{artist}", return "not_found"
+MATCHING REQUIREMENTS (RELAXED):
+- For Spotify: Trust the spotify_search_artist tool if it returns a URL
+- For other platforms: Accept close matches - minor differences are OK:
+  - "The" prefix can be omitted (e.g., "The Beatles" matches "Beatles")
+  - Small spelling variations or punctuation differences are acceptable
+  - Artist name should be recognizably the same, but exact match is NOT required
+- If the URL domain and artist name are clearly related (e.g., [artistname].bandcamp.com), use it
+- Prefer a close match over returning "not_found"
 
-Priority order:
+PRIORITY ORDER (with fallback emphasis):
 1. Spotify artist page (https://open.spotify.com/artist/...) - Use spotify_search_artist tool first
-2. Bandcamp artist page (https://[artistname].bandcamp.com) - ONLY if artist name matches
-3. SoundCloud profile (https://soundcloud.com/...) - ONLY if artist name matches
+2. Bandcamp artist page (https://[artistname].bandcamp.com) - STRONGLY PREFERRED as fallback
+   - Bandcamp links are often easy to find and verify
+   - If you find a Bandcamp link that matches the artist name closely, use it
+   - Don't be overly strict - if it's clearly for this artist, use it
+3. SoundCloud profile (https://soundcloud.com/...) - Accept if name matches closely
+4. Other music platforms - Accept if clearly for this artist
 
 IMPORTANT:
-- ALWAYS use spotify_search_artist tool for Spotify links - it's the most reliable method
-- The tool will only return a URL if there's an exact name match, so you can trust it
-- For other platforms, always verify the artist name matches before returning a URL
-- Only return a URL if you're confident it's for the correct artist "{artist}"
+- ALWAYS try Bandcamp as a fallback - it's often the easiest to find and verify
+- If you find a Bandcamp link in search results that matches the artist name (even loosely), use it
+- Only return "not_found" if you've searched Spotify, Bandcamp, SoundCloud, and general web search with no results
+- Prefer finding ANY valid music link over leaving blank
+- Close matches are acceptable - don't require perfect exact match
 
 Output JSON: {{"platform": "Spotify|Bandcamp|SoundCloud|Other", "url": "https://..."}}. 
-If nothing found or you cannot verify the correct artist, return {{"platform": "not_found", "url": null}}.
+Only return {{"platform": "not_found", "url": null}} if you've thoroughly searched all options and found nothing.
 
 Return ONLY JSON, no other text."""
 

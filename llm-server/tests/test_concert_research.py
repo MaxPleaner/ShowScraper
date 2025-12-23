@@ -9,14 +9,18 @@ Usage:
   python test_concert_research.py --list             # List available tests
   python test_concert_research.py bobby-young        # Run specific test
   python test_concert_research.py --all              # Run all tests
+  python test_concert_research.py --title "Title"    # Run generic test with title
 """
 import asyncio
 import os
 import sys
 import argparse
 import json
+import time
+import re
 from pathlib import Path
 from typing import Dict, List, Any
+from unittest.mock import patch
 from dotenv import load_dotenv
 
 # Add parent directory to path so we can import from tasks
@@ -25,6 +29,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from tasks.quick_handler import quick_research_handler
 from tasks.artists_list_handler import artists_list_handler
 from tasks.artists_fields_handler import artists_fields_handler
+from core.config import Config
 
 load_dotenv()
 
@@ -105,19 +110,44 @@ async def run_artists_fields_phase(event_data: Dict[str, str], artists_list: Lis
     print("=" * 70)
     
     artist_data = {}
-    async for event in artists_fields_handler(event_data, artists_list):
-        if event["event"] == "data":
-            data = json.loads(event["data"])
-            if data.get("type") == "artist_datapoint":
-                artist = data.get("artist")
-                field = data.get("field")
-                value = data.get("value")
-                if artist not in artist_data:
-                    artist_data[artist] = {}
-                artist_data[artist][field] = value
-                print(f"  ✓ {artist} - {field}")
-        elif event["event"] == "error":
-            print(f"\n❌ Error: {event['data']}")
+    # Track when queries actually start (when we see "Starting parallel queries")
+    queries_start_time = None
+    
+    # Intercept print to detect when queries start
+    original_print = print
+    start_pattern = re.compile(r'  → Starting (\d+) parallel field queries')
+    
+    def tracking_print(*args, **kwargs):
+        """Print function that tracks when parallel queries start."""
+        nonlocal queries_start_time
+        message = ' '.join(str(arg) for arg in args)
+        # Check if this is the "Starting parallel queries" message
+        if start_pattern.search(message) and queries_start_time is None:
+            queries_start_time = time.time()
+        original_print(*args, **kwargs)
+    
+    # Use the tracking print function
+    with patch('builtins.print', side_effect=tracking_print):
+        async for event in artists_fields_handler(event_data, artists_list):
+            if event["event"] == "data":
+                data = json.loads(event["data"])
+                if data.get("type") == "artist_datapoint":
+                    artist = data.get("artist")
+                    field = data.get("field")
+                    value = data.get("value")
+                    if artist not in artist_data:
+                        artist_data[artist] = {}
+                    artist_data[artist][field] = value
+                    
+                    # Calculate and print duration
+                    if queries_start_time is not None:
+                        duration = time.time() - queries_start_time
+                        duration_str = f" ({duration:.1f}s)"
+                    else:
+                        duration_str = ""
+                    original_print(f"  ✓ {artist} - {field}{duration_str}")
+            elif event["event"] == "error":
+                original_print(f"\n❌ Error: {event['data']}")
     
     print("=" * 70)
     return artist_data
@@ -223,6 +253,17 @@ async def test_peacock_lounge():
     }
     await run_full_research_flow(event_data, "Peacock Lounge - Multi-Artist")
 
+@register_test("scott-guberman", "")
+async def test_peacock_lounge():
+    event_data = {
+        "date": "2025-12-11",
+        "venue": "PEACOCK LOUNGE, S.F. (via The List)",
+        "title": "Scott Guberman",
+        "url": "https://www.thelistsf.com/",
+        "no_cache": True
+    }
+    await run_full_research_flow(event_data, "Scott Guberman")    
+
 
 @register_test("gray-area", "Gray Area Cultural Incubator Showcase 2025")
 async def test_gray_area():
@@ -261,6 +302,18 @@ async def test_bobby_mcferrin():
         "no_cache": True
     }
     await run_full_research_flow(event_data, "Bobby McFerrin - Spotify URL Test")
+
+
+async def run_generic_test(title: str):
+    """Run a generic test with the provided title, leaving other fields blank."""
+    event_data = {
+        "date": "",
+        "venue": "",
+        "title": title,
+        "url": "",
+        "no_cache": True
+    }
+    await run_full_research_flow(event_data, f"Generic - {title}")
 
 
 def list_tests():
@@ -313,9 +366,11 @@ if __name__ == "__main__":
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  %(prog)s bobby-young        Run Bobby Young test
-  %(prog)s --all              Run all tests
-  %(prog)s --list             List available tests
+  %(prog)s bobby-young                    Run Bobby Young test
+  %(prog)s --all                          Run all tests
+  %(prog)s --list                         List available tests
+  %(prog)s --title "Artist Name"          Run generic test with title
+  %(prog)s --verbose                      Show verbose tool output
         """
     )
     parser.add_argument(
@@ -333,11 +388,31 @@ Examples:
         action="store_true",
         help="Run all test cases"
     )
+    parser.add_argument(
+        "--title", "-t",
+        type=str,
+        help="Run generic test with the provided title (other fields will be blank)"
+    )
+    parser.add_argument(
+        "--verbose", "-v",
+        action="store_true",
+        help="Show verbose tool output and detailed LLM logs"
+    )
 
     args = parser.parse_args()
+    
+    # Set verbose mode in config
+    Config.VERBOSE = args.verbose
 
     if args.list:
         list_tests()
+        sys.exit(0)
+
+    if args.title:
+        # Run generic test with provided title
+        print(f"\n🧪 Running generic test with title: {args.title}\n")
+        asyncio.run(run_generic_test(args.title))
+        print("\n✅ Generic test completed!\n")
         sys.exit(0)
 
     if args.tests:
@@ -359,11 +434,14 @@ Examples:
             print(f"  • {test_id:15} - {test_info['description']}")
         print("\n" + "=" * 70)
         print("\nUsage:")
-        print("  python test_concert_research.py <test-id>      Run specific test")
-        print("  python test_concert_research.py --all          Run all tests")
-        print("  python test_concert_research.py --list         List all tests")
-        print("  python test_concert_research.py --help         Show help")
+        print("  python test_concert_research.py <test-id>              Run specific test")
+        print("  python test_concert_research.py --all                  Run all tests")
+        print("  python test_concert_research.py --list                 List all tests")
+        print("  python test_concert_research.py --title \"Artist Name\"  Run generic test with title")
+        print("  python test_concert_research.py --verbose               Show verbose tool output")
+        print("  python test_concert_research.py --help                  Show help")
         print("\nExamples:")
         print("  python test_concert_research.py bobby-young")
         print("  python test_concert_research.py --all")
+        print("  python test_concert_research.py --title \"My Artist\"")
         print("\n" + "=" * 70 + "\n")
