@@ -9,7 +9,7 @@ import DayGroupTitle from './DayGroupTitle';
 import DayEventsGrid from './DayEventsGrid';
 import RegionBlock from './RegionBlock';
 
-export default function EventListView({ events: eventsByDate, textOnly }) {
+export default function EventListView({ events: eventsByDate, textOnly, hideDayGroupTitle }) {
   const dayGroups = Object.entries(eventsByDate).map(([date, dateEvents], dayIdx) => {
     const dayGroupTitle = <DayGroupTitle label={moment(date, "MM-DD").format("M/DD (dddd)")} />;
 
@@ -18,7 +18,7 @@ export default function EventListView({ events: eventsByDate, textOnly }) {
 
     return (
       <DayGroup key={dayIdx}>
-        {dayGroupTitle}
+        {!hideDayGroupTitle && dayGroupTitle}
         <DayEventsGrid textOnly={textOnly}>
           {eventsByRegion.map(([region, regionEvents]) => (
             <RegionBlock key={region} region={region} showTitle={textOnly}>

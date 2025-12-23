@@ -43,6 +43,10 @@ const MapViewManager = () => {
       <br />
       <OtherEventLists />
       <br />
+      <MapView
+        events={events}
+        onEventClick={handleEventClick}
+      />
       <DateSelector
         currentValue={DateUtils.currentDateEntry(currentDay, 'day')}
         nextValue={DateUtils.nextDateEntry(currentDay, 'day')}
@@ -50,11 +54,7 @@ const MapViewManager = () => {
         onPreviousClick={() => setCurrentDay((prev) => DateUtils.prevDate(prev, 'day'))}
         onNextClick={() => setCurrentDay((prev) => DateUtils.nextDate(prev, 'day'))}
       />
-      <MapView
-        events={events}
-        onEventClick={handleEventClick}
-      />
-      <EventListView textOnly={true} events={events}/>
+      <EventListView hideDayGroupTitle={true} textOnly={true} events={events}/>
       <EventModal
         isOpen={showEventModal}
         event={selectedEvent}
