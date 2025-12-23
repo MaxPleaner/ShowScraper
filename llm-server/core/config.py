@@ -13,6 +13,8 @@ class Config:
     OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
     SERPER_API_KEY = os.getenv("SERPER_API_KEY")
     AGENTOPS_API_KEY = os.getenv("AGENTOPS_API_KEY")
+    SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+    SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
     
     # Server
     PORT = int(os.getenv("PORT", 8000))

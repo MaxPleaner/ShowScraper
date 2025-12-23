@@ -250,6 +250,19 @@ async def test_missing_url_handling():
     await run_full_research_flow(event_data, "Missing URL Handling")
 
 
+@register_test("bobby-mcferrin", "Bobby McFerrin - Spotify URL verification test")
+async def test_bobby_mcferrin():
+    """Test research for Bobby McFerrin to verify Spotify URL is correct."""
+    event_data = {
+        "date": "2025-12-15",
+        "venue": "Unknown",
+        "title": "Bobby McFerrin",
+        "url": "",
+        "no_cache": True
+    }
+    await run_full_research_flow(event_data, "Bobby McFerrin - Spotify URL Test")
+
+
 def list_tests():
     """Display available test cases"""
     print("\n" + "=" * 70)

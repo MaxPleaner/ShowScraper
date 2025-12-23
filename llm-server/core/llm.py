@@ -52,6 +52,24 @@ FETCH_URL_FUNCTION_DEF = {
     }
 }
 
+SPOTIFY_SEARCH_FUNCTION_DEF = {
+    "type": "function",
+    "function": {
+        "name": "spotify_search_artist",
+        "description": "Search Spotify for an artist by exact name. Input: artist name as a string. Returns the Spotify artist URL if an exact name match is found. Use this for finding Spotify links - it's more reliable than web search.",
+        "parameters": {
+            "type": "object",
+            "properties": {
+                "artist_name": {
+                    "type": "string",
+                    "description": "Artist name to search for"
+                }
+            },
+            "required": ["artist_name"]
+        }
+    }
+}
+
 def create_llm(
     model: str = None,
     streaming: bool = False,
@@ -164,7 +182,7 @@ async def run_with_tools(
             ))
 
 
-def _build_function_definitions(has_search: bool) -> List[Dict[str, Any]]:
+def _build_function_definitions(has_search: bool, tools: List[Tool] = None) -> List[Dict[str, Any]]:
     """Build OpenAI function definitions based on available tools."""
     functions = []
     
@@ -172,6 +190,10 @@ def _build_function_definitions(has_search: bool) -> List[Dict[str, Any]]:
         functions.append(SEARCH_FUNCTION_DEF)
     
     functions.append(FETCH_URL_FUNCTION_DEF)
+    
+    # Only include Spotify function if Spotify tool is in the tools list
+    if tools and any(t.name == "spotify_search_artist" for t in tools):
+        functions.append(SPOTIFY_SEARCH_FUNCTION_DEF)
     
     return functions
 
@@ -225,6 +247,7 @@ def _execute_fetch_url_tool(url: str) -> str:
 def _execute_tool_call(tool_call: Any, has_search: bool) -> str:
     """Execute a single tool call and return the result."""
     import json as json_lib
+    from core.tools import spotify_search_artist
     
     function_name = tool_call.function.name
     args = json_lib.loads(tool_call.function.arguments)
@@ -233,6 +256,12 @@ def _execute_tool_call(tool_call: Any, has_search: bool) -> str:
         return _execute_search_tool(args["query"], has_search)
     elif function_name == "fetch_url":
         return _execute_fetch_url_tool(args["url"])
+    elif function_name == "spotify_search_artist":
+        artist_name = args.get("artist_name", "")
+        result = spotify_search_artist(artist_name)
+        # Log Spotify search results for debugging
+        print(f"[run_json_prompt] Spotify search result for '{artist_name}': {result[:300]}...")
+        return result
     else:
         return f"Error: Unknown function {function_name}"
 
@@ -306,7 +335,7 @@ async def run_json_prompt(
     from openai import AsyncOpenAI
 
     client = AsyncOpenAI(api_key=Config.OPENAI_API_KEY)
-    functions = _build_function_definitions(has_search)
+    functions = _build_function_definitions(has_search, tools)
     messages = [{"role": "user", "content": prompt_text}]
     
     try:

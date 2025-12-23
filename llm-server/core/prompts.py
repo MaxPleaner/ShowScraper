@@ -179,24 +179,56 @@ If nothing trustworthy found after thorough searching, return {{"label": "not_fo
 Return ONLY JSON, no other text."""
 
 
-def build_music_link_prompt(artist: str) -> str:
+def build_music_link_prompt(artist: str, event_data: Dict[str, str] = None) -> str:
     """Build prompt for finding music platform links."""
-    return f"""Find a valid, working link to {artist}'s music.
+    # Build context string if event data available (for disambiguation only)
+    context_str = ""
+    if event_data:
+        context_parts = []
+        title = event_data.get('title', '').strip()
+        venue = event_data.get('venue', '').strip()
+        
+        if title:
+            context_parts.append(f"title: {title}")
+        if venue and venue.lower() != 'unknown':
+            context_parts.append(f"venue: {venue}")
+        
+        if context_parts:
+            context_str = f"\n\nEvent context: {', '.join(context_parts)}. This can help disambiguate if multiple artists with similar names exist."
+    
+    return f"""Find a valid, working link to {artist}'s music.{context_str}
 
-IMPORTANT: Use the search tool if available. If search fails or returns no results, use your training data knowledge.
+CRITICAL: Use the spotify_search_artist tool FIRST for Spotify links. It searches Spotify directly and only returns URLs for exact name matches, which is much more reliable than web search.
 
-Steps:
-1. Try searching for "{artist} spotify" - look for open.spotify.com/artist/ URLs
-2. If not found, try "{artist} bandcamp" - look for [artistname].bandcamp.com URLs  
-3. If still not found, try "{artist} soundcloud" - look for soundcloud.com URLs
+SEARCH STRATEGY:
+1. FIRST: Use the spotify_search_artist tool with "{artist}" - this will search Spotify directly and return the URL only if there's an exact name match
+   - The tool will return a URL like "https://open.spotify.com/artist/..." if an exact match is found
+   - Extract the URL from the tool result
+2. If Spotify search finds an exact match, use that URL
+3. If Spotify search doesn't find an exact match, try web search for Bandcamp or SoundCloud:
+   - Search for "{artist} bandcamp" - look for [artistname].bandcamp.com URLs
+   - Search for "{artist} soundcloud" - look for soundcloud.com URLs
+   - Verify the artist name matches before using any URL
+
+VERIFICATION REQUIREMENTS:
+- For Spotify: The spotify_search_artist tool only returns URLs for exact name matches, so you can trust it
+- For other platforms: Verify the artist name matches "{artist}" exactly before using the URL
+- Do NOT use a URL for a different artist, even if it appears in search results
+- If you cannot find a URL that clearly matches "{artist}", return "not_found"
 
 Priority order:
-1. Spotify artist page (https://open.spotify.com/artist/...)
-2. Bandcamp artist page (https://[artistname].bandcamp.com)
-3. SoundCloud profile (https://soundcloud.com/...)
+1. Spotify artist page (https://open.spotify.com/artist/...) - Use spotify_search_artist tool first
+2. Bandcamp artist page (https://[artistname].bandcamp.com) - ONLY if artist name matches
+3. SoundCloud profile (https://soundcloud.com/...) - ONLY if artist name matches
+
+IMPORTANT:
+- ALWAYS use spotify_search_artist tool for Spotify links - it's the most reliable method
+- The tool will only return a URL if there's an exact name match, so you can trust it
+- For other platforms, always verify the artist name matches before returning a URL
+- Only return a URL if you're confident it's for the correct artist "{artist}"
 
 Output JSON: {{"platform": "Spotify|Bandcamp|SoundCloud|Other", "url": "https://..."}}. 
-If nothing found, return {{"platform": "not_found", "url": null}}.
+If nothing found or you cannot verify the correct artist, return {{"platform": "not_found", "url": null}}.
 
 Return ONLY JSON, no other text."""
 

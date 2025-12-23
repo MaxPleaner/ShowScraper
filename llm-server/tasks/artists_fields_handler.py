@@ -32,15 +32,18 @@ async def _research_single_field(
         "bio": lambda a: build_bio_genres_prompt(a),
         "genres": lambda a: build_bio_genres_prompt(a),
         "website": lambda a: build_website_prompt(a, event_data),
-        "music": lambda a: build_music_link_prompt(a),
+        "music": lambda a: build_music_link_prompt(a, event_data),
     }
     
     if field not in prompt_map:
         return {"error": f"Unknown field: {field}"}
     
+    # Filter tools: only include Spotify tool for "music" field
+    field_tools = [t for t in tools if field == "music" or t.name != "spotify_search_artist"]
+    
     try:
         res = await asyncio.wait_for(
-            run_json_prompt(prompt_map[field](artist), tools, has_search),
+            run_json_prompt(prompt_map[field](artist), field_tools, has_search),
             timeout=field_timeout
         )
         res = res or {}
