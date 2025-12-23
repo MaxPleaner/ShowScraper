@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
@@ -37,37 +37,12 @@ const formatFieldValue = (field, value) => {
 };
 
 const AiResultsArtistField = ({ field, value, isLoading }) => {
-  const [progress, setProgress] = useState(0);
-  
   // Distinguish a hard error from a simple not-found
   const isNotFound = value && typeof value === 'object' && value.error === 'not_found';
   const isError = value && typeof value === 'object' && value.error && value.error !== 'not_found';
   const hasValidValue = !isError && value !== undefined && value !== null;
   // Only show loading if we're actually loading (not if there's an error)
   const shouldShowLoading = isLoading && !isError;
-
-  // Animate progress bar over 10 seconds when loading
-  useEffect(() => {
-    if (shouldShowLoading) {
-      setProgress(0);
-      const startTime = Date.now();
-      const duration = 10000; // 10 seconds
-      
-      const interval = setInterval(() => {
-        const elapsed = Date.now() - startTime;
-        const newProgress = Math.min((elapsed / duration) * 100, 100);
-        setProgress(newProgress);
-        
-        if (newProgress >= 100) {
-          clearInterval(interval);
-        }
-      }, 50); // Update every 50ms for smooth animation
-      
-      return () => clearInterval(interval);
-    } else {
-      setProgress(0);
-    }
-  }, [shouldShowLoading]);
 
   // Normalize not_found to a friendly string so the UI shows something
   const normalizedValue = isNotFound ? '(not found)' : value;
@@ -89,14 +64,12 @@ const AiResultsArtistField = ({ field, value, isLoading }) => {
         <span className="artist-field-value" style={{ color: '#9ca3af', fontStyle: 'italic' }}>
           (unavailable)
         </span>
-      ) : (
-        <div className="progress-track" aria-label={`Loading ${field}`}>
-          <div
-            className="progress-fill"
-            style={{ width: `${Math.max(progress, 2)}%` }}
-          ></div>
-        </div>
-      )}
+      ) : shouldShowLoading ? (
+        <span className="artist-field-value" style={{ color: '#4ade80', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+          <i className="fas fa-spinner fa-spin"></i>
+          <span style={{ fontSize: '0.9em', opacity: 0.8 }}>Loading...</span>
+        </span>
+      ) : null}
     </div>
   );
 };

@@ -24,7 +24,13 @@ export default function useLlmServer({
 }) {
   const eventSourceRef = useRef(null);
 
+  const requestTimeoutRef = useRef(null);
+  
   const cleanup = useCallback(() => {
+    if (requestTimeoutRef.current) {
+      clearTimeout(requestTimeoutRef.current);
+      requestTimeoutRef.current = null;
+    }
     if (eventSourceRef.current) {
       eventSourceRef.current.close();
       eventSourceRef.current = null;
@@ -92,11 +98,29 @@ export default function useLlmServer({
     let hasOpened = false;
     let hasReceivedData = false;
     let errorTimeout = null;
+    
+    // Set overall request timeout based on mode
+    const timeoutMs = mode === 'artists_fields' 
+      ? API_CONFIG.DETAILED_TIMEOUT_MS 
+      : mode === 'quick' 
+        ? API_CONFIG.QUICK_TIMEOUT_MS 
+        : API_CONFIG.DETAILED_TIMEOUT_MS; // Default to detailed timeout for other modes
+    
+    // Set timeout for the entire request
+    requestTimeoutRef.current = setTimeout(() => {
+      const isStillOpen = eventSourceRef.current?.readyState === 1; // OPEN
+      const isStillConnecting = eventSourceRef.current?.readyState === 0; // CONNECTING
+      if (isStillOpen || isStillConnecting) {
+        console.error(`[SSE ${mode}] Request timed out after ${timeoutMs}ms`);
+        cleanup();
+        onError?.('Request timed out. The server may be taking longer than expected. Please try again.');
+      }
+    }, timeoutMs);
 
     // Also listen for 'open' event to confirm connection
     es.addEventListener('open', () => {
       hasOpened = true;
-      console.log(`[SSE ${mode}] Connection opened`);
+      console.log(`[SSE ${mode}] Connection opened (timeout: ${timeoutMs}ms)`);
       if (errorTimeout) {
         clearTimeout(errorTimeout);
         errorTimeout = null;
@@ -130,6 +154,16 @@ export default function useLlmServer({
         if (errorTimeout) {
           clearTimeout(errorTimeout);
           errorTimeout = null;
+        }
+        // Reset timeout on data receipt - we're making progress
+        // For artists_fields mode, we want to allow the full timeout since data comes in chunks
+        if (mode !== 'artists_fields' && requestTimeoutRef.current) {
+          clearTimeout(requestTimeoutRef.current);
+          requestTimeoutRef.current = setTimeout(() => {
+            console.error(`[SSE ${mode}] Request timed out after ${timeoutMs}ms`);
+            cleanup();
+            onError?.('Request timed out. The server may be taking longer than expected. Please try again.');
+          }, timeoutMs);
         }
         console.log(`[SSE ${mode}] Received data event:`, e.data?.substring(0, 100));
         try {
@@ -169,6 +203,10 @@ export default function useLlmServer({
         // readyState 2 = CLOSED, readyState 0 = CONNECTING (might happen during closure)
         // If we got data, the stream completed successfully
         console.log(`[SSE ${mode}] Stream completed normally (readyState: ${readyState})`);
+        if (requestTimeoutRef.current) {
+          clearTimeout(requestTimeoutRef.current);
+          requestTimeoutRef.current = null;
+        }
         cleanup();
         onComplete?.();
         return;

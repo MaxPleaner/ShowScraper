@@ -18,6 +18,7 @@ const useArtistsFields = ({
 }) => {
   const [artistsData, setArtistsData] = useState([]);
   const skipServerCacheRef = useRef(skipServerCache);
+  const initializedKeyRef = useRef('');
 
   // Keep ref in sync with prop
   useEffect(() => {
@@ -31,6 +32,24 @@ const useArtistsFields = ({
       fields: {},
     }));
   };
+
+  // Initialize artistsData immediately when artistsDataNoFields becomes available
+  const artistsListKey = artistsDataNoFields?.length > 0 
+    ? artistsDataNoFields.map(a => typeof a === 'string' ? a : a.name).join('|')
+    : '';
+  
+  // Initialize immediately when artistsDataNoFields changes
+  useEffect(() => {
+    if (artistsListKey && artistsListKey !== initializedKeyRef.current && artistsDataNoFields?.length > 0) {
+      const artists = artistsDataNoFields.map(a => typeof a === 'string' ? { name: a } : a);
+      const initialized = initArtists(artists);
+      setArtistsData(initialized);
+      initializedKeyRef.current = artistsListKey;
+    } else if (!artistsListKey && artistsData.length > 0) {
+      setArtistsData([]);
+      initializedKeyRef.current = '';
+    }
+  }, [artistsListKey, artistsDataNoFields, artistsData.length]);
 
   // Handle incoming data events - only artist_datapoint events
   const handleData = useCallback((data) => {

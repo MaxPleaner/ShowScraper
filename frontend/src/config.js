@@ -4,6 +4,6 @@ export const API_CONFIG = {
     ? 'https://llm-backend.dissonant.info/tasks/concert-research'
     : 'http://localhost:8000/tasks/concert-research',
   QUICK_TIMEOUT_MS: 10000,
-  DETAILED_TIMEOUT_MS: 300000,
+  DETAILED_TIMEOUT_MS: 600000, // 10 minutes (increased from 5 minutes)
   ARTIST_PROGRESS_DURATION_MS: 20000,
 };
