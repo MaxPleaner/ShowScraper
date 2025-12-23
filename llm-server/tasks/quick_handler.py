@@ -77,10 +77,13 @@ async def quick_research_handler(event_data: Dict[str, str]) -> AsyncGenerator[D
         )
         
         async for chunk in stream:
-            if chunk.choices[0].delta.content:
-                content = chunk.choices[0].delta.content
-                quick_buffer += content
-                yield {"event": "data", "data": content}
+            # Check if choices array exists and has at least one element
+            if chunk.choices and len(chunk.choices) > 0:
+                delta = chunk.choices[0].delta
+                if delta and hasattr(delta, 'content') and delta.content:
+                    content = delta.content
+                    quick_buffer += content
+                    yield {"event": "data", "data": content}
         
         # Always save to cache after fetching fresh data (even if no_cache was True)
         # The no_cache flag only controls reading from cache, not writing to it
