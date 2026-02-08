@@ -1,0 +1,2 @@
+2026-01-20 21:44:07,856 - WARNING - [OPENAI INSTRUMENTOR] Error setting up OpenAI streaming wrappers: No module named 'openai.resources.beta.chat'
+2026-01-20 21:44:07,859 - INFO - Session Replay for default trace: https://app.agentops.ai/sessions?trace_id=8e0cf114efe3301badd7b68860fc1b81
