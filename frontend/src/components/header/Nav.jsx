@@ -8,6 +8,8 @@ export default class Nav extends React.Component {
 
   
   render() {
+    const scraperLogUrl = `https://storage.googleapis.com/show-scraper-data/scraper.log?_=${Date.now()}`;
+
     return (
         <div className='nav-container'>
         {/* <nav className='flex-row' > */}
@@ -35,7 +37,7 @@ export default class Nav extends React.Component {
                         <div className={`nav-item ${this.props.route === "About" ? "selected" : ""}`}>About</div>
                     </Link>
                     
-                    <a href='https://storage.googleapis.com/show-scraper-data/scraper.log'>
+                    <a href={scraperLogUrl}>
                         <div className='nav-item'>Scraper Log</div>
                     </a>
 
